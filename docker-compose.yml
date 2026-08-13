@@ -1,0 +1,16 @@
+# =============================================
+# AI Teacher Copilot — Root Docker Compose
+# =============================================
+# Convenience entry point per README Section 18.
+# For local development, starts only infrastructure
+# services (Postgres + MinIO). Application services
+# (Spring Boot, FastAPI, React) run natively.
+# =============================================
+# Usage:
+#   docker compose up -d          # start infra
+#   docker compose down           # stop infra
+#   docker compose down -v        # stop + remove data
+# =============================================
+
+include:
+  - infrastructure/docker-compose/docker-compose.dev.yml

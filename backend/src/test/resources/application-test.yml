@@ -1,0 +1,27 @@
+# Test profile — uses H2 in-memory database
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    database-platform: org.hibernate.dialect.H2Dialect
+  flyway:
+    enabled: false
+
+app:
+  jwt:
+    secret: test-secret-key-that-is-at-least-32-characters-long-for-hmac
+    expiration-ms: 3600000
+  ai-service:
+    url: http://localhost:8000
+    api-key: test-api-key
+  minio:
+    endpoint: http://localhost:9000
+    access-key: minioadmin
+    secret-key: minioadmin
+    bucket-documents: test-documents
+    bucket-exports: test-exports
