@@ -19,17 +19,15 @@ function ProtectedRoute({ children }) {
 
 export default function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        
-        <Route path="/" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
-          <Route index element={<Dashboard />} />
-          <Route path="workspaces" element={<Workspace />} />
-          <Route path="lesson-planner" element={<LessonPlanner />} />
-          <Route path="quiz-generator" element={<QuizGenerator />} />
-        </Route>
-      </Routes>
-    </Router>
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      
+      <Route path="/" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
+        <Route index element={<Dashboard />} />
+        <Route path="workspaces" element={<Workspace />} />
+        <Route path="lesson-planner" element={<LessonPlanner />} />
+        <Route path="quiz-generator" element={<QuizGenerator />} />
+      </Route>
+    </Routes>
   );
 }

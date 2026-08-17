@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.InputStream;
 import java.util.List;
@@ -29,6 +30,7 @@ public class DocumentService {
     private final DocumentRepository documentRepository;
     private final WorkspaceService workspaceService;
     private final MinioClient minioClient;
+    private final WebClient aiServiceWebClient;
 
     @Value("${app.minio.bucket-documents}")
     private String bucketName;
@@ -99,7 +101,21 @@ public class DocumentService {
                 .build();
 
         doc = documentRepository.save(doc);
-        log.info("Document uploaded: {} -> {}", doc.getId(), objectKey);
+        final java.util.UUID savedDocId = doc.getId();
+        log.info("Document uploaded: {} -> {}", savedDocId, objectKey);
+
+        // Trigger AI processing asynchronously
+        aiServiceWebClient.post()
+                .uri(uriBuilder -> uriBuilder.path("/ingestion/process")
+                        .queryParam("document_id", savedDocId)
+                        .queryParam("workspace_id", workspaceId)
+                        .queryParam("minio_object_key", objectKey)
+                        .build())
+                .retrieve()
+                .bodyToMono(Void.class)
+                .doOnSuccess(v -> log.info("Successfully triggered AI processing for document: {}", savedDocId))
+                .doOnError(e -> log.error("Failed to trigger AI processing for document: {}", savedDocId, e))
+                .subscribe();
 
         return DocumentDto.UploadResponse.fromEntity(doc);
     }
