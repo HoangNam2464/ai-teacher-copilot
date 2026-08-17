@@ -1,0 +1,44 @@
+name: Backend CI
+
+on:
+  push:
+    branches:
+      - develop
+      - 'feature/**'
+      - 'fix/**'
+    paths:
+      - 'backend/**'
+      - '!backend/ai-service/**'
+  pull_request:
+    branches:
+      - develop
+      - main
+    paths:
+      - 'backend/**'
+      - '!backend/ai-service/**'
+
+jobs:
+  build-and-test:
+    name: Spring Boot Test (H2)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Make mvnw executable
+        working-directory: backend
+        run: chmod +x mvnw
+
+      - name: Build and Test (profile=test → H2 in-memory)
+        working-directory: backend
+        run: ./mvnw test --no-transfer-progress -P test
+        env:
+          SPRING_PROFILES_ACTIVE: test
