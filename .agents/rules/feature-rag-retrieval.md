@@ -1,109 +1,78 @@
 ---
 description: >-
   Rules for implementing RAG Retrieval in AI Teacher Copilot.
-  Baseline retrieval: metadata filter + cosine similarity vector search via pgvector.
-  Runs in FastAPI. No Hybrid Retrieval or Reranker at MVP.
+  Covers query embedding, metadata-filtered vector search via pgvector,
+  insufficient evidence handling, and retrieval quality logging.
 trigger: model_decision
 ---
 
 # Feature Rules: RAG Retrieval
 
-## Scope
+## 1. Scope
 
-**Includes (CURRENT — Baseline):**
-- Query embedding via AI provider
-- Metadata filter: `workspace_id`, `document_ids` (from KB)
-- Cosine similarity search via pgvector (`<=>` operator)
-- Return top-K chunks with metadata
+### Includes (MVP Baseline)
+- Embedding query text using the configured provider abstraction
+- Metadata-filtered vector search in pgvector (`workspace_id`, `document_id`, `subject`, `grade_level`)
+- Cosine distance similarity ordering (`<=>` operator using HNSW index)
+- Returning top-k chunks with metadata for citation grounding
+- Explicit `insufficient_evidence` detection when context is missing
 
-**Excludes:**
-- Hybrid Retrieval / BM25 (EVALUATE — only if baseline proves insufficient)
-- Reranking / Cross-encoder (EVALUATE)
-- Query expansion (DEFERRED)
-- Multi-step retrieval (DEFERRED)
-
----
-
-## Files Involved
-
-### FastAPI
-```
-ai-service/app/
-├── api/routes/retrieval.py         ← POST /retrieval/search
-└── retrieval/
-    └── service.py                  ← embed query + pgvector search
-```
+### Excludes (Evaluation Path / Deferred)
+- Hybrid Retrieval / BM25 (Evaluate only if baseline evaluation shows necessity)
+- Cross-encoder Reranking (Evaluate only if baseline evaluation shows necessity)
+- Multi-step retrieval and query expansion
 
 ---
 
-## Implementation Rules
+## 2. Architecture & Responsibility
 
-### Retrieval Pipeline
-```
-1. Receive query text + knowledgeBaseId + top_k
-2. Embed query using same provider as ingestion (settings.AI_PROVIDER)
-3. Build pgvector query:
-   SELECT * FROM document_chunks
-   WHERE workspace_id = :workspace_id
-     AND document_id = ANY(:document_ids)
-   ORDER BY embedding <=> :query_embedding
-   LIMIT :top_k
-4. Return chunks with: id, content, source_page, document_id, chunk_index, subject, grade_level, topic
-```
-
-### Rules
-1. Query embedding MUST use the same provider/model as ingestion embedding (dimension must match: 768)
-2. `top_k` default: **5**, max: **10** — do NOT allow unbounded retrieval
-3. NEVER return chunks from a different workspace — `workspace_id` filter is MANDATORY
-4. `document_ids` filter comes from KB document list — do NOT allow caller to pass arbitrary document IDs
-5. If no chunks found: return empty list `[]` — do NOT call LLM (insufficient evidence path)
-6. Minimum relevance: if top chunk score > threshold (TBD after baseline eval) → consider insufficient
-7. Log retrieval metrics: `query_length`, `num_results`, `top_score` — for future evaluation
-
-### Insufficient Evidence Handling
-```python
-if len(chunks) == 0:
-    return RetrievalResult(chunks=[], insufficient_evidence=True)
-```
-Generation layer MUST check `insufficient_evidence` before calling LLM.
+- **Owner Service**: FastAPI AI Service (`ai-service/`)
+- **Package**: `app.retrieval`
+- **Internal Service**: Called internally by generation routes or Spring Boot.
 
 ---
 
-## API Contract (FastAPI internal)
+## 3. Implementation & Security Constraints
 
-```
+1. **Workspace Isolation**: The `workspace_id` filter is **mandatory** in all database queries. Vector search must never match chunks across workspace boundaries.
+2. **Embedding Consistency**: Query embeddings must use the same provider and dimension (768) as ingestion embeddings.
+3. **Retrieval Constraints**:
+   - `top_k`: Default is **5**, maximum is **10** (unbounded retrieval prohibited).
+   - Filter by document IDs / subject / grade level when provided by the teacher's request context.
+4. **Insufficient Evidence Handling**:
+   - If 0 chunks match the query, or relevance score falls below threshold, return `insufficient_evidence: true` and empty chunk list.
+   - Generation layers must inspect this flag and return an explicit `insufficient_evidence` response rather than proceeding to LLM generation.
+5. **Evaluation Logging**: Log query metrics (query length, result count, top similarity score) to support offline retrieval quality evaluation.
+
+---
+
+## 4. API Contract (Internal FastAPI)
+
+```text
 POST /retrieval/search
-Body: {
-  query: str,
-  knowledgeBaseId: UUID,
-  workspaceId: UUID,
-  documentIds: [UUID],   ← populated by Spring Boot from KB
-  topK: int = 5
-}
-Response 200: {
+Request:  { query: string, workspace_id: UUID, document_ids?: UUID[], subject?: string, grade_level?: string, top_k?: number }
+Response: 200 OK {
   chunks: [
     {
-      id: str,
-      content: str,
-      documentId: UUID,
-      sourcePage: int,
-      chunkIndex: int,
-      subject: str,
-      gradeLevel: str,
-      topic: str
+      id: UUID,
+      content: string,
+      document_id: UUID,
+      source_page: number,
+      chunk_index: number,
+      similarity_score: number
     }
   ],
-  insufficientEvidence: bool
+  insufficient_evidence: boolean
 }
 ```
 
 ---
 
-## Definition of Done
-- [ ] Retrieval returns top-K chunks filtered by workspace + document_ids
-- [ ] Empty result returns `insufficientEvidence: true` instead of calling LLM
-- [ ] `top_k` capped at 10
-- [ ] Retrieval uses same embedding provider/dimension as ingestion
-- [ ] Workspace isolation: no cross-workspace chunks returned
-- [ ] Retrieval metrics logged for future evaluation
-- [ ] CI passes (ai-service-ci.yml)
+## 5. Definition of Done
+
+- [ ] Query embedding generated with 768 dimensions via provider abstraction.
+- [ ] Vector search filtered by workspace and optional document metadata.
+- [ ] Returns top-k chunks with source page and document IDs for citation.
+- [ ] Empty retrieval correctly sets `insufficient_evidence: true`.
+- [ ] No cross-workspace data leakage.
+- [ ] CI tests pass (`ai-service-ci.yml`).

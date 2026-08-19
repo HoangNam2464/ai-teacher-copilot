@@ -1,100 +1,71 @@
 ---
 description: >-
   Rules for implementing Document Upload in AI Teacher Copilot.
-  Handles file upload (PDF, DOCX), MinIO storage, and document metadata
-  persistence in Spring Boot. Does NOT handle parsing or embedding.
+  Handles file upload (PDF, DOCX), MinIO storage, document metadata
+  persistence in Spring Boot, and triggering async AI ingestion.
 trigger: model_decision
 ---
 
 # Feature Rules: Document Upload
 
-## Scope
+## 1. Scope
 
-**Includes:**
-- Upload file (PDF, DOCX) via multipart/form-data
-- Store file in MinIO bucket
-- Save document metadata to PostgreSQL (Spring Boot)
-- List documents per workspace
-- Delete document (MinIO object + DB record)
+### Includes
+- Uploading instructional materials (PDF, DOCX, TXT) via multipart/form-data
+- Storing raw files in MinIO object storage (`documents` bucket)
+- Persisting document metadata and processing status in PostgreSQL
+- Asynchronously dispatching processing requests to FastAPI AI Service
+- Listing and deleting documents within a workspace
 
-**Excludes:**
-- Document parsing / chunking (→ feature-document-processing)
-- Embedding (→ feature-document-processing)
-- Version history (DEFERRED)
-
----
-
-## Files Involved
-
-### Spring Boot
-```
-backend/src/main/java/com/aiteachercopilot/
-├── document/
-│   ├── Document.java               ← JPA entity
-│   ├── DocumentController.java     ← upload, list, delete endpoints
-│   ├── DocumentService.java        ← MinIO upload + DB save
-│   ├── DocumentDto.java            ← UploadResponse, DocumentResponse
-│   └── DocumentRepository.java
-└── config/
-    └── MinioConfig.java            ← MinIO client bean
-```
-
-### FastAPI (does NOT handle upload — receives processing requests only)
-```
-ai-service/app/api/routes/ingestion.py  ← triggered AFTER upload completes
-```
+### Excludes (Handled by Document Processing)
+- Document parsing, text extraction, chunking, and embedding generation
+- OCR for scanned images / image extraction (Deferred / Out of Scope)
 
 ---
 
-## Implementation Rules
+## 2. Architecture & Responsibility
 
-### Spring Boot
-1. File validation BEFORE upload: accept only `application/pdf` and `application/vnd.openxmlformats-officedocument.wordprocessingml.document`
-2. Reject files larger than **50MB** (configurable via `app.upload.max-size`)
-3. MinIO object key pattern: `{workspaceId}/{documentId}/{originalFilename}`
-4. `Document` entity fields: `id` (UUID), `workspaceId`, `fileName`, `fileType`, `fileSize`, `minioKey`, `status`, `uploadedAt`
-5. `status` enum: `UPLOADED` → `PROCESSING` → `READY` | `FAILED`
-6. `DocumentService` must verify workspace ownership before upload
-7. On delete: remove MinIO object FIRST, then DB record (not reversed)
-8. MinIO credentials loaded from env vars (`app.minio.*`) — NEVER hardcoded
-
-### Workflow After Upload
-```
-POST /api/documents/upload
-    → Spring Boot saves to MinIO + DB (status=UPLOADED)
-    → Spring Boot calls FastAPI POST /ingestion/process (async, fire-and-forget)
-    → FastAPI updates status to PROCESSING → READY|FAILED
-```
-
-Spring Boot does NOT wait for FastAPI to finish. Status polling is client responsibility.
+- **Owner Service**: Spring Boot (`backend/`)
+- **Package**: `com.aiteachercopilot.document`
+- **Object Storage**: MinIO (`documents` bucket)
+- **Handoff**: Dispatches async non-blocking HTTP request to FastAPI (`POST /ingestion/process`) upon successful upload and metadata persistence.
 
 ---
 
-## API Contract
+## 3. Implementation & Security Constraints
 
-```
-POST /api/documents/upload
+1. **Untrusted Data**: Uploaded files are strictly treated as **untrusted data**. File names must be sanitized (`sanitizeFileName()`) to prevent path traversal attacks.
+2. **File Validation**: Allowed content types: `application/pdf`, `application/vnd.openxmlformats-officedocument.wordprocessingml.document`, `text/plain`. Maximum file size: 50MB (`app.upload.max-size`).
+3. **Storage Path**: MinIO object keys follow the pattern: `{workspaceId}/{userId}/{documentId}_{filename}`.
+4. **Processing Status Lifecycle**: `PENDING` → `PROCESSING` → `READY` | `FAILED`.
+5. **Ownership Check**: Upload and delete operations must verify workspace ownership before accessing storage or database.
+6. **Deletion Ordering**: On document deletion, remove the MinIO object first, then delete database records (cascading to chunks).
+
+---
+
+## 4. API Contract
+
+```text
+POST /api/workspaces/{workspaceId}/documents/upload
 Content-Type: multipart/form-data
-Body: file (binary), workspaceId (UUID)
-Response 201: { id, fileName, fileType, fileSize, status, uploadedAt }
-Response 400: { message: "Unsupported file type" }
-Response 413: { message: "File too large" }
+Form Fields:  file (binary), subject (string), gradeLevel (string), topic (string)
+Response:     201 Created { id: UUID, fileName: string, fileType: string, fileSize: number, processingStatus: string, uploadedAt: string }
+Errors:       400 Bad Request (invalid type/empty), 413 Payload Too Large (>50MB), 403 Forbidden
 
 GET /api/workspaces/{workspaceId}/documents
-Response 200: [ { id, fileName, fileType, fileSize, status, uploadedAt }, ... ]
+Response:     200 OK [ { id: UUID, fileName: string, fileType: string, fileSize: number, processingStatus: string, chunkCount: number, createdAt: string } ]
 
-DELETE /api/documents/{id}
-Response 204
-Response 403: if not owner
+DELETE /api/workspaces/{workspaceId}/documents/{documentId}
+Response:     204 No Content
 ```
 
 ---
 
-## Definition of Done
-- [ ] PDF and DOCX files upload successfully to MinIO
-- [ ] Document metadata saved with status=UPLOADED
-- [ ] Files > 50MB rejected with 413
-- [ ] Unsupported file types rejected with 400
-- [ ] Delete removes MinIO object and DB record
-- [ ] List returns only documents belonging to caller's workspace
-- [ ] CI passes (backend-ci.yml)
+## 5. Definition of Done
+
+- [ ] PDF, DOCX, and TXT files under 50MB upload successfully to MinIO.
+- [ ] Document record created with `PENDING` status.
+- [ ] Unsupported formats and files > 50MB are rejected with clear error messages.
+- [ ] FastAPI ingestion endpoint is triggered asynchronously without blocking client upload response.
+- [ ] Deletion removes file from MinIO and metadata from PostgreSQL.
+- [ ] CI tests pass (`backend-ci.yml`).

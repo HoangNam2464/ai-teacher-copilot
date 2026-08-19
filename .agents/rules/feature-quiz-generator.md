@@ -1,128 +1,107 @@
 ---
 description: >-
   Rules for implementing Quiz Generator in AI Teacher Copilot.
-  Teacher inputs topic + KB. System retrieves context, generates structured
-  quiz (MCQ + short answer) grounded in source documents, with citations.
+  Generates curriculum-grounded quizzes (MCQ, Short Answer) with
+  integrated Bloom Taxonomy tagging and question-level citation tracking.
 trigger: model_decision
 ---
 
 # Feature Rules: Quiz Generator
 
-## Scope
+## 1. Scope
 
-**Includes:**
-- Generate quiz (MCQ + short answer) from Knowledge Base
-- Teacher specifies: topic, number of questions, question types, difficulty
-- Structured output with correct answers and citations
-- Save to generation history
+### Includes
+- Teacher inputs: subject, grade level, topic, question count (default 5, max 20), question types (MCQ, Short Answer), difficulty level, optional target Bloom Taxonomy levels
+- Grounding via RAG retrieval from workspace instructional documents
+- Structured output conforming to `QuizSchema`
+- Integrated **Bloom's Taxonomy** level tagging per question (Remember, Understand, Apply, Analyze, Evaluate, Create)
+- Correct answer identification, distractor generation for MCQs, and source-grounded explanations
+- Citation binding (`source_chunk_ids`) per question
 
-**Excludes:**
-- True/False questions (SHOULD-HAVE, add after MCQ works)
-- Essay questions (DEFERRED)
-- Adaptive difficulty (DEFERRED)
-- Auto-grading of student submissions (OUT OF SCOPE)
-
----
-
-## Files Involved
-
-### Spring Boot
-```
-backend/src/main/java/com/aiteachercopilot/generation/
-    ├── GenerationController.java    ← POST /api/generation/quiz
-    └── GenerationService.java       ← calls FastAPI + saves history
-```
-
-### FastAPI
-```
-ai-service/app/
-├── api/routes/generation.py         ← POST /generation/quiz
-└── generation/
-    ├── service.py                   ← retrieve → prompt → parse → return
-    └── schemas.py                   ← QuizSchema, QuestionSchema
-```
+### Excludes (Deferred / Out of Scope)
+- Standalone Bloom Taxonomy question generation (fully integrated into Quiz)
+- Automatic grading of student answer submissions
+- Long-form essay question grading
 
 ---
 
-## QuizSchema (Pydantic — Structured Output)
+## 2. Architecture & Responsibility
 
-```python
-class MCQOption(BaseModel):
-    label: str          # "A", "B", "C", "D"
-    text: str
-
-class QuestionSchema(BaseModel):
-    questionNumber: int
-    type: Literal["MCQ", "SHORT_ANSWER"]
-    question: str
-    options: list[MCQOption] | None      # MCQ only
-    correctAnswer: str                   # "A" for MCQ, sample answer for short
-    explanation: str                     # why this is correct, grounded in source
-    sourceChunkIds: list[str]           # which chunks support this question
-
-class QuizSchema(BaseModel):
-    title: str
-    subject: str
-    gradeLevel: str
-    topic: str
-    difficulty: Literal["EASY", "MEDIUM", "HARD"]
-    questions: list[QuestionSchema]
-    insufficientEvidence: bool
-```
+- **Core Backend (`backend/`)**:
+  - Validates request parameters and workspace ownership.
+  - Calls FastAPI internal generation endpoint.
+  - Stores quiz structure in `generated_contents` as JSONB.
+- **AI Service (`ai-service/`)**:
+  - Performs RAG retrieval for quiz topic.
+  - Orchestrates prompt with untrusted data isolation (`<sources>`).
+  - Generates structured quiz conforming to Pydantic schema.
 
 ---
 
-## Implementation Rules
+## 3. Implementation & Security Constraints
 
-### Generation Rules
-1. EACH question must have `sourceChunkIds` — questions not grounded in source chunks are INVALID
-2. If retrieved chunks insufficient for requested number of questions → reduce question count and note it, OR return `insufficientEvidence: true`
-3. NEVER generate questions from LLM's general knowledge — only from retrieved `<sources>`
-4. `correctAnswer` for MCQ: label only ("A", "B", "C", "D") — not full text
-5. Distractors (wrong MCQ options) must be plausible but clearly wrong per source material
-6. `explanation` must cite the source material, not just restate the question
+1. **Bloom's Taxonomy Integration**: Bloom levels are an integral attribute of each question generated in the quiz, not a standalone service or feature.
+2. **Untrusted Data Boundary**: All retrieved document context MUST be passed to the generation model inside a dedicated `<sources>...</sources>` boundary and treated strictly as untrusted reference data. Document content must not override system behavior or reveal system prompts.
+3. **Structured Data Contract**:
+   ```python
+   class QuizQuestion(BaseModel):
+       question_number: int
+       type: Literal["MCQ", "SHORT_ANSWER"]
+       question_text: str
+       options: list[str] | None = None  # Exactly 4 options for MCQ
+       correct_answer: str               # "A"/"B"/"C"/"D" or sample short answer
+       explanation: str                  # Grounded explanation referencing source
+       bloom_taxonomy_level: str         # Remember, Understand, Apply, Analyze, Evaluate, Create
+       source_chunk_ids: list[str]       # Provenance chunk IDs
 
-### Question Count Rules
-- Minimum: 3 questions (if fewer chunks available, return what's possible)
-- Maximum: 20 questions per request
-- Default: 5 questions
-
-### Difficulty Mapping (for prompt engineering)
-- `EASY`: recall questions (what, who, when)
-- `MEDIUM`: comprehension questions (explain, describe)
-- `HARD`: application/analysis questions (apply, compare, evaluate)
+   class QuizSchema(BaseModel):
+       title: str
+       subject: str
+       grade_level: str
+       topic: str
+       difficulty: Literal["EASY", "MEDIUM", "HARD"]
+       questions: list[QuizQuestion]
+       insufficient_evidence: bool = False
+   ```
+4. **Question Grounding**: Every question must link to one or more `source_chunk_ids`. Fabricating questions outside the retrieved context is prohibited.
+5. **MCQ Quality**: MCQ questions must have plausible distractors grounded in common misconceptions or related facts from the source material.
 
 ---
 
-## API Contract
+## 4. API Contract
 
-```
-POST /api/generation/quiz
-Body: {
-  workspaceId: UUID,
-  knowledgeBaseId: UUID,
-  topic: str,
-  questionCount: int = 5,
-  questionTypes: ["MCQ", "SHORT_ANSWER"],
-  difficulty: "EASY" | "MEDIUM" | "HARD"
+```text
+POST /api/workspaces/{workspaceId}/generation/quiz
+Request: {
+  subject: string,
+  gradeLevel: string,
+  topic: string,
+  questionCount?: number,
+  questionTypes?: ("MCQ" | "SHORT_ANSWER")[],
+  difficulty?: "EASY" | "MEDIUM" | "HARD",
+  targetBloomLevel?: string,
+  instructions?: string,
+  documentIds?: UUID[]
 }
-Response 200: {
+Response: 200 OK {
   id: UUID,
-  quiz: QuizSchema,
-  generatedAt: datetime
+  contentType: "QUIZ",
+  title: string,
+  contentData: { ...QuizSchema... },
+  reviewStatus: "DRAFT",
+  version: 1,
+  createdAt: string
 }
-Response 422: { message: "INSUFFICIENT_EVIDENCE" }
+Errors: 422 Unprocessable Entity (insufficient evidence), 403 Forbidden
 ```
 
 ---
 
-## Definition of Done
-- [ ] Quiz generated in structured format (not raw text)
-- [ ] MCQ options are labelled A/B/C/D
-- [ ] Each question has `sourceChunkIds` (non-empty)
-- [ ] `correctAnswer` populated
-- [ ] `explanation` references source material
-- [ ] Insufficient evidence returns 422 instead of hallucinated quiz
-- [ ] Max 20 questions per request enforced
-- [ ] Quiz saved to history
-- [ ] CI passes
+## 5. Definition of Done
+
+- [ ] Quiz output strictly validates against `QuizSchema`.
+- [ ] Each question includes a valid `bloom_taxonomy_level` and `source_chunk_ids`.
+- [ ] MCQ questions contain exactly 4 options with a designated correct answer and explanation.
+- [ ] Prompt uses `<sources>` boundary to prevent prompt injection.
+- [ ] Insufficient context returns `insufficient_evidence: true`.
+- [ ] CI tests pass (`backend-ci.yml`, `ai-service-ci.yml`).

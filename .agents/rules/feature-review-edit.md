@@ -1,117 +1,94 @@
 ---
 description: >-
-  Rules for implementing Review & Edit/Regenerate in AI Teacher Copilot.
-  Teacher reviews AI-generated content (lesson plan or quiz), edits inline,
-  or requests regeneration with updated instructions.
+  Rules for implementing Review, Edit, Regenerate and Document History in AI Teacher Copilot.
+  Supports inline teacher revisions, instruction-based regeneration, versioning,
+  and historical record retrieval.
 trigger: model_decision
 ---
 
-# Feature Rules: Review & Edit / Regenerate
+# Feature Rules: Review, Edit & Document History
 
-## Scope
+## 1. Scope
 
-**Includes:**
-- Display generated content (lesson plan or quiz) in editable UI
-- Teacher edits content inline (free-text edit of any field)
-- Teacher requests regeneration with optional additional instructions
-- Save edited version to history
-- Track version number (original = v1, regenerated = v2, v3, ...)
+### Includes
+- Interactive review of generated drafts (Lesson Plans, Quizzes) in the frontend
+- Inline manual editing of any field in the structured content
+- Saving edited content directly to PostgreSQL (`generated_contents`) without invoking LLM
+- Regenerating content with optional refinement instructions (creating a new version record)
+- Tracking document history, version lineage (`version`, `parent_id`), and review status (`DRAFT`, `REVIEWED`, `APPROVED`)
 
-**Excludes:**
-- Real-time collaborative editing (OUT OF SCOPE)
-- Diff view between versions (DEFERRED)
-- Automatic AI review/scoring of teacher edits (DEFERRED)
-
----
-
-## Files Involved
-
-### Spring Boot
-```
-backend/src/main/java/com/aiteachercopilot/generation/
-    ├── GenerationController.java
-    │   ├── PUT /api/generation/{id}          ← save manual edit
-    │   └── POST /api/generation/{id}/regenerate ← regenerate with instructions
-    └── GenerationService.java
-```
-
-### Database
-```
-generation_history table:
-  id (UUID), workspace_id, type (LESSON_PLAN|QUIZ), content (JSONB),
-  version (int), parent_id (UUID nullable), source_chunk_ids (UUID[]),
-  instructions (text nullable), created_at
-```
-
-### FastAPI
-```
-ai-service/app/api/routes/generation.py
-    └── POST /generation/regenerate     ← regenerate with previous context + new instructions
-```
-
-### React Frontend
-```
-frontend/src/pages/lesson/LessonPlanner.jsx  ← editable fields
-frontend/src/pages/quiz/QuizGenerator.jsx    ← editable fields
-```
+### Excludes (Deferred / Out of Scope)
+- Real-time multi-teacher collaborative editing
+- Visual diffing tool between historical versions
 
 ---
 
-## Implementation Rules
+## 2. Architecture & Responsibility
 
-### Edit (Manual)
-1. Teacher edits content in UI → `PUT /api/generation/{id}` with full updated content JSON
-2. Server saves as SAME record (no new version created for manual edits at MVP)
-3. Frontend sends entire content object (not diff/patch)
-4. No re-retrieval, no LLM call for manual edits
-
-### Regenerate
-1. `POST /api/generation/{id}/regenerate` with optional `additionalInstructions: str`
-2. Creates a NEW history record with `version = parent.version + 1` and `parent_id = original.id`
-3. Spring Boot retrieves original `source_chunk_ids` and re-uses them (no new retrieval) unless teacher explicitly changes KB
-4. FastAPI receives: original content + original context + `additionalInstructions`
-5. LLM instructed: "Revise the following content based on these instructions: {additionalInstructions}"
-6. Response follows same schema as original generation (LessonPlanSchema or QuizSchema)
-
-### Version History Rules
-- `version` starts at 1 (original generation)
-- Each regeneration creates new record: `version++`, `parent_id = previous.id`
-- Endpoint `GET /api/generation/history?workspaceId={id}` returns flat list sorted by `created_at` desc
-- Client groups by `parent_id` to show version chains (frontend responsibility)
-
-### UI Rules
-1. Each field in LessonPlanSchema/QuizSchema must be individually editable
-2. "Regenerate" button opens instruction input modal — instruction is OPTIONAL
-3. After regeneration, show new version — do NOT auto-delete previous version
-4. "Save" triggers `PUT`, "Regenerate" triggers `POST .../regenerate`
+- **Core Backend (`backend/`)**:
+  - Owns `generated_contents` table lifecycle and version tracking.
+  - Handles manual updates (`PUT`), regeneration triggers (`POST`), and history queries (`GET`).
+  - Enforces workspace ownership on all history modifications.
+- **AI Service (`ai-service/`)**:
+  - Handles regeneration requests when refinement instructions require LLM re-prompting.
 
 ---
 
-## API Contract
+## 3. Implementation & Security Constraints
 
-```
-PUT /api/generation/{id}
-Body: { content: { ...full LessonPlanSchema or QuizSchema... } }
-Response 200: { id, content, version, updatedAt }
+1. **Teacher Authority**: AI output is strictly a draft. The teacher retains final editorial authority before exporting or finalizing materials.
+2. **Manual Edits vs Regeneration**:
+   - **Manual Edit**: Updates `content_data` on the current record directly. No LLM or RAG pipeline is executed.
+   - **Regeneration**: Creates a **new** record in `generated_contents` with `version = parent.version + 1` and `parent_id = original.id`. Reuses original source chunks unless teacher explicitly requests new retrieval.
+3. **Review Status Lifecycle**: `DRAFT` → `REVIEWED` → `APPROVED`.
+4. **History Isolation**: History queries must strictly filter by `workspace_id` and authenticate the requesting user.
 
-POST /api/generation/{id}/regenerate
-Body: { additionalInstructions?: str }
-Response 200: {
-  id: UUID,           ← new record id
-  parentId: UUID,
-  version: int,
-  content: { ... },
-  generatedAt: datetime
+---
+
+## 4. API Contract
+
+```text
+GET /api/workspaces/{workspaceId}/generation/history
+Response: 200 OK [
+  {
+    id: UUID,
+    contentType: "LESSON_PLAN" | "QUIZ",
+    title: string,
+    version: number,
+    parentId: UUID | null,
+    reviewStatus: string,
+    createdAt: string
+  }
+]
+
+GET /api/workspaces/{workspaceId}/generation/{id}
+Response: 200 OK {
+  id: UUID,
+  contentType: string,
+  title: string,
+  contentData: object,
+  version: number,
+  parentId: UUID | null,
+  reviewStatus: string,
+  createdAt: string
 }
+
+PUT /api/workspaces/{workspaceId}/generation/{id}
+Request:  { contentData: object, reviewStatus?: string }
+Response: 200 OK { id: UUID, contentData: object, reviewStatus: string, updatedAt: string }
+
+POST /api/workspaces/{workspaceId}/generation/{id}/regenerate
+Request:  { instructions?: string }
+Response: 201 Created { id: UUID, parentId: UUID, version: number, contentData: object, createdAt: string }
 ```
 
 ---
 
-## Definition of Done
-- [ ] Teacher can edit any field in lesson plan / quiz inline
-- [ ] Manual edits saved via PUT without LLM call
-- [ ] Regenerate creates new version record with `parent_id`
-- [ ] Version number increments correctly
-- [ ] Regenerate with instructions produces updated content
-- [ ] History list shows previous versions
-- [ ] CI passes
+## 5. Definition of Done
+
+- [ ] Teacher can view, edit, and save structured drafts inline.
+- [ ] Manual edits save immediately without invoking LLM endpoints.
+- [ ] Regeneration creates a new versioned entry linked via `parent_id`.
+- [ ] History list displays version lineage within the workspace.
+- [ ] Cross-workspace history access returns 403 Forbidden.
+- [ ] CI tests pass (`backend-ci.yml`).
