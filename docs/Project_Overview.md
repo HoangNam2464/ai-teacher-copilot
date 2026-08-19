@@ -4,7 +4,7 @@
 
 > AI Teacher Copilot is a specialized AI assistant for K-12 teachers, with an initial focus on lower and upper secondary education (THCS/THPT). The system supports teachers in creating teaching materials grounded in teacher-provided documents, with structured outputs, source references, teacher review, history, and document export.
 
-**Project status:** Draft / Proposed — Pending Mentor Confirmation
+**Project status:** Confirmed — Official Source of Truth & Active Implementation
 
 ## 1. Project Overview
 
@@ -820,16 +820,16 @@ will be defined during the deployment phase.
 
 | Area | Status |
 |---|---|
-| Product Idea | Proposed / Reviewed |
-| Product Vision | Proposed |
-| Six-Month Scope | Pending Mentor Confirmation |
-| Architecture | Proposed |
-| ERD | Proposed |
-| Data Sources | Pending Mentor Confirmation |
-| Deployment Environment | Pending Mentor Confirmation |
-| Technology Stack | Proposed |
-| Development Methodology | Agile / Iterative |
-| Implementation | Not started / subject to scope confirmation |
+| Product Idea | Confirmed |
+| Product Vision | Confirmed |
+| Six-Month Scope | Confirmed (MVP Boundaries Locked) |
+| Architecture | Confirmed (3-Tier Monorepo) |
+| ERD | Confirmed |
+| Data Sources | Confirmed (PDF/DOCX/TXT) |
+| Deployment Environment | Confirmed (Docker Compose & VPS) |
+| Technology Stack | Confirmed (Spring Boot 3 + FastAPI + React 18) |
+| Development Methodology | Agile / Iterative (6 Sprints x 4 Weeks) |
+| Implementation | In Active Progress |
 
 ## 26. Mentor Decisions Required
 

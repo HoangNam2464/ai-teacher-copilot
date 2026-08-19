@@ -7,19 +7,19 @@
 
 ## 1. BẢNG TỔNG HỢP PHẠM VI 11 TÍNH NĂNG CỐT LÕI (MVP MATRIX)
 
-| Mã Task | Phân Hệ / Tính Năng | Nhánh Git | Giai Đoạn (Phase) | Trạng Thái |
-|---|---|---|---|---|
-| **ATC-AUTH** | Authentication & User Management | `feature/authentication` | Phase 3 (Tuần 5-7) | 🟡 Ready for Implementation |
-| **ATC-WS** | Teacher Workspace & Isolation | `feature/workspace` | Phase 3 (Tuần 5-7) | ⚪ Backlog |
-| **ATC-DOC** | Document Upload & Storage (MinIO) | `feature/document-upload` | Phase 4 (Tuần 8-10) | ⚪ Backlog |
-| **ATC-PROC** | Document Parsing, Chunking & Embedding | `feature/document-processing` | Phase 4 (Tuần 8-10) | ⚪ Backlog |
-| **ATC-RAG** | RAG Retrieval Baseline (pgvector) | `feature/rag-retrieval` | Phase 5 (Tuần 11-14) | ⚪ Backlog |
-| **ATC-PLAN** | AI Lesson Planner (Structured Output) | `feature/lesson-planner` | Phase 5 (Tuần 11-14) | ⚪ Backlog |
-| **ATC-QUIZ** | Quiz Generator (Bloom Taxonomy Tagging) | `feature/quiz-generator` | Phase 6 (Tuần 15-19) | ⚪ Backlog |
-| **ATC-REV** | Review, Inline Edit & Document History | `feature/review-edit` | Phase 5-6 (Tuần 11-19) | ⚪ Backlog |
-| **ATC-CITE** | Citation & Provenance Resolution | `feature/citation` | Phase 5-6 (Tuần 11-19) | ⚪ Backlog |
-| **ATC-EXP** | Word (DOCX) & PDF Document Export | `feature/export` | Phase 5-6 (Tuần 11-19) | ⚪ Backlog |
-| **ATC-EVAL** | RAG Quality Evaluation & Checklists | `feature/evaluation` | Phase 7 (Tuần 20-22) | ⚪ Backlog |
+| Mã Task | Phân Hệ / Tính Năng | Nhánh Git | Giai Đoạn (Phase) | Sprint (4 tuần) | Trạng Thái |
+|---|---|---|---|---|---|
+| **ATC-AUTH** | Authentication & User Management | `feature/authentication` | Phase 3 (Tuần 5-7) | **Sprint 2** | 🟡 Ready for Implementation |
+| **ATC-WS** | Teacher Workspace & Isolation | `feature/workspace` | Phase 3 (Tuần 5-7) | **Sprint 2** | ⚪ Backlog |
+| **ATC-DOC** | Document Upload & Storage (MinIO) | `feature/document-upload` | Phase 4 (Tuần 8-10) | **Sprint 2** | ⚪ Backlog |
+| **ATC-PROC** | Document Parsing, Chunking & Embedding | `feature/document-processing` | Phase 4 (Tuần 8-10) | **Sprint 2** | ⚪ Backlog |
+| **ATC-RAG** | RAG Retrieval Baseline (pgvector) | `feature/rag-retrieval` | Phase 5 (Tuần 11-14) | **Sprint 3** | ⚪ Backlog |
+| **ATC-PLAN** | AI Lesson Planner (Structured Output) | `feature/lesson-planner` | Phase 5 (Tuần 11-14) | **Sprint 3** | ⚪ Backlog |
+| **ATC-QUIZ** | Quiz Generator (Bloom Taxonomy Tagging) | `feature/quiz-generator` | Phase 6 (Tuần 15-19) | **Sprint 4** | ⚪ Backlog |
+| **ATC-REV** | Review, Inline Edit & Document History | `feature/review-edit` | Phase 5-6 (Tuần 11-19) | **Sprint 3-4** | ⚪ Backlog |
+| **ATC-CITE** | Citation & Provenance Resolution | `feature/citation` | Phase 5-6 (Tuần 11-19) | **Sprint 3-4** | ⚪ Backlog |
+| **ATC-EXP** | Word (DOCX) & PDF Document Export | `feature/export` | Phase 5-6 (Tuần 11-19) | **Sprint 3-5** | ⚪ Backlog |
+| **ATC-EVAL** | RAG Quality Evaluation & Checklists | `feature/evaluation` | Phase 7 (Tuần 20-22) | **Sprint 5** | ⚪ Backlog |
 
 ---
 

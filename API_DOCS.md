@@ -521,4 +521,4 @@ Phạm vi này phù hợp với nguyên tắc cắt scope 6 tháng: ưu tiên ho
 
 ---
 
-**Ghi chú:** File `API_DOCS.md` này là tài liệu API contract ở mức thiết kế dựa trên Project Detail hiện tại. Các endpoint, HTTP method, request body, response schema và authentication flow cụ thể cần được cập nhật theo source code sau khi API contract giữa **Spring Boot ↔ FastAPI** được Mentor xác nhận. Tài liệu Project Detail hiện tại xác định API contract này cần được chốt sớm để tránh rework trong quá trình implementation.
+**Ghi chú:** File `API_DOCS.md` này là tài liệu API contract chính thức được đồng bộ trực tiếp với Project Detail và source code của hệ thống (**Spring Boot ↔ FastAPI**). Toàn bộ endpoint, HTTP method, request body, response schema và authentication flow tuân thủ nghiêm ngặt các ranh giới kiến trúc đã được chốt.

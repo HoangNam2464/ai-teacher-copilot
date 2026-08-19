@@ -427,4 +427,4 @@ Document History
 Word / PDF Export
 ```
 
-Scope, Architecture và ERD hiện là **đề xuất chờ Mentor xác nhận**. README này cần được cập nhật nếu Mentor thay đổi phạm vi hoặc kiến trúc trước khi implementation chính thức.
+Scope, Architecture và ERD đã được **xác nhận chính thức** theo tài liệu `AI_Teacher_Copilot_for_K-12_Teachers_-_Project_Detail.docx`. Toàn bộ quá trình phát triển tuân thủ nghiêm ngặt các ranh giới và quy tắc bảo mật của tài liệu này.
