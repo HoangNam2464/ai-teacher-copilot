@@ -5,16 +5,19 @@
 
 ---
 
-## 1. TỔNG QUAN LỘ TRÌNH 8 GIAI ĐOẠN (24 TUẦN)
+## 1. TỔNG QUAN LỘ TRÌNH 8 PHASE & CẤU TRÚC 6 SPRINT (24 TUẦN)
 
-- **Phase 1 (Tuần 1-2)**: Khám phá & Yêu cầu `[Hoàn thành]`
-- **Phase 2 (Tuần 3-4)**: Kiến trúc & Thiết kế Hệ thống `[Hoàn thành]`
-- **Phase 3 (Tuần 5-7)**: Foundation, Auth & Workspace `[Đang triển khai]`
-- **Phase 4 (Tuần 8-10)**: Document Knowledge Base & Ingestion Pipeline `[Chờ]`
-- **Phase 5 (Tuần 11-14)**: RAG Engine & AI Lesson Planner `[Chờ]`
-- **Phase 6 (Tuần 15-19)**: Quiz Generator & Content Expansion `[Chờ]`
-- **Phase 7 (Tuần 20-22)**: Testing, Hardening & Evaluation `[Chờ]`
-- **Phase 8 (Tuần 23-24)**: Triển khai VPS/Cloud & Bàn giao `[Chờ]`
+> **Mô hình Sprint chính thức**: **6 Sprints × 4 tuần (1 tháng/Sprint)**  
+> Cân bằng giữa quản trị Jira tinh gọn, ít Sprint và chuẩn mực Scrum timebox (≤ 1 tháng).
+
+| Sprint | Thời gian | Phase ánh xạ | Trọng tâm bàn giao (Deliverables) | Trạng thái |
+|---|---|---|---|---|
+| **Sprint 1** | Tuần 1 – 4 | **Phase 1 + Phase 2** | Discovery, SRS, System Architecture, ERD & Monorepo Setup | 🟢 Hoàn thành |
+| **Sprint 2** | Tuần 5 – 8 | **Phase 3 + Phase 4** | Auth (Spring Security), Teacher Workspace, Document Upload & pgvector Ingestion | 🟡 Đang triển khai |
+| **Sprint 3** | Tuần 9 – 12 | **Phase 5** | RAG Retrieval Engine, AI Lesson Planner, Prompt Boundary & Citations | ⚪ Chờ |
+| **Sprint 4** | Tuần 13 – 16 | **Phase 6** | Quiz Generator with Integrated Bloom Taxonomy, Lineage & Version History | ⚪ Chờ |
+| **Sprint 5** | Tuần 17 – 20 | **Phase 7** | RAG Evaluation, Functional Integration Testing, Export DOCX/PDF | ⚪ Chờ |
+| **Sprint 6** | Tuần 21 – 24 | **Phase 8** | VPS/Cloud Deployment, Hardening, Demo & Bàn giao sản phẩm | ⚪ Chờ |
 
 ---
 
