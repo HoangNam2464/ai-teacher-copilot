@@ -8,14 +8,12 @@ on:
       - 'fix/**'
     paths:
       - 'backend/**'
-      - '!backend/ai-service/**'
   pull_request:
     branches:
       - develop
       - main
     paths:
       - 'backend/**'
-      - '!backend/ai-service/**'
 
 jobs:
   build-and-test:
