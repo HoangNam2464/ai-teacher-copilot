@@ -4,7 +4,6 @@ from app.providers.base import BaseAIProvider
 class OpenAIProvider(BaseAIProvider):
     def __init__(self, api_key: str):
         self.api_key = api_key
-        # Initialize openai async client here
 
     async def generate_structured_output(
         self,

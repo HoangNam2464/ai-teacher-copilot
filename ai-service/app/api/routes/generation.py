@@ -13,11 +13,12 @@ async def generate_lesson_plan(
     instructions: str | None = None,
     _api_key: str = Depends(verify_api_key),
 ):
-    plan = await generate_lesson_plan_service(workspace_id, subject, grade_level, topic, instructions)
+    plan, citations = await generate_lesson_plan_service(workspace_id, subject, grade_level, topic, instructions)
     return {
         "status": "success",
         "content_type": "lesson_plan",
-        "data": plan.model_dump()
+        "data": plan.model_dump(),
+        "citations": citations
     }
 
 @router.post("/quiz")
@@ -30,9 +31,10 @@ async def generate_quiz(
     instructions: str | None = None,
     _api_key: str = Depends(verify_api_key),
 ):
-    quiz = await generate_quiz_service(workspace_id, subject, grade_level, topic, num_questions, instructions)
+    quiz, citations = await generate_quiz_service(workspace_id, subject, grade_level, topic, num_questions, instructions)
     return {
         "status": "success",
         "content_type": "quiz",
-        "data": quiz.model_dump()
+        "data": quiz.model_dump(),
+        "citations": citations
     }

@@ -8,5 +8,5 @@ public class GenerationRequestDto {
     private String gradeLevel;
     private String topic;
     private String instructions;
-    private Integer numQuestions; // For quiz
+    private Integer numQuestions;
 }

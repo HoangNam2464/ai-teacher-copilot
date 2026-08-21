@@ -21,7 +21,7 @@ public class GenerationController {
             @AuthenticationPrincipal User user,
             @PathVariable UUID workspaceId,
             @RequestBody GenerationRequestDto request) {
-        
+
         Object result = generationService.generateLessonPlan(workspaceId, user.getId(), request);
         return ResponseEntity.ok(ApiResponse.success(result));
     }
@@ -31,7 +31,7 @@ public class GenerationController {
             @AuthenticationPrincipal User user,
             @PathVariable UUID workspaceId,
             @RequestBody GenerationRequestDto request) {
-        
+
         Object result = generationService.generateQuiz(workspaceId, user.getId(), request);
         return ResponseEntity.ok(ApiResponse.success(result));
     }

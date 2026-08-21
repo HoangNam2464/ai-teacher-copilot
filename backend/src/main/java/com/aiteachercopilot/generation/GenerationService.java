@@ -12,13 +12,13 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class GenerationService {
-    
+
     private final WorkspaceService workspaceService;
     private final WebClient aiServiceWebClient;
 
     public Object generateLessonPlan(UUID workspaceId, UUID userId, GenerationRequestDto req) {
         workspaceService.findAndAuthorize(workspaceId, userId);
-        
+
         return aiServiceWebClient.post()
                 .uri(builder -> builder.path("/generation/lesson-plan")
                         .queryParam("workspace_id", workspaceId)
@@ -34,7 +34,7 @@ public class GenerationService {
 
     public Object generateQuiz(UUID workspaceId, UUID userId, GenerationRequestDto req) {
         workspaceService.findAndAuthorize(workspaceId, userId);
-        
+
         return aiServiceWebClient.post()
                 .uri(builder -> builder.path("/generation/quiz")
                         .queryParam("workspace_id", workspaceId)

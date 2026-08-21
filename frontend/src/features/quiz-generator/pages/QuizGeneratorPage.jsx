@@ -4,242 +4,378 @@ import { useWorkspace } from '../../../core/hooks/useWorkspace';
 import { Button } from '../../../core/components/ui/Button';
 import { Card } from '../../../core/components/ui/Card';
 import { Badge } from '../../../core/components/ui/Badge';
-import { CitationBadge } from '../../../core/components/citation/CitationBadge';
+import { Spinner } from '../../../core/components/ui/Spinner';
+import { EmptyState } from '../../../core/components/feedback/EmptyState';
+import { InsufficientEvidenceAlert } from '../../../core/components/feedback/InsufficientEvidenceAlert';
 import { CitationDrawer } from '../../../core/components/citation/CitationDrawer';
-import { ExportDropdown } from '../../../core/components/export/ExportDropdown';
+import { QuizCanvas } from '../components/QuizCanvas';
+import { LocalRegenerateModal } from '../components/LocalRegenerateModal';
 import { APP_CONFIG } from '../../../core/constants/appConfig';
+import {
+  IconSparkles,
+  IconTarget,
+  IconSchool,
+  IconAlertTriangle,
+} from '../../../core/components/icons/SvgIcons';
+
+function normalizeQuizResponse(rawResponse, defaultTopic = '') {
+  const root = rawResponse?.data?.data || rawResponse?.data || rawResponse || {};
+  const title = root.title || defaultTopic || 'Đề kiểm tra trắc nghiệm';
+  const questions = Array.isArray(root.questions)
+    ? root.questions.map((q) => ({
+        question_text: q.question_text || q.question || '',
+        options: Array.isArray(q.options)
+          ? q.options.map((opt) => (typeof opt === 'string' ? opt : `${opt.label || ''}. ${opt.text || ''}`))
+          : [],
+        correct_answer_index: typeof q.correct_answer_index === 'number' ? q.correct_answer_index : 0,
+        bloom_taxonomy_level: q.bloom_taxonomy_level || 'Understand',
+        explanation: q.explanation || '',
+        source_chunk_ids: Array.isArray(q.source_chunk_ids) ? q.source_chunk_ids : [],
+      }))
+    : [];
+
+  return {
+    title,
+    questions,
+  };
+}
 
 export function QuizGeneratorPage() {
   const { activeWorkspace } = useWorkspace();
   const [topic, setTopic] = useState('');
-  const [questionCount, setQuestionCount] = useState(5);
-  const [difficulty, setDifficulty] = useState('MEDIUM');
+  const [numQuestions, setNumQuestions] = useState(5);
   const [targetBloomLevel, setTargetBloomLevel] = useState('Understand');
   const [instructions, setInstructions] = useState('');
+
   const [loading, setLoading] = useState(false);
+  const [isRegenerating, setIsRegenerating] = useState(false);
   const [error, setError] = useState('');
-  const [result, setResult] = useState(null);
+  const [isInsufficientEvidence, setIsInsufficientEvidence] = useState(false);
 
-  // Citation Drawer State
+  const [currentQuiz, setCurrentQuiz] = useState(null);
+  const [localVersion, setLocalVersion] = useState(1);
+  const [sessionReviewStatus, setSessionReviewStatus] = useState('DRAFT');
+
+  const [citations, setCitations] = useState([]);
   const [isCitationOpen, setIsCitationOpen] = useState(false);
+  const [isRegenerateModalOpen, setIsRegenerateModalOpen] = useState(false);
 
-  const handleSubmit = async (e) => {
+  const handleGenerate = async (e) => {
     e.preventDefault();
     if (!activeWorkspace?.id) {
-      alert('Vui lòng chọn không gian làm việc trước.');
+      setError('Vui lòng chọn không gian làm việc trước khi thực hiện.');
+      return;
+    }
+    if (!topic.trim()) {
+      setError('Vui lòng nhập chủ đề kiểm tra.');
       return;
     }
 
     try {
       setLoading(true);
       setError('');
-      setResult(null);
+      setIsInsufficientEvidence(false);
 
       const payload = {
         subject: activeWorkspace.subject || 'Toán học',
         gradeLevel: activeWorkspace.gradeLevel || 'Lớp 10',
-        topic,
-        questionCount: Number(questionCount),
-        difficulty,
-        targetBloomLevel,
-        instructions,
+        topic: topic.trim(),
+        numQuestions: Number(numQuestions) || 5,
+        instructions: instructions.trim() || undefined,
       };
 
-      const data = await quizApi.generateQuiz(activeWorkspace.id, payload);
-      setResult(data);
+      const rawData = await quizApi.generateQuiz(activeWorkspace.id, payload);
+      const normalized = normalizeQuizResponse(rawData, topic.trim());
+
+      const fetchedCitations = rawData?.citations || rawData?.data?.citations || [];
+      setCitations(fetchedCitations);
+
+      setCurrentQuiz(normalized);
+      setLocalVersion(1);
+      setSessionReviewStatus('DRAFT');
     } catch (err) {
       console.error('Quiz generation failed:', err);
       if (err.response?.status === 422) {
-        setError('Không đủ tài liệu liên quan trong kho tri thức để tạo đề kiểm tra này (Insufficient Evidence). Vui lòng nạp thêm tài liệu.');
+        setIsInsufficientEvidence(true);
       } else {
-        setError(err.response?.data?.message || 'Tạo đề kiểm tra thất bại.');
+        setError(err.response?.data?.error || err.response?.data?.message || 'Tạo đề kiểm tra thất bại. Vui lòng thử lại.');
       }
     } finally {
       setLoading(false);
     }
   };
 
-  const quiz = result?.contentData || result?.quiz;
+  const handleRegenerate = async (refinementPrompt) => {
+    if (!activeWorkspace?.id || !currentQuiz) return;
+
+    try {
+      setIsRegenerating(true);
+      setError('');
+
+      const combinedInstructions = instructions
+        ? `${instructions}\n[Yêu cầu tinh chỉnh]: ${refinementPrompt}`
+        : `[Yêu cầu tinh chỉnh]: ${refinementPrompt}`;
+
+      const payload = {
+        subject: activeWorkspace.subject || 'Toán học',
+        gradeLevel: activeWorkspace.gradeLevel || 'Lớp 10',
+        topic: currentQuiz.title || topic.trim(),
+        numQuestions: Number(numQuestions) || 5,
+        instructions: combinedInstructions,
+      };
+
+      const rawData = await quizApi.generateQuiz(activeWorkspace.id, payload);
+      const normalized = normalizeQuizResponse(rawData, currentQuiz.title);
+
+      setCurrentQuiz(normalized);
+      setLocalVersion((prev) => prev + 1);
+      setSessionReviewStatus('DRAFT');
+      setIsRegenerateModalOpen(false);
+    } catch (err) {
+      console.error('Quiz regeneration failed:', err);
+      setError(err.response?.data?.error || 'Sinh lại đề thi thất bại. Vui lòng thử lại.');
+    } finally {
+      setIsRegenerating(false);
+    }
+  };
+
+  const handleUpdateQuiz = (updatedQuiz) => {
+    setCurrentQuiz(updatedQuiz);
+    if (sessionReviewStatus === 'APPROVED_SESSION') {
+      setSessionReviewStatus('DRAFT');
+    }
+  };
+
+  const handleApprove = () => {
+    setSessionReviewStatus('APPROVED_SESSION');
+  };
 
   return (
-    <div>
-      <div style={{ marginBottom: '1.5rem' }}>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 700 }}>Tạo Đề Thi & Câu Hỏi AI (Quiz Generator)</h1>
-        <p style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)', marginTop: '0.25rem' }}>
-          Sinh trắc nghiệm và câu hỏi tự luận ngắn gắn nhãn Bloom's Taxonomy bám sát tài liệu học liệu
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+      {/* 1. Page Header */}
+      <div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-1)' }}>
+          <h1 style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', letterSpacing: '-0.02em' }}>
+            Tạo Đề Thi & Quiz AI
+          </h1>
+          <Badge variant="primary">AI Generator</Badge>
+        </div>
+        <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', margin: 0 }}>
+          Kiến tạo ngân hàng câu hỏi trắc nghiệm gắn nhãn Bloom's Taxonomy, highlight đáp án đúng và xuất file đề thi.
         </p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: result ? '1fr 1.3fr' : '1fr', gap: '1.5rem' }}>
-        {/* Input Form */}
-        <Card>
-          <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '1rem' }}>Thiết Lập Đề Kiểm Tra</h3>
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label className="form-label">Chủ đề kiểm tra *</label>
-              <input
-                type="text"
-                className="form-input"
-                placeholder="Ví dụ: Phương trình lượng giác cơ bản"
-                required
-                value={topic}
-                onChange={(e) => setTopic(e.target.value)}
-              />
+      {/* 2. Two-Pane Authoring Workspace */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
+          gap: 'var(--space-6)',
+          alignItems: 'start',
+        }}
+      >
+        {/* Left Pane: Setup Form Card */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+          <Card>
+            {/* Workspace Context Ribbon */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: 'var(--space-2-5) var(--space-3)',
+                backgroundColor: 'var(--color-bg-subtle)',
+                borderRadius: 'var(--radius-md)',
+                marginBottom: 'var(--space-4)',
+                border: '1px solid var(--color-border-subtle)',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', overflow: 'hidden' }}>
+                <span style={{ color: 'var(--color-primary)', display: 'flex' }}>
+                  <IconSchool size={16} />
+                </span>
+                <span style={{ fontSize: 'var(--font-size-xs)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--color-text-primary)', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                  {activeWorkspace?.name || 'Chưa chọn Không gian'}
+                </span>
+              </div>
+              <Badge variant="neutral" style={{ fontSize: 'var(--font-size-2xs)' }}>
+                {activeWorkspace?.subject || 'Chung'} • {activeWorkspace?.gradeLevel || 'K12'}
+              </Badge>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <h3 style={{ fontSize: 'var(--font-size-base)', fontWeight: 'var(--font-weight-semibold)', marginBottom: 'var(--space-4)', color: 'var(--color-text-primary)' }}>
+              Thiết Lập Đề Kiểm Tra
+            </h3>
+
+            <form onSubmit={handleGenerate} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+              {/* Topic Field */}
               <div className="form-group">
-                <label className="form-label">Số lượng câu hỏi (3 - 20)</label>
+                <label className="form-label" style={{ fontSize: 'var(--font-size-xs)' }}>
+                  Chủ đề kiểm tra *
+                </label>
                 <input
-                  type="number"
+                  type="text"
                   className="form-input"
-                  min={3}
-                  max={20}
-                  value={questionCount}
-                  onChange={(e) => setQuestionCount(e.target.value)}
+                  placeholder="Ví dụ: Phương trình lượng giác cơ bản"
+                  required
+                  value={topic}
+                  onChange={(e) => setTopic(e.target.value)}
+                  disabled={loading}
                 />
               </div>
 
+              {/* Number of Questions Field with Quick Selection Pills */}
               <div className="form-group">
-                <label className="form-label">Độ khó</label>
+                <label className="form-label" style={{ fontSize: 'var(--font-size-xs)' }}>
+                  Số lượng câu hỏi (3 - 20 câu)
+                </label>
+                <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
+                  <input
+                    type="number"
+                    className="form-input"
+                    min={3}
+                    max={20}
+                    value={numQuestions}
+                    onChange={(e) => setNumQuestions(e.target.value)}
+                    disabled={loading}
+                    style={{ maxWidth: '100px' }}
+                  />
+                  <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                    {[5, 10, 15, 20].map((count) => (
+                      <Button
+                        key={count}
+                        type="button"
+                        variant={Number(numQuestions) === count ? 'primary' : 'outline'}
+                        size="xs"
+                        onClick={() => setNumQuestions(count)}
+                        disabled={loading}
+                      >
+                        {count} câu
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Target Bloom Level Focus Select */}
+              <div className="form-group">
+                <label className="form-label" style={{ fontSize: 'var(--font-size-xs)' }}>
+                  Mức độ tư duy Bloom trọng tâm
+                </label>
                 <select
                   className="form-select"
-                  value={difficulty}
-                  onChange={(e) => setDifficulty(e.target.value)}
+                  value={targetBloomLevel}
+                  onChange={(e) => setTargetBloomLevel(e.target.value)}
+                  disabled={loading}
+                  style={{ fontSize: 'var(--font-size-xs)' }}
                 >
-                  {APP_CONFIG.DIFFICULTY_LEVELS.map((d) => (
-                    <option key={d.value} value={d.value}>{d.label}</option>
+                  {APP_CONFIG.BLOOM_LEVELS.map((b) => (
+                    <option key={b.value} value={b.value}>{b.label}</option>
                   ))}
                 </select>
               </div>
-            </div>
 
-            <div className="form-group">
-              <label className="form-label">Mức độ tư duy Bloom Taxonomy trọng tâm</label>
-              <select
-                className="form-select"
-                value={targetBloomLevel}
-                onChange={(e) => setTargetBloomLevel(e.target.value)}
-              >
-                {APP_CONFIG.BLOOM_LEVELS.map((b) => (
-                  <option key={b.value} value={b.value}>{b.label}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Yêu cầu bổ sung</label>
-              <textarea
-                className="form-textarea"
-                rows={2}
-                placeholder="Ví dụ: Tập trung câu hỏi thực tiễn đời sống..."
-                value={instructions}
-                onChange={(e) => setInstructions(e.target.value)}
-              />
-            </div>
-
-            {error && (
-              <div style={{ padding: '0.75rem', marginBottom: '1rem', backgroundColor: 'var(--color-danger-light)', color: 'var(--color-danger-text)', borderRadius: 'var(--radius-md)', fontSize: '0.8125rem' }}>
-                {error}
-              </div>
-            )}
-
-            <Button type="submit" variant="primary" loading={loading} style={{ width: '100%' }}>
-              ✨ Sinh đề thi & câu hỏi AI
-            </Button>
-          </form>
-        </Card>
-
-        {/* Output Preview */}
-        {result && quiz && (
-          <div>
-            <Card>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.75rem' }}>
-                <div>
-                  <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-primary)' }}>
-                    {quiz.title || topic}
-                  </h3>
-                  <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)' }}>
-                    Tổng số câu: {quiz.questions?.length || questionCount} • Độ khó: {quiz.difficulty}
-                  </p>
-                </div>
-                <ExportDropdown
-                  workspaceId={activeWorkspace?.id}
-                  generationId={result.id}
-                  defaultFileName={`de-thi-${topic}`}
+              {/* Additional Instructions Field */}
+              <div className="form-group">
+                <label className="form-label" style={{ fontSize: 'var(--font-size-xs)' }}>
+                  Yêu cầu & Chỉ dẫn bổ sung
+                </label>
+                <textarea
+                  className="form-textarea"
+                  rows={3}
+                  placeholder="Ví dụ:&#10;- Tập trung câu hỏi ứng dụng thực tế đời sống&#10;- Phân hóa câu hỏi mức độ vận dụng cao&#10;- Tránh câu hỏi mẹo..."
+                  value={instructions}
+                  onChange={(e) => setInstructions(e.target.value)}
+                  disabled={loading}
+                  style={{ fontSize: 'var(--font-size-xs)' }}
                 />
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                {quiz.questions?.map((q, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      padding: '1rem',
-                      background: 'var(--color-bg-subtle)',
-                      borderRadius: 'var(--radius-md)',
-                      border: '1px solid var(--color-border)',
-                    }}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
-                      <strong style={{ fontSize: '0.9375rem' }}>
-                        Câu {q.question_number || i + 1}: {q.question_text || q.question}
-                      </strong>
-                      <div style={{ display: 'flex', gap: '0.35rem' }}>
-                        {q.bloom_taxonomy_level && (
-                          <Badge variant="info">{q.bloom_taxonomy_level}</Badge>
-                        )}
-                        <CitationBadge
-                          count={q.source_chunk_ids?.length || 0}
-                          onClick={() => setIsCitationOpen(true)}
-                        />
-                      </div>
-                    </div>
+              {/* Insufficient Evidence Alert */}
+              {isInsufficientEvidence && (
+                <InsufficientEvidenceAlert
+                  message="Kho tri thức của không gian làm việc này chưa có đủ tài liệu liên quan để tạo đề thi theo chủ đề trên."
+                />
+              )}
 
-                    {/* MCQ Options */}
-                    {q.options && Array.isArray(q.options) && (
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', margin: '0.75rem 0' }}>
-                        {q.options.map((opt, optIndex) => (
-                          <div
-                            key={optIndex}
-                            style={{
-                              padding: '0.5rem 0.75rem',
-                              background: 'var(--color-bg-surface)',
-                              border: '1px solid var(--color-border)',
-                              borderRadius: 'var(--radius-sm)',
-                              fontSize: '0.8125rem',
-                            }}
-                          >
-                            {typeof opt === 'string' ? opt : `${opt.label}. ${opt.text}`}
-                          </div>
-                        ))}
-                      </div>
-                    )}
+              {/* General Error Alert */}
+              {error && !isInsufficientEvidence && (
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 'var(--space-2-5)',
+                    padding: 'var(--space-3) var(--space-4)',
+                    backgroundColor: 'var(--color-danger-light)',
+                    border: '1px solid var(--color-danger-border)',
+                    borderRadius: 'var(--radius-md)',
+                    color: 'var(--color-danger-text)',
+                    fontSize: 'var(--font-size-xs)',
+                  }}
+                  role="alert"
+                >
+                  <IconAlertTriangle size={16} style={{ marginTop: '2px', flexShrink: 0 }} />
+                  <span>{error}</span>
+                </div>
+              )}
 
-                    {/* Explanation / Answer Key */}
-                    <div style={{ marginTop: '0.75rem', paddingTop: '0.5rem', borderTop: '1px dashed var(--color-border)', fontSize: '0.8125rem' }}>
-                      <p style={{ color: 'var(--color-success-text)', fontWeight: 600 }}>
-                        ✓ Đáp án đúng: {q.correct_answer || q.correctAnswer}
-                      </p>
-                      {q.explanation && (
-                        <p style={{ color: 'var(--color-text-secondary)', marginTop: '0.25rem' }}>
-                          💡 Giải thích: {q.explanation}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
+              {/* Submit Button */}
+              <Button
+                type="submit"
+                variant="primary"
+                loading={loading}
+                disabled={loading || !topic.trim()}
+                icon={<IconSparkles size={16} />}
+                style={{ width: '100%', marginTop: 'var(--space-1)' }}
+              >
+                {loading ? 'Đang nghiên cứu học liệu...' : 'Sinh đề thi & câu hỏi AI'}
+              </Button>
+            </form>
+          </Card>
+        </div>
+
+        {/* Right Pane: Quiz Authoring Canvas */}
+        <div>
+          {loading ? (
+            <Card style={{ minHeight: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Spinner message="AI đang nghiên cứu học liệu và tạo ngân hàng câu hỏi..." size="lg" />
             </Card>
-
-            <CitationDrawer
-              isOpen={isCitationOpen}
-              onClose={() => setIsCitationOpen(false)}
-              citations={[{ chunkId: '1', fileName: 'Tài liệu nguồn trích dẫn', excerpt: 'Nội dung chunk đã trích xuất qua RAG vector search.' }]}
+          ) : !currentQuiz ? (
+            <EmptyState
+              icon={IconTarget}
+              title="Chưa có đề thi nào được tạo"
+              description="Nhập thông tin chủ đề kiểm tra bên trái và nhấn 'Sinh đề thi & câu hỏi AI' để bắt đầu."
             />
-          </div>
-        )}
+          ) : (
+            <QuizCanvas
+              quiz={currentQuiz}
+              workspace={activeWorkspace}
+              localVersion={localVersion}
+              sessionReviewStatus={sessionReviewStatus}
+              onUpdateQuiz={handleUpdateQuiz}
+              onApprove={handleApprove}
+              onOpenRegenerate={() => setIsRegenerateModalOpen(true)}
+              onOpenCitations={() => setIsCitationOpen(true)}
+              isRegenerating={isRegenerating}
+            />
+          )}
+        </div>
       </div>
+
+      {/* 3. Session-Local Regenerate Modal */}
+      <LocalRegenerateModal
+        isOpen={isRegenerateModalOpen}
+        onClose={() => setIsRegenerateModalOpen(false)}
+        onSubmit={handleRegenerate}
+        loading={isRegenerating}
+      />
+
+      {/* 4. Citation Drawer */}
+      <CitationDrawer
+        isOpen={isCitationOpen}
+        onClose={() => setIsCitationOpen(false)}
+        citations={citations}
+      />
     </div>
   );
 }

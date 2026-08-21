@@ -9,7 +9,6 @@ from app.core.security import verify_api_key
 
 router = APIRouter()
 
-
 @router.post("/search")
 async def search_chunks(
     query: str,

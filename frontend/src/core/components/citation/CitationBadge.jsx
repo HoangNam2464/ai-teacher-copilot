@@ -1,4 +1,5 @@
 import React from 'react';
+import { IconBookOpen } from '../icons/SvgIcons';
 
 export function CitationBadge({ count = 0, onClick }) {
   if (!count || count === 0) return null;
@@ -8,10 +9,10 @@ export function CitationBadge({ count = 0, onClick }) {
       type="button"
       className="citation-badge"
       onClick={onClick}
-      title="Xem nguồn trích dẫn học liệu"
+      title="Xem nguồn trích dẫn học liệu (RAG Grounding)"
     >
-      <span>📖</span>
-      <span>{count} nguồn</span>
+      <IconBookOpen size={12} />
+      <span>{count} trích dẫn</span>
     </button>
   );
 }
