@@ -1,3 +1,4 @@
+import uuid
 from pgvector.sqlalchemy import Vector
 from sqlalchemy import Column, String, Integer, JSON
 from sqlalchemy.dialects.postgresql import UUID
@@ -7,7 +8,7 @@ Base = declarative_base()
 
 class DocumentChunk(Base):
     __tablename__ = "document_chunks"
-    id = Column(String, primary_key=True, index=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     document_id = Column(UUID(as_uuid=True), index=True, nullable=False)
     workspace_id = Column(UUID(as_uuid=True), index=True, nullable=False)
     content = Column(String, nullable=False)

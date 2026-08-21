@@ -5,9 +5,6 @@ import lombok.Data;
 import java.time.Instant;
 import java.util.UUID;
 
-/**
- * DTOs for Document operations.
- */
 public final class DocumentDto {
 
     private DocumentDto() {}

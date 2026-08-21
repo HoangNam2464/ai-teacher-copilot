@@ -8,10 +8,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.Instant;
 import java.util.UUID;
 
-/**
- * Document entity — metadata for uploaded teaching materials.
- * The actual file is stored in MinIO. Processing is handled by FastAPI.
- */
 @Entity
 @Table(name = "documents")
 @Data

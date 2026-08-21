@@ -18,10 +18,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-/**
- * Document service — handles file upload to MinIO, metadata persistence,
- * and document listing with workspace authorization.
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -41,21 +37,16 @@ public class DocumentService {
             "text/plain"
     );
 
-    private static final long MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
+    private static final long MAX_FILE_SIZE = 50 * 1024 * 1024;
 
-    /**
-     * Upload a document to MinIO and save metadata.
-     * The file is treated as untrusted data.
-     */
     @Transactional
     public DocumentDto.UploadResponse upload(UUID workspaceId, UUID userId,
                                               MultipartFile file,
                                               String subject, String gradeLevel,
                                               String topic) {
-        // Verify workspace ownership
+
         workspaceService.findAndAuthorize(workspaceId, userId);
 
-        // Validate file
         if (file.isEmpty()) {
             throw new IllegalArgumentException("File is empty");
         }
@@ -68,12 +59,10 @@ public class DocumentService {
                     "Unsupported file type. Allowed: PDF, DOCX, TXT");
         }
 
-        // Generate a unique object key
         String objectKey = String.format("%s/%s/%s_%s",
                 workspaceId, userId, UUID.randomUUID(),
                 sanitizeFileName(file.getOriginalFilename()));
 
-        // Upload to MinIO
         try (InputStream is = file.getInputStream()) {
             minioClient.putObject(PutObjectArgs.builder()
                     .bucket(bucketName)
@@ -86,7 +75,6 @@ public class DocumentService {
             throw new RuntimeException("File upload failed", e);
         }
 
-        // Save metadata
         Document doc = Document.builder()
                 .workspaceId(workspaceId)
                 .uploadedBy(userId)
@@ -104,7 +92,6 @@ public class DocumentService {
         final java.util.UUID savedDocId = doc.getId();
         log.info("Document uploaded: {} -> {}", savedDocId, objectKey);
 
-        // Trigger AI processing asynchronously
         aiServiceWebClient.post()
                 .uri(uriBuilder -> uriBuilder.path("/ingestion/process")
                         .queryParam("document_id", savedDocId)
@@ -137,10 +124,6 @@ public class DocumentService {
                 .orElseThrow(() -> new ResourceNotFoundException("Document", documentId));
     }
 
-    /**
-     * Sanitize file name to prevent path traversal.
-     * Uploaded documents are untrusted data.
-     */
     private String sanitizeFileName(String fileName) {
         if (fileName == null) return "unnamed";
         return fileName.replaceAll("[^a-zA-Z0-9._-]", "_");

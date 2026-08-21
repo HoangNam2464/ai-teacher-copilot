@@ -5,7 +5,6 @@ Structured logging setup using structlog.
 import logging
 import structlog
 
-
 def setup_logging() -> None:
     """Configure structured logging for the AI service."""
     structlog.configure(

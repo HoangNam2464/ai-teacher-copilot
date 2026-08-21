@@ -21,9 +21,4 @@ export const documentApi = {
     });
     return response.data;
   },
-
-  async deleteDocument(workspaceId, documentId) {
-    const response = await apiClient.delete(ENDPOINTS.DOCUMENT_BY_ID(workspaceId, documentId));
-    return response.data;
-  },
 };

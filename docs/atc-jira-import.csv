@@ -1,0 +1,1513 @@
+Summary,Issue key,Issue id,Issue Type,Status,Project key,Project name,Project type,Project lead,Project lead id,Project description,Priority,Resolution,Assignee,Assignee Id,Reporter,Reporter Id,Creator,Creator Id,Created,Updated,Last Viewed,Resolved,Due date,Votes,Description,Environment,Watchers,Watchers Id,Original estimate,Remaining Estimate,Time Spent,Work Ratio,Σ Original Estimate,Σ Remaining Estimate,Σ Time Spent,Security Level,Custom field (Development),Custom field (Issue color),Custom field (Rank),Sprint,Custom field (Start date),Custom field (Story point estimate),Custom field (Team),Custom field (Vulnerability),Status Category,Status Category Changed
+[BE-001] Standardize Backend Package Structure by Feature,BE-001,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Backend Engineer
+Master Task: ATC-101
+Sprint: Sprint 1 - Foundation
+Priority: High
+Dependencies: None
+Deliverable: Backend Directory Layout
+
+Description:
+Tổ chức lại cấu trúc thư mục backend Spring Boot và dọn dẹp các package thừa.
+
+Acceptance Criteria:
+Cấu trúc package backend chuẩn theo feature (auth, workspace, document, generation); không còn file mồ côi.",,,,,,,,,,,,,,,Sprint 1 - Foundation,,,Backend,,Done,
+[FE-001] Initialize React Vite Frontend Project,FE-001,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Frontend Engineer
+Master Task: ATC-101
+Sprint: Sprint 1 - Foundation
+Priority: High
+Dependencies: None
+Deliverable: Frontend Directory Layout
+
+Description:
+Khởi tạo thư mục frontend React 18 với Vite và cấu trúc thư mục phân tầng.
+
+Acceptance Criteria:
+Thư mục frontend build sạch sẽ, sẵn sàng tích hợp design system và router.",,,,,,,,,,,,,,,Sprint 1 - Foundation,,,Frontend,,Done,
+[OPS-001] Restructure Monorepo Root Layout and Workspace Scripts,OPS-001,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: DevOps Engineer
+Master Task: ATC-101
+Sprint: Sprint 1 - Foundation
+Priority: High
+Dependencies: None
+Deliverable: Root Scripts & .gitignore
+
+Description:
+Cập nhật đường dẫn gốc, file .gitignore và scripts điều phối monorepo.
+
+Acceptance Criteria:
+Di chuyển ai-service/ ra root độc lập; scripts dev nhận diện đúng 3 service.",,,,,,,,,,,,,,,Sprint 1 - Foundation,,,DevOps,,Done,
+[QA-001] Test Multi-Service Monorepo Build Isolation,QA-001,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-101
+Sprint: Sprint 1 - Foundation
+Priority: High
+Dependencies: None
+Deliverable: Monorepo Build Report
+
+Description:
+Kiểm thử độc lập quá trình build và chạy của 3 service trong monorepo.
+
+Acceptance Criteria:
+Backend, AI Service và Frontend build độc lập không bị xung đột dependency.",,,,,,,,,,,,,,,Sprint 1 - Foundation,,,Quality Assurance,,Done,
+[OPS-002] Set Up Local Dev Docker Compose for PostgreSQL and MinIO,OPS-002,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: DevOps Engineer
+Master Task: ATC-102
+Sprint: Sprint 1 - Foundation
+Priority: High
+Dependencies: None
+Deliverable: docker-compose.dev.yml
+
+Description:
+Viết file docker-compose.dev.yml khởi tạo PostgreSQL 16 pgvector và MinIO S3 storage.
+
+Acceptance Criteria:
+Khởi chạy thành công atc-postgres, atc-minio và atc-minio-init với healthcheck hợp lệ.",,,,,,,,,,,,,,,Sprint 1 - Foundation,,,DevOps,,Done,
+[QA-002] Test Local Dev Infrastructure Startup and Healthchecks,QA-002,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-102
+Sprint: Sprint 1 - Foundation
+Priority: High
+Dependencies: None
+Deliverable: Infra Verification Report
+
+Description:
+Kiểm thử kết nối cổng và tính sẵn sàng của database và object storage.
+
+Acceptance Criteria:
+Cổng 5432 (Postgres), 9000/9001 (MinIO) phản hồi đúng; dữ liệu volume được bảo toàn.",,,,,,,,,,,,,,,Sprint 1 - Foundation,,,Quality Assurance,,Done,
+[BE-002] Implement Flyway V1 Database Migration Schema,BE-002,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Backend Engineer
+Master Task: ATC-103
+Sprint: Sprint 1 - Foundation
+Priority: High
+Dependencies: is blocked by ATC-102
+Deliverable: V1__init_schema.sql
+
+Description:
+Viết script V1__init_schema.sql tạo 6 bảng chính với khóa chính UUID chuẩn hóa.
+
+Acceptance Criteria:
+Flyway tự động migrate thành công 6 bảng trên PostgreSQL; khóa chính dùng uuid-ossp.",,,,,,,,,,,,,,,Sprint 1 - Foundation,,,Backend,,Done,
+[OPS-003] Configure PostgreSQL pgvector Extension Initialization,OPS-003,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: DevOps Engineer
+Master Task: ATC-103
+Sprint: Sprint 1 - Foundation
+Priority: High
+Dependencies: is blocked by ATC-102
+Deliverable: init-extensions.sql
+
+Description:
+Cấu hình script khởi tạo extension vector và uuid-ossp trong Docker init.
+
+Acceptance Criteria:
+Extension vector và uuid-ossp được kích hoạt tự động khi container khởi động.",,,,,,,,,,,,,,,Sprint 1 - Foundation,,,DevOps,,Done,
+[QA-003] Test Flyway Migrations on PostgreSQL and H2,QA-003,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-103
+Sprint: Sprint 1 - Foundation
+Priority: High
+Dependencies: is blocked by ATC-102
+Deliverable: Migration Test Report
+
+Description:
+Kiểm thử chạy migration trên PostgreSQL và tương thích test profile H2.
+
+Acceptance Criteria:
+Chạy mvnw test với profile=test pass 100% không bị lỗi cú pháp SQL.",,,,,,,,,,,,,,,Sprint 1 - Foundation,,,Quality Assurance,,Done,
+[OPS-004] Configure GitHub Actions CI Workflows for All Services,OPS-004,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: DevOps Engineer
+Master Task: ATC-104
+Sprint: Sprint 1 - Foundation
+Priority: High
+Dependencies: is blocked by ATC-101
+Deliverable: .github/workflows/*.yml
+
+Description:
+Tạo 4 workflows CI riêng biệt kích hoạt theo đường dẫn thay đổi (paths-filter).
+
+Acceptance Criteria:
+backend-ci.yml, ai-service-ci.yml, frontend-ci.yml và ci.yml chạy đúng khi có push/PR.",,,,,,,,,,,,,,,Sprint 1 - Foundation,,,DevOps,,Done,
+[QA-004] Test CI Workflow Triggers and Branch Protection Gates,QA-004,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-104
+Sprint: Sprint 1 - Foundation
+Priority: High
+Dependencies: is blocked by ATC-101
+Deliverable: CI Gate Verification Report
+
+Description:
+Kiểm thử trigger CI khi tạo PR vào develop và main.
+
+Acceptance Criteria:
+CI tự động chặn merge nếu có unit test fail hoặc lint error.",,,,,,,,,,,,,,,Sprint 1 - Foundation,,,Quality Assurance,,Done,
+[DES-001] Define Figma Design System & Color Tokens,DES-001,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Designer
+Master Task: ATC-105
+Sprint: Sprint 1 - Foundation
+Priority: High
+Dependencies: None
+Deliverable: Figma Design System
+
+Description:
+Thiết kế bộ Design System chuẩn: bảng màu HSL, typography, spacing và component primitives.
+
+Acceptance Criteria:
+Bộ Figma Design System hoàn chỉnh với đầy đủ biến màu sắc, font chữ và button states.",,,,,,,,,,,,,,,Sprint 1 - Foundation,,,Design,,Done,
+[FE-002] Implement 4-Layer Frontend Architecture and CSS Tokens,FE-002,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Frontend Engineer
+Master Task: ATC-105
+Sprint: Sprint 1 - Foundation
+Priority: High
+Dependencies: None
+Deliverable: variables.css & Core Components
+
+Description:
+Tạo cấu trúc 4 tầng (app, core, features, shared) và cài đặt biến CSS design tokens.
+
+Acceptance Criteria:
+File variables.css chứa đủ tokens; cấu trúc thư mục tuân thủ FRONTEND_ARCHITECTURE.md.",,,,,,,,,,,,,,,Sprint 1 - Foundation,,,Frontend,,Done,
+[FE-003] Configure Axios Client and React Router Layout Shells,FE-003,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Frontend Engineer
+Master Task: ATC-105
+Sprint: Sprint 1 - Foundation
+Priority: High
+Dependencies: None
+Deliverable: AppRoutes.jsx & client.js
+
+Description:
+Cấu hình client.js, paths.js và 3 Layout shells (Dashboard, Auth, Focus).
+
+Acceptance Criteria:
+paths.js là SSOT cho toàn bộ URL; router chuyển đổi mượt mà giữa các layout.",,,,,,,,,,,,,,,Sprint 1 - Foundation,,,Frontend,,Done,
+[QA-005] Test Frontend Layout Shells and Token Rendering,QA-005,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-105
+Sprint: Sprint 1 - Foundation
+Priority: High
+Dependencies: None
+Deliverable: Frontend Base Test Report
+
+Description:
+Kiểm thử giao diện layout cơ bản và tốc độ build của Vite.
+
+Acceptance Criteria:
+npm run build hoàn thành < 2s; không có lỗi CSS hay console warning.",,,,,,,,,,,,,,,Sprint 1 - Foundation,,,Quality Assurance,,Done,
+[BE-003] Document Backend REST API Contracts and Data Models,BE-003,,Task,Done,ATC,AI Teacher Copilot,software,,,,Medium,,,,,,,,,,,,,0,"Role: Backend Engineer
+Master Task: ATC-106
+Sprint: Sprint 1 - Foundation
+Priority: Medium
+Dependencies: None
+Deliverable: API & ERD Specs
+
+Description:
+Tài liệu hóa các endpoint API, mã lỗi HTTP và thực thể CSDL trong tài liệu SRS.
+
+Acceptance Criteria:
+Đặc tả rõ 100% request/response payload và quan hệ ERD trong docs/3.Database/.",,,,,,,,,,,,,,,Sprint 1 - Foundation,,,Backend,,Done,
+[FE-004] Document Frontend Component Specs and UI Interactions,FE-004,,Task,Done,ATC,AI Teacher Copilot,software,,,,Medium,,,,,,,,,,,,,0,"Role: Frontend Engineer
+Master Task: ATC-106
+Sprint: Sprint 1 - Foundation
+Priority: Medium
+Dependencies: None
+Deliverable: Frontend Architecture Specs
+
+Description:
+Viết tài liệu quy chuẩn component, routing hierarchy và state management.
+
+Acceptance Criteria:
+Tài liệu FRONTEND_ARCHITECTURE.md mô tả rõ ràng 4 tầng kiến trúc và Zustand store.",,,,,,,,,,,,,,,Sprint 1 - Foundation,,,Frontend,,Done,
+"[OPS-005] Document Infrastructure, Security and Environment Specs",OPS-005,,Task,Done,ATC,AI Teacher Copilot,software,,,,Medium,,,,,,,,,,,,,0,"Role: DevOps Engineer
+Master Task: ATC-106
+Sprint: Sprint 1 - Foundation
+Priority: Medium
+Dependencies: None
+Deliverable: Infra & Security Specs
+
+Description:
+Xác định các thông số môi trường, bảo mật bí mật (.env.example) và ranh giới mạng.
+
+Acceptance Criteria:
+Tài liệu ranh giới bảo mật AI và cấu hình Docker chuẩn hóa.",,,,,,,,,,,,,,,Sprint 1 - Foundation,,,DevOps,,Done,
+[QA-006] Define Master Test Strategy and Quality Acceptance Gates,QA-006,,Task,Done,ATC,AI Teacher Copilot,software,,,,Medium,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-106
+Sprint: Sprint 1 - Foundation
+Priority: Medium
+Dependencies: None
+Deliverable: Master Test Strategy
+
+Description:
+Thiết lập tiêu chuẩn kiểm thử, ma trận truy xuất nguồn gốc và ngưỡng chấp nhận MVP.
+
+Acceptance Criteria:
+11 files trong .agents/rules/ được đồng bộ hóa với định hướng chất lượng.",,,,,,,,,,,,,,,Sprint 1 - Foundation,,,Quality Assurance,,Done,
+[DES-002] Design Teacher Registration Screen in Figma,DES-002,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Designer
+Master Task: ATC-201
+Sprint: Sprint 2 - Auth & Ingestion
+Priority: High
+Dependencies: is blocked by ATC-103, ATC-105
+Deliverable: Figma Register Screen
+
+Description:
+Thiết kế màn hình Đăng ký tài khoản giáo viên với các trạng thái lỗi và thành công.
+
+Acceptance Criteria:
+Bản vẽ Figma hoàn chỉnh cho màn hình Register với form input, validation message và nút submit.",,,,,,,,,,,,,,,Sprint 2 - Auth & Ingestion,,,Design,,Done,
+[FE-005] Implement Teacher Registration Form with Validation,FE-005,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Frontend Engineer
+Master Task: ATC-201
+Sprint: Sprint 2 - Auth & Ingestion
+Priority: High
+Dependencies: is blocked by ATC-103, ATC-105
+Deliverable: RegisterForm.jsx
+
+Description:
+Xây dựng RegisterForm component với kiểm tra tính hợp lệ của email và độ mạnh mật khẩu.
+
+Acceptance Criteria:
+Form kiểm tra định dạng email và mật khẩu tối thiểu 8 ký tự trước khi gọi API.",,,,,,,,,,,,,,,Sprint 2 - Auth & Ingestion,,,Frontend,,Done,
+[BE-004] Implement Teacher Registration API,BE-004,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Backend Engineer
+Master Task: ATC-201
+Sprint: Sprint 2 - Auth & Ingestion
+Priority: High
+Dependencies: is blocked by ATC-103, ATC-105
+Deliverable: AuthController.java & AuthService.java
+
+Description:
+Tạo endpoint POST /api/auth/register, kiểm tra trùng email và hash mật khẩu bằng BCrypt.
+
+Acceptance Criteria:
+Trả về HTTP 201 khi thành công; trả về 400 nếu email tồn tại; mật khẩu không lưu plaintext.",,,,,,,,,,,,,,,Sprint 2 - Auth & Ingestion,,,Backend,,Done,
+[QA-007] Test Teacher Registration and Duplicate Email Handling,QA-007,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-201
+Sprint: Sprint 2 - Auth & Ingestion
+Priority: High
+Dependencies: is blocked by ATC-103, ATC-105
+Deliverable: Register Test Suite
+
+Description:
+Kiểm thử tự động các kịch bản đăng ký thành công, trùng email và mật khẩu không hợp lệ.
+
+Acceptance Criteria:
+Unit test và integration test bao phủ 100% các nhánh validation và mã lỗi.",,,,,,,,,,,,,,,Sprint 2 - Auth & Ingestion,,,Quality Assurance,,Done,
+[DES-003] Design Teacher Login Screen in Figma,DES-003,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Designer
+Master Task: ATC-202
+Sprint: Sprint 2 - Auth & Ingestion
+Priority: High
+Dependencies: is blocked by ATC-201
+Deliverable: Figma Login Screen
+
+Description:
+Thiết kế màn hình Đăng nhập giáo viên với trạng thái loading, lỗi sai mật khẩu.
+
+Acceptance Criteria:
+Bản vẽ Figma hoàn chỉnh cho màn hình Login kèm thông báo lỗi trực quan.",,,,,,,,,,,,,,,Sprint 2 - Auth & Ingestion,,,Design,,Done,
+[FE-006] Implement Teacher Login Form and Token Storage,FE-006,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Frontend Engineer
+Master Task: ATC-202
+Sprint: Sprint 2 - Auth & Ingestion
+Priority: High
+Dependencies: is blocked by ATC-201
+Deliverable: LoginForm.jsx & authStore.js
+
+Description:
+Xây dựng LoginForm component và lưu trữ JWT token trong authStore.
+
+Acceptance Criteria:
+Đăng nhập thành công lưu token vào localStorage và chuyển hướng sang /workspaces.",,,,,,,,,,,,,,,Sprint 2 - Auth & Ingestion,,,Frontend,,Done,
+[BE-005] Implement Teacher Login and JWT Issuance API,BE-005,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Backend Engineer
+Master Task: ATC-202
+Sprint: Sprint 2 - Auth & Ingestion
+Priority: High
+Dependencies: is blocked by ATC-201
+Deliverable: JwtTokenProvider.java & AuthController.java
+
+Description:
+Tạo endpoint POST /api/auth/login xác thực credentials và sinh JWT token.
+
+Acceptance Criteria:
+Trả về HTTP 200 kèm JWT token chứa userId, email và role TEACHER; trả về 401 nếu sai mật khẩu.",,,,,,,,,,,,,,,Sprint 2 - Auth & Ingestion,,,Backend,,Done,
+[QA-008] Test Teacher Login and Invalid Credentials Handling,QA-008,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-202
+Sprint: Sprint 2 - Auth & Ingestion
+Priority: High
+Dependencies: is blocked by ATC-201
+Deliverable: Login Test Suite
+
+Description:
+Kiểm thử các kịch bản đăng nhập đúng, sai thông tin, tài khoản chưa đăng ký.
+
+Acceptance Criteria:
+Test suite kiểm tra cấu trúc JWT claims và thời gian hết hạn (expiration).",,,,,,,,,,,,,,,Sprint 2 - Auth & Ingestion,,,Quality Assurance,,Done,
+[FE-007] Implement Axios JWT Bearer Interceptors and 401 Redirect,FE-007,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Frontend Engineer
+Master Task: ATC-203
+Sprint: Sprint 2 - Auth & Ingestion
+Priority: High
+Dependencies: is blocked by ATC-202
+Deliverable: client.js Interceptors
+
+Description:
+Cấu hình client.js tự động gắn header Authorization: Bearer <token> và bắt lỗi 401.
+
+Acceptance Criteria:
+Mọi request đều có Bearer token; khi gặp lỗi 401 tự động xóa session và redirect về /login.",,,,,,,,,,,,,,,Sprint 2 - Auth & Ingestion,,,Frontend,,Done,
+[BE-006] Implement Spring Security Stateless JWT Filter,BE-006,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Backend Engineer
+Master Task: ATC-203
+Sprint: Sprint 2 - Auth & Ingestion
+Priority: High
+Dependencies: is blocked by ATC-202
+Deliverable: JwtAuthenticationFilter.java & SecurityConfig.java
+
+Description:
+Tạo JwtAuthenticationFilter trích xuất token, xác thực chữ ký và set SecurityContext.
+
+Acceptance Criteria:
+Các endpoint bảo vệ từ chối truy cập không có token (401); SecurityContext lưu Principal.",,,,,,,,,,,,,,,Sprint 2 - Auth & Ingestion,,,Backend,,Done,
+[QA-009] Test JWT Route Protection and Token Expiration,QA-009,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-203
+Sprint: Sprint 2 - Auth & Ingestion
+Priority: High
+Dependencies: is blocked by ATC-202
+Deliverable: Security Filter Test Report
+
+Description:
+Kiểm thử truy cập các endpoint bảo vệ khi không có token, token hết hạn hoặc giả mạo.
+
+Acceptance Criteria:
+Bảo vệ 100% các endpoint nghiệp vụ khỏi truy cập trái phép.",,,,,,,,,,,,,,,Sprint 2 - Auth & Ingestion,,,Quality Assurance,,Done,
+[DES-004] Design Workspace Dashboard and Creation Modal in Figma,DES-004,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Designer
+Master Task: ATC-204
+Sprint: Sprint 2 - Auth & Ingestion
+Priority: High
+Dependencies: is blocked by ATC-203
+Deliverable: Figma Workspace Screens
+
+Description:
+Thiết kế giao diện quản lý danh sách Workspace, modal tạo mới và thẻ workspace.
+
+Acceptance Criteria:
+Bản vẽ Figma hoàn chỉnh cho Workspace Dashboard, Workspace Card và Create Modal.",,,,,,,,,,,,,,,Sprint 2 - Auth & Ingestion,,,Design,,Done,
+"[FE-008] Implement Workspace List, Creation Modal and Selector",FE-008,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Frontend Engineer
+Master Task: ATC-204
+Sprint: Sprint 2 - Auth & Ingestion
+Priority: High
+Dependencies: is blocked by ATC-203
+Deliverable: WorkspaceListPage.jsx & workspaceStore.js
+
+Description:
+Xây dựng WorkspaceListPage, CreateWorkspaceModal và quản lý activeWorkspace trong Zustand.
+
+Acceptance Criteria:
+Giáo viên xem được danh sách workspace của mình, tạo mới và chọn workspace hoạt động.",,,,,,,,,,,,,,,Sprint 2 - Auth & Ingestion,,,Frontend,,Done,
+[BE-007] Implement Workspace CRUD API with Ownership Gate,BE-007,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Backend Engineer
+Master Task: ATC-204
+Sprint: Sprint 2 - Auth & Ingestion
+Priority: High
+Dependencies: is blocked by ATC-203
+Deliverable: WorkspaceController.java & WorkspaceService.java
+
+Description:
+Tạo các endpoint CRUD cho Workspace kèm phương thức kiểm tra quyền sở hữu findAndAuthorize.
+
+Acceptance Criteria:
+Truy cập workspace của giáo viên khác lập tức nhận mã lỗi HTTP 403 Forbidden.",,,,,,,,,,,,,,,Sprint 2 - Auth & Ingestion,,,Backend,,Done,
+[QA-010] Test Workspace Multi-Tenant Data Isolation and 403 Forbidden,QA-010,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-204
+Sprint: Sprint 2 - Auth & Ingestion
+Priority: High
+Dependencies: is blocked by ATC-203
+Deliverable: Workspace Isolation Test Report
+
+Description:
+Kiểm thử phân lập dữ liệu đa người dùng: Teacher A không thể đọc/sửa dữ liệu Teacher B.
+
+Acceptance Criteria:
+Test suite kiểm tra chặt chẽ các trường hợp vi phạm quyền sở hữu workspace.",,,,,,,,,,,,,,,Sprint 2 - Auth & Ingestion,,,Quality Assurance,,Done,
+[DES-005] Design Document Upload Drag-and-Drop and File List in Figma,DES-005,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Designer
+Master Task: ATC-205
+Sprint: Sprint 2 - Auth & Ingestion
+Priority: High
+Dependencies: is blocked by ATC-204
+Deliverable: Figma Document Screens
+
+Description:
+Thiết kế khu vực kéo thả tài liệu, thanh tiến trình upload và danh sách tài liệu.
+
+Acceptance Criteria:
+Bản vẽ Figma chi tiết cho Document Library, Upload Dropzone và trạng thái PENDING.",,,,,,,,,,,,,,,Sprint 2 - Auth & Ingestion,,,Design,,Done,
+[FE-009] Implement Document Upload Component with Progress Bar,FE-009,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Frontend Engineer
+Master Task: ATC-205
+Sprint: Sprint 2 - Auth & Ingestion
+Priority: High
+Dependencies: is blocked by ATC-204
+Deliverable: DocumentUploadModal.jsx & DocumentTable.jsx
+
+Description:
+Xây dựng DocumentUploadModal và DocumentTable hiển thị danh sách tài liệu trong workspace.
+
+Acceptance Criteria:
+Hỗ trợ kéo thả file .pdf, .docx; hiển thị tiến trình tải lên và cập nhật danh sách.",,,,,,,,,,,,,,,Sprint 2 - Auth & Ingestion,,,Frontend,,Done,
+[BE-008] Implement Multipart Document Upload API to MinIO,BE-008,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Backend Engineer
+Master Task: ATC-205
+Sprint: Sprint 2 - Auth & Ingestion
+Priority: High
+Dependencies: is blocked by ATC-204
+Deliverable: DocumentController.java & MinioStorageService.java
+
+Description:
+Tạo endpoint POST /api/workspaces/{id}/documents lưu file lên MinIO và lưu metadata vào DB.
+
+Acceptance Criteria:
+Lưu file an toàn lên MinIO; lưu metadata vào bảng documents với processing_status='PENDING'.",,,,,,,,,,,,,,,Sprint 2 - Auth & Ingestion,,,Backend,,Done,
+"[QA-011] Test Document Upload, MinIO Storage and Metadata Persistence",QA-011,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-205
+Sprint: Sprint 2 - Auth & Ingestion
+Priority: High
+Dependencies: is blocked by ATC-204
+Deliverable: Document Upload Test Report
+
+Description:
+Kiểm thử upload file PDF/DOCX hợp lệ, từ chối file sai định dạng hoặc quá dung lượng (50MB).
+
+Acceptance Criteria:
+Metadata lưu chính xác dung lượng, loại file và đường dẫn MinIO object key.",,,,,,,,,,,,,,,Sprint 2 - Auth & Ingestion,,,Quality Assurance,,Done,
+[BE-009] Implement PDF and DOCX Document Parsing Pipeline,BE-009,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Backend Engineer
+Master Task: ATC-206
+Sprint: Sprint 2 - Auth & Ingestion
+Priority: High
+Dependencies: is blocked by ATC-205
+Deliverable: parsers.py in ai-service
+
+Description:
+Sử dụng PyMuPDF và python-docx để trích xuất văn bản có cấu trúc kèm thông tin số trang.
+
+Acceptance Criteria:
+Trích xuất văn bản chính xác từ PDF và DOCX; giữ lại metadata tiêu đề và trang nguồn.",,,,,,,,,,,,,,,Sprint 2 - Auth & Ingestion,,,Backend,,Done,
+[BE-010] Implement Structure-Aware Text Chunking with Overlap,BE-010,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Backend Engineer
+Master Task: ATC-206
+Sprint: Sprint 2 - Auth & Ingestion
+Priority: High
+Dependencies: is blocked by ATC-205
+Deliverable: chunking.py in ai-service
+
+Description:
+Xây dựng thuật toán băm văn bản StructureAwareChunker (512 tokens / 50 tokens overlap).
+
+Acceptance Criteria:
+Không ngắt giữa chừng câu; giữ ranh giới đoạn văn và bảo toàn ngữ cảnh liền kề.",,,,,,,,,,,,,,,Sprint 2 - Auth & Ingestion,,,Backend,,Done,
+[QA-012] Test Document Parsing Accuracy and Chunk Boundaries,QA-012,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-206
+Sprint: Sprint 2 - Auth & Ingestion
+Priority: High
+Dependencies: is blocked by ATC-205
+Deliverable: Chunking Quality Test Report
+
+Description:
+Kiểm thử băm chunk trên các giáo trình thực tế có định dạng phức tạp.
+
+Acceptance Criteria:
+100% chunk có độ dài trong ngưỡng 100-512 tokens và không bị mất chữ.",,,,,,,,,,,,,,,Sprint 2 - Auth & Ingestion,,,Quality Assurance,,Done,
+[BE-011] Implement Text Chunk Embedding Generation,BE-011,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Backend Engineer
+Master Task: ATC-207
+Sprint: Sprint 2 - Auth & Ingestion
+Priority: High
+Dependencies: is blocked by ATC-206
+Deliverable: embeddings.py in ai-service
+
+Description:
+Tích hợp sinh vector embedding 768 chiều qua Google Gemini text-embedding-004.
+
+Acceptance Criteria:
+Sinh vector embedding chuẩn 768 chiều cho từng text chunk theo batch hiệu quả.",,,,,,,,,,,,,,,Sprint 2 - Auth & Ingestion,,,Backend,,Done,
+[BE-012] Implement Vector Embedding Persistence in pgvector,BE-012,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Backend Engineer
+Master Task: ATC-207
+Sprint: Sprint 2 - Auth & Ingestion
+Priority: High
+Dependencies: is blocked by ATC-206
+Deliverable: ingestion_router.py & models.py
+
+Description:
+Lưu các chunks và vector tương ứng vào bảng document_chunks qua SQLAlchemy asyncpg.
+
+Acceptance Criteria:
+Toàn bộ chunks được chèn thành công kèm workspace_id, document_id và vector column.",,,,,,,,,,,,,,,Sprint 2 - Auth & Ingestion,,,Backend,,Done,
+[QA-013] Test Vector Embedding Generation and pgvector Storage,QA-013,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-207
+Sprint: Sprint 2 - Auth & Ingestion
+Priority: High
+Dependencies: is blocked by ATC-206
+Deliverable: Vector Storage Test Report
+
+Description:
+Kiểm tra số lượng bản ghi chunk trong database và tính toàn vẹn của vector index.
+
+Acceptance Criteria:
+Vector có đúng 768 chiều; HNSW index được cập nhật và liên kết đúng document_id.",,,,,,,,,,,,,,,Sprint 2 - Auth & Ingestion,,,Quality Assurance,,Done,
+[QA-014] Implement Automated Unit and Integration Tests for Auth and Ingestion,QA-014,,Task,In Progress,ATC,AI Teacher Copilot,software,,,,Medium,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-208
+Sprint: Sprint 2 - Auth & Ingestion
+Priority: Medium
+Dependencies: is blocked by ATC-203, ATC-207
+Deliverable: Auth & Ingestion Test Suite
+
+Description:
+Viết test suite tự động kiểm thử toàn bộ luồng từ đăng ký, đăng nhập đến tải tài liệu và băm chunk.
+
+Acceptance Criteria:
+Bộ test chạy tự động trên CI; đạt tỷ lệ bao phủ code (code coverage) theo yêu cầu.",,,,,,,,,,,,,,,Sprint 2 - Auth & Ingestion,,,Quality Assurance,,In Progress,
+[QA-015] Execute Security and Negative Input Tests for Upload and Auth,QA-015,,Task,In Progress,ATC,AI Teacher Copilot,software,,,,Medium,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-208
+Sprint: Sprint 2 - Auth & Ingestion
+Priority: Medium
+Dependencies: is blocked by ATC-203, ATC-207
+Deliverable: Negative Testing Report
+
+Description:
+Kiểm thử các kịch bản tiêu cực: upload file độc hại, file rỗng, sai token, truy cập trái phép.
+
+Acceptance Criteria:
+Hệ thống từ chối an toàn và trả về mã lỗi HTTP chuẩn mực (400, 401, 403, 415).",,,,,,,,,,,,,,,Sprint 2 - Auth & Ingestion,,,Quality Assurance,,In Progress,
+[BE-013] Implement AI Provider Abstraction Interface and Factory,BE-013,,Task,In Progress,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Backend Engineer
+Master Task: ATC-301
+Sprint: Sprint 3 - RAG & Lesson
+Priority: High
+Dependencies: is blocked by ATC-207
+Deliverable: providers/base.py & factory.py
+
+Description:
+Xây dựng lớp trừu tượng BaseAIProvider định nghĩa các phương thức generate và embed.
+
+Acceptance Criteria:
+Loại bỏ import cứng SDK trong route handlers; khởi tạo provider qua ProviderFactory.",,,,,,,,,,,,,,,Sprint 3 - RAG & Lesson,,,Backend,,In Progress,
+[BE-014] Implement Gemini and OpenAI LLM Provider Adapters,BE-014,,Task,In Progress,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Backend Engineer
+Master Task: ATC-301
+Sprint: Sprint 3 - RAG & Lesson
+Priority: High
+Dependencies: is blocked by ATC-207
+Deliverable: providers/gemini.py & openai.py
+
+Description:
+Cài đặt cụ thể GeminiProvider và OpenAIProvider tuân thủ BaseAIProvider interface.
+
+Acceptance Criteria:
+Hỗ trợ chuyển đổi qua biến môi trường AI_PROVIDER mà không cần sửa code nghiệp vụ.",,,,,,,,,,,,,,,Sprint 3 - RAG & Lesson,,,Backend,,In Progress,
+[QA-016] Test AI Provider Dynamic Switching and API Error Fallback,QA-016,,Task,In Progress,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-301
+Sprint: Sprint 3 - RAG & Lesson
+Priority: High
+Dependencies: is blocked by ATC-207
+Deliverable: Provider Test Report
+
+Description:
+Kiểm thử chuyển đổi linh hoạt giữa Gemini và OpenAI; xử lý timeout và rate limit.
+
+Acceptance Criteria:
+Hệ thống tự động bắt lỗi API provider và trả về mã lỗi nội bộ thích hợp.",,,,,,,,,,,,,,,Sprint 3 - RAG & Lesson,,,Quality Assurance,,In Progress,
+[BE-015] Implement Vector Similarity Search with Workspace Isolation,BE-015,,Task,In Progress,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Backend Engineer
+Master Task: ATC-302
+Sprint: Sprint 3 - RAG & Lesson
+Priority: High
+Dependencies: is blocked by ATC-301
+Deliverable: retrieval/service.py in ai-service
+
+Description:
+Xây dựng hàm truy vấn vector trong retrieval_service với khoảng cách Cosine và bộ lọc workspace_id.
+
+Acceptance Criteria:
+Trả về Top-K (5-8) chunks phù hợp nhất; bắt buộc lọc workspace_id ở mức câu lệnh SQL.",,,,,,,,,,,,,,,Sprint 3 - RAG & Lesson,,,Backend,,In Progress,
+[QA-017] Test Top-K Vector Retrieval and Workspace Data Isolation,QA-017,,Task,In Progress,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-302
+Sprint: Sprint 3 - RAG & Lesson
+Priority: High
+Dependencies: is blocked by ATC-301
+Deliverable: Retrieval Isolation Test Report
+
+Description:
+Kiểm thử truy vấn vector bảo đảm không rò rỉ dữ liệu chunk giữa các workspace khác nhau.
+
+Acceptance Criteria:
+Truy vấn từ Workspace A không bao giờ trả về chunk thuộc Workspace B.",,,,,,,,,,,,,,,Sprint 3 - RAG & Lesson,,,Quality Assurance,,In Progress,
+[BE-016] Implement Sources Boundary Wrapper for Retrieved Context,BE-016,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Backend Engineer
+Master Task: ATC-303
+Sprint: Sprint 3 - RAG & Lesson
+Priority: High
+Dependencies: is blocked by ATC-302
+Deliverable: prompt_builder.py in ai-service
+
+Description:
+Bọc toàn bộ nội dung chunk trích xuất vào thẻ <sources>...</sources> và chỉ thị Untrusted Data.
+
+Acceptance Criteria:
+Tài liệu nguồn được coi là dữ liệu tham khảo thuần túy; ngăn chặn ghi đè system prompt.",,,,,,,,,,,,,,,Sprint 3 - RAG & Lesson,,,Backend,,To Do,
+[BE-017] Implement Insufficient Evidence Detection and Handling,BE-017,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Backend Engineer
+Master Task: ATC-303
+Sprint: Sprint 3 - RAG & Lesson
+Priority: High
+Dependencies: is blocked by ATC-302
+Deliverable: evidence_validator.py
+
+Description:
+Kiểm tra điểm tương đồng; nếu không có chunk nào đạt ngưỡng trả về lỗi INSUFFICIENT_EVIDENCE.
+
+Acceptance Criteria:
+Trả về mã HTTP 422 với mã lỗi INSUFFICIENT_EVIDENCE thay vì để LLM bịa đặt nội dung.",,,,,,,,,,,,,,,Sprint 3 - RAG & Lesson,,,Backend,,To Do,
+[QA-018] Test Prompt Injection Defense and Insufficient Evidence Rejection,QA-018,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-303
+Sprint: Sprint 3 - RAG & Lesson
+Priority: High
+Dependencies: is blocked by ATC-302
+Deliverable: Prompt Security Test Report
+
+Description:
+Thực hiện kiểm thử tiêm prompt (Prompt Injection) và truy vấn kiến thức không có trong tài liệu.
+
+Acceptance Criteria:
+Hệ thống từ chối tạo nội dung ảo giác khi thiếu tài liệu nguồn.",,,,,,,,,,,,,,,Sprint 3 - RAG & Lesson,,,Quality Assurance,,To Do,
+[DES-006] Design Lesson Planner Input Form and Output View in Figma,DES-006,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Designer
+Master Task: ATC-304
+Sprint: Sprint 3 - RAG & Lesson
+Priority: High
+Dependencies: is blocked by ATC-303
+Deliverable: Figma Lesson Planner Screens
+
+Description:
+Thiết kế form nhập yêu cầu bài giảng (chủ đề, khối lớp, thời lượng) và giao diện xem giáo án.
+
+Acceptance Criteria:
+Bản vẽ Figma hoàn chỉnh cho cấu trúc giáo án 4 phần: Mục tiêu, Chuẩn bị, Hoạt động, Đánh giá.",,,,,,,,,,,,,,,Sprint 3 - RAG & Lesson,,,Design,,To Do,
+[FE-010] Implement Lesson Planner Generation Form and Viewer,FE-010,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Frontend Engineer
+Master Task: ATC-304
+Sprint: Sprint 3 - RAG & Lesson
+Priority: High
+Dependencies: is blocked by ATC-303
+Deliverable: LessonPlanViewer.jsx
+
+Description:
+Xây dựng LessonPlanGeneratorForm và LessonPlanViewer hiển thị giáo án theo tab/timeline.
+
+Acceptance Criteria:
+Form gửi yêu cầu sinh giáo án, hiển thị animation loading và render cấu trúc bài giảng trực quan.",,,,,,,,,,,,,,,Sprint 3 - RAG & Lesson,,,Frontend,,To Do,
+[BE-018] Implement Structured Lesson Plan Generation Pipeline,BE-018,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Backend Engineer
+Master Task: ATC-304
+Sprint: Sprint 3 - RAG & Lesson
+Priority: High
+Dependencies: is blocked by ATC-303
+Deliverable: lesson_planner.py in ai-service
+
+Description:
+Xây dựng pipeline sinh giáo án bằng Gemini/OpenAI ép cấu trúc qua schema LessonPlanSchema.
+
+Acceptance Criteria:
+Output trả về khớp 100% với Pydantic schema; giữ lại mảng source_chunk_ids.",,,,,,,,,,,,,,,Sprint 3 - RAG & Lesson,,,Backend,,To Do,
+[BE-019] Implement Lesson Plan Persistence in Generated Contents Repository,BE-019,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Backend Engineer
+Master Task: ATC-304
+Sprint: Sprint 3 - RAG & Lesson
+Priority: High
+Dependencies: is blocked by ATC-303
+Deliverable: GenerationService.java in backend
+
+Description:
+Nhận kết quả từ FastAPI và lưu bản ghi vào bảng generated_contents với review_status='DRAFT'.
+
+Acceptance Criteria:
+Giáo án được lưu với content_type='LESSON_PLAN', version=1 và liên kết đúng workspace.",,,,,,,,,,,,,,,Sprint 3 - RAG & Lesson,,,Backend,,To Do,
+[QA-019] Test Lesson Plan JSON Schema and Source Citation Traceability,QA-019,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-304
+Sprint: Sprint 3 - RAG & Lesson
+Priority: High
+Dependencies: is blocked by ATC-303
+Deliverable: Lesson Plan Schema Test Report
+
+Description:
+Kiểm thử tự động tính hợp lệ của JSON giáo án và liên kết trích dẫn nguồn chunk.
+
+Acceptance Criteria:
+Schema không bị thiếu trường; mảng source_chunk_ids tồn tại trong database.",,,,,,,,,,,,,,,Sprint 3 - RAG & Lesson,,,Quality Assurance,,To Do,
+"[DES-007] Design Citation Badges, Tooltips and Source Drawer in Figma",DES-007,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Designer
+Master Task: ATC-305
+Sprint: Sprint 3 - RAG & Lesson
+Priority: High
+Dependencies: is blocked by ATC-304
+Deliverable: Figma Citation Components
+
+Description:
+Thiết kế badge trích dẫn [1], tooltip hiển thị tên sách/trang và drawer xem đoạn gốc.
+
+Acceptance Criteria:
+Bản vẽ Figma chi tiết cho Citation Badge, Citation Tooltip và Source Drawer.",,,,,,,,,,,,,,,Sprint 3 - RAG & Lesson,,,Design,,To Do,
+[FE-011] Implement Citation Badges and Source Chunk Drawer,FE-011,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Frontend Engineer
+Master Task: ATC-305
+Sprint: Sprint 3 - RAG & Lesson
+Priority: High
+Dependencies: is blocked by ATC-304
+Deliverable: CitationBadge.jsx & SourceDrawer.jsx
+
+Description:
+Gắn badge trích dẫn tương tác vào nội dung bài giảng; mở drawer xem đoạn văn bản gốc khi click.
+
+Acceptance Criteria:
+Click vào badge hiển thị chính xác tên tài liệu, trang số và đoạn trích dẫn nguồn.",,,,,,,,,,,,,,,Sprint 3 - RAG & Lesson,,,Frontend,,To Do,
+[BE-020] Implement Citation Resolution and Provenance API,BE-020,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Backend Engineer
+Master Task: ATC-305
+Sprint: Sprint 3 - RAG & Lesson
+Priority: High
+Dependencies: is blocked by ATC-304
+Deliverable: CitationController.java & CitationService.java
+
+Description:
+Tạo endpoint GET /api/workspaces/{id}/citations/resolve và lưu bản ghi vào content_citations.
+
+Acceptance Criteria:
+Truy vấn trả về đầy đủ metadata nguồn gốc từ bảng document_chunks.",,,,,,,,,,,,,,,Sprint 3 - RAG & Lesson,,,Backend,,To Do,
+[QA-020] Test Citation Provenance Resolution to Document Page and Chunk,QA-020,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-305
+Sprint: Sprint 3 - RAG & Lesson
+Priority: High
+Dependencies: is blocked by ATC-304
+Deliverable: Citation Traceability Test Report
+
+Description:
+Kiểm thử đối chiếu dữ liệu trích dẫn từ giao diện ngược về trang PDF/DOCX gốc.
+
+Acceptance Criteria:
+100% trích dẫn trỏ đúng tài liệu và vị trí trang đã tải lên.",,,,,,,,,,,,,,,Sprint 3 - RAG & Lesson,,,Quality Assurance,,To Do,
+[DES-008] Design Lesson Plan Inline Editor and Review Status in Figma,DES-008,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Designer
+Master Task: ATC-306
+Sprint: Sprint 3 - RAG & Lesson
+Priority: High
+Dependencies: is blocked by ATC-304
+Deliverable: Figma Inline Review Screen
+
+Description:
+Thiết kế chế độ chỉnh sửa trực tiếp trên từng phần giáo án và nút đổi trạng thái phê duyệt.
+
+Acceptance Criteria:
+Bản vẽ Figma cho Inline Editor, nút Save Draft và chuyển đổi DRAFT -> APPROVED.",,,,,,,,,,,,,,,Sprint 3 - RAG & Lesson,,,Design,,To Do,
+[FE-012] Implement Inline Lesson Plan Editor with Auto-Save,FE-012,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Frontend Engineer
+Master Task: ATC-306
+Sprint: Sprint 3 - RAG & Lesson
+Priority: High
+Dependencies: is blocked by ATC-304
+Deliverable: InlineLessonEditor.jsx
+
+Description:
+Cho phép giáo viên sửa tiêu đề, mục tiêu, nội dung hoạt động và chọn trạng thái phê duyệt.
+
+Acceptance Criteria:
+Giáo viên sửa trực tiếp trên UI; có nút Lưu thay đổi và thông báo toast thành công.",,,,,,,,,,,,,,,Sprint 3 - RAG & Lesson,,,Frontend,,To Do,
+[BE-021] Implement Lesson Content Update and Review Status API,BE-021,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Backend Engineer
+Master Task: ATC-306
+Sprint: Sprint 3 - RAG & Lesson
+Priority: High
+Dependencies: is blocked by ATC-304
+Deliverable: GenerationController.java
+
+Description:
+Tạo endpoint PUT /api/workspaces/{id}/generation/{id} cập nhật content_data và review_status.
+
+Acceptance Criteria:
+Cập nhật thành công nội dung bài giảng và chuyển trạng thái DRAFT -> REVIEWED -> APPROVED.",,,,,,,,,,,,,,,Sprint 3 - RAG & Lesson,,,Backend,,To Do,
+[QA-021] Test Inline Content Editing and Review Status Transitions,QA-021,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-306
+Sprint: Sprint 3 - RAG & Lesson
+Priority: High
+Dependencies: is blocked by ATC-304
+Deliverable: Review Edit Test Report
+
+Description:
+Kiểm thử lưu nội dung chỉnh sửa, cập nhật trạng thái và bảo đảm dữ liệu JSON không bị vỡ.
+
+Acceptance Criteria:
+Dữ liệu chỉnh sửa được lưu chính xác vào DB mà không làm hỏng cấu trúc schema.",,,,,,,,,,,,,,,Sprint 3 - RAG & Lesson,,,Quality Assurance,,To Do,
+[DES-009] Design Document Export Modal and Layout Options in Figma,DES-009,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Designer
+Master Task: ATC-307
+Sprint: Sprint 3 - RAG & Lesson
+Priority: High
+Dependencies: is blocked by ATC-306
+Deliverable: Figma Export Modal
+
+Description:
+Thiết kế modal tùy chọn định dạng xuất file (Word, PDF) và template văn bản mẫu.
+
+Acceptance Criteria:
+Bản vẽ Figma cho Export Modal và mẫu trình bày giáo án chuẩn trường học.",,,,,,,,,,,,,,,Sprint 3 - RAG & Lesson,,,Design,,To Do,
+[FE-013] Implement Document Export Modal and Download Flow,FE-013,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Frontend Engineer
+Master Task: ATC-307
+Sprint: Sprint 3 - RAG & Lesson
+Priority: High
+Dependencies: is blocked by ATC-306
+Deliverable: ExportModal.jsx
+
+Description:
+Xây dựng ExportModal kích hoạt API tải file blob và lưu file về máy người dùng.
+
+Acceptance Criteria:
+Người dùng chọn định dạng DOCX hoặc PDF và tải file về máy thành công.",,,,,,,,,,,,,,,Sprint 3 - RAG & Lesson,,,Frontend,,To Do,
+[BE-022] Implement DOCX Lesson Export with Citation Footnotes,BE-022,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Backend Engineer
+Master Task: ATC-307
+Sprint: Sprint 3 - RAG & Lesson
+Priority: High
+Dependencies: is blocked by ATC-306
+Deliverable: DocxExportService.java
+
+Description:
+Sử dụng Apache POI để sinh file Word chuẩn định dạng giáo án kèm danh mục trích dẫn cuối trang.
+
+Acceptance Criteria:
+Tạo file .docx với font chữ, bảng biểu chuẩn và danh mục tài liệu tham khảo.",,,,,,,,,,,,,,,Sprint 3 - RAG & Lesson,,,Backend,,To Do,
+[BE-023] Implement PDF Lesson Export with Pedagogical Formatting,BE-023,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Backend Engineer
+Master Task: ATC-307
+Sprint: Sprint 3 - RAG & Lesson
+Priority: High
+Dependencies: is blocked by ATC-306
+Deliverable: PdfExportService.java
+
+Description:
+Sử dụng iText/OpenPDF để render giáo án thành file PDF chuyên nghiệp.
+
+Acceptance Criteria:
+Tạo file .pdf chuẩn trang in A4, có header/footer và đánh số trang.",,,,,,,,,,,,,,,Sprint 3 - RAG & Lesson,,,Backend,,To Do,
+[QA-022] Test DOCX and PDF Lesson Export Formatting and Citations,QA-022,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-307
+Sprint: Sprint 3 - RAG & Lesson
+Priority: High
+Dependencies: is blocked by ATC-306
+Deliverable: Export Quality Test Report
+
+Description:
+Kiểm thử tải và mở file DOCX/PDF trên Microsoft Word và Adobe Acrobat.
+
+Acceptance Criteria:
+File mở không bị lỗi format; bảng biểu và trích dẫn hiển thị rõ ràng.",,,,,,,,,,,,,,,Sprint 3 - RAG & Lesson,,,Quality Assurance,,To Do,
+[DES-010] Design Quiz Generator Form and Preview Interface in Figma,DES-010,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Designer
+Master Task: ATC-401
+Sprint: Sprint 4 - Quiz & Versioning
+Priority: High
+Dependencies: is blocked by ATC-303, ATC-304
+Deliverable: Figma Quiz Screens
+
+Description:
+Thiết kế form tạo đề thi (số lượng câu, trắc nghiệm, tự luận) và giao diện xem danh sách câu hỏi.
+
+Acceptance Criteria:
+Bản vẽ Figma cho Quiz Generator, Question Card và hiển thị đáp án đúng/sai.",,,,,,,,,,,,,,,Sprint 4 - Quiz & Versioning,,,Design,,To Do,
+[FE-014] Implement Quiz Generator Form and Question List Viewer,FE-014,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Frontend Engineer
+Master Task: ATC-401
+Sprint: Sprint 4 - Quiz & Versioning
+Priority: High
+Dependencies: is blocked by ATC-303, ATC-304
+Deliverable: QuizQuestionViewer.jsx
+
+Description:
+Xây dựng QuizGeneratorForm và QuizQuestionViewer với tùy chọn ẩn/hiện đáp án.
+
+Acceptance Criteria:
+Hiển thị đầy đủ danh sách câu hỏi trắc nghiệm (4 phương án) và câu hỏi tự luận.",,,,,,,,,,,,,,,Sprint 4 - Quiz & Versioning,,,Frontend,,To Do,
+[BE-024] Implement Structured MCQ and Short Answer Quiz Generation,BE-024,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Backend Engineer
+Master Task: ATC-401
+Sprint: Sprint 4 - Quiz & Versioning
+Priority: High
+Dependencies: is blocked by ATC-303, ATC-304
+Deliverable: quiz_generator.py in ai-service
+
+Description:
+Xây dựng pipeline sinh đề thi bằng LLM với Pydantic schema QuizSchema.
+
+Acceptance Criteria:
+Sinh đúng số lượng câu hỏi yêu cầu; câu trắc nghiệm có đủ 4 lựa chọn A, B, C, D.",,,,,,,,,,,,,,,Sprint 4 - Quiz & Versioning,,,Backend,,To Do,
+[BE-025] Implement Quiz Content Persistence in Generated Contents Repository,BE-025,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Backend Engineer
+Master Task: ATC-401
+Sprint: Sprint 4 - Quiz & Versioning
+Priority: High
+Dependencies: is blocked by ATC-303, ATC-304
+Deliverable: QuizService.java in backend
+
+Description:
+Lưu đề thi vào bảng generated_contents với content_type='QUIZ'.
+
+Acceptance Criteria:
+Đề thi được lưu vào CSDL kèm metadata câu hỏi và mảng source_chunk_ids.",,,,,,,,,,,,,,,Sprint 4 - Quiz & Versioning,,,Backend,,To Do,
+"[QA-023] Test Quiz Question Completeness, Options and Answer Keys",QA-023,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-401
+Sprint: Sprint 4 - Quiz & Versioning
+Priority: High
+Dependencies: is blocked by ATC-303, ATC-304
+Deliverable: Quiz Generation Test Report
+
+Description:
+Kiểm thử sinh đề thi với các mức số lượng câu hỏi (3 - 20 câu) và kiểm tra tính duy nhất của đáp án.
+
+Acceptance Criteria:
+100% câu hỏi trắc nghiệm có đúng 1 đáp án chính xác và lời giải thích hợp lý.",,,,,,,,,,,,,,,Sprint 4 - Quiz & Versioning,,,Quality Assurance,,To Do,
+[DES-011] Design Bloom Taxonomy Level Badges and Distribution in Figma,DES-011,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Designer
+Master Task: ATC-402
+Sprint: Sprint 4 - Quiz & Versioning
+Priority: High
+Dependencies: is blocked by ATC-401
+Deliverable: Figma Bloom Badges
+
+Description:
+Thiết kế hệ thống badge màu sắc cho 6 cấp độ Bloom (Nhận biết đến Sáng tạo) và biểu đồ phân bổ.
+
+Acceptance Criteria:
+Bản vẽ Figma cho 6 Bloom Badges và widget thống kê ma trận nhận thức.",,,,,,,,,,,,,,,Sprint 4 - Quiz & Versioning,,,Design,,To Do,
+[FE-015] Implement Bloom's Taxonomy Filter and Level Badges,FE-015,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Frontend Engineer
+Master Task: ATC-402
+Sprint: Sprint 4 - Quiz & Versioning
+Priority: High
+Dependencies: is blocked by ATC-401
+Deliverable: BloomBadge.jsx & BloomFilter.jsx
+
+Description:
+Gắn badge cấp độ Bloom vào từng câu hỏi và thêm bộ lọc câu hỏi theo thang Bloom.
+
+Acceptance Criteria:
+Giáo viên lọc được câu hỏi theo cấp độ nhận thức; xem tỷ lệ phân bổ ma trận đề.",,,,,,,,,,,,,,,Sprint 4 - Quiz & Versioning,,,Frontend,,To Do,
+[BE-026] Implement Automated Bloom's Taxonomy Question Classification,BE-026,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Backend Engineer
+Master Task: ATC-402
+Sprint: Sprint 4 - Quiz & Versioning
+Priority: High
+Dependencies: is blocked by ATC-401
+Deliverable: bloom_classifier.py
+
+Description:
+Tích hợp chỉ thị phân loại cấp độ Bloom trực tiếp vào prompt sinh câu hỏi.
+
+Acceptance Criteria:
+Mỗi câu hỏi có trường bloom_taxonomy_level hợp lệ (REMEMBER, UNDERSTAND, APPLY, ANALYZE, EVALUATE, CREATE).",,,,,,,,,,,,,,,Sprint 4 - Quiz & Versioning,,,Backend,,To Do,
+[QA-024] Test Bloom's Taxonomy Question Tagging and Filtering,QA-024,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-402
+Sprint: Sprint 4 - Quiz & Versioning
+Priority: High
+Dependencies: is blocked by ATC-401
+Deliverable: Bloom Tagging Test Report
+
+Description:
+Kiểm thử tính chính xác của việc gắn nhãn cấp độ Bloom trên tập câu hỏi mẫu.
+
+Acceptance Criteria:
+Nhãn Bloom phản ánh đúng độ khó của câu hỏi; bộ lọc UI hoạt động chính xác.",,,,,,,,,,,,,,,Sprint 4 - Quiz & Versioning,,,Quality Assurance,,To Do,
+[DES-012] Design Regeneration Prompt Modal and Version Diff in Figma,DES-012,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Designer
+Master Task: ATC-403
+Sprint: Sprint 4 - Quiz & Versioning
+Priority: High
+Dependencies: is blocked by ATC-401, ATC-306
+Deliverable: Figma Regeneration Screens
+
+Description:
+Thiết kế modal nhập chỉ dẫn sinh lại (Regenerate) và giao diện so sánh 2 phiên bản.
+
+Acceptance Criteria:
+Bản vẽ Figma cho Regeneration Modal và Diff Viewer so sánh bài soạn.",,,,,,,,,,,,,,,Sprint 4 - Quiz & Versioning,,,Design,,To Do,
+[FE-016] Implement Instruction-Based Regeneration Dialog and Version Selector,FE-016,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Frontend Engineer
+Master Task: ATC-403
+Sprint: Sprint 4 - Quiz & Versioning
+Priority: High
+Dependencies: is blocked by ATC-401, ATC-306
+Deliverable: RegenerationModal.jsx
+
+Description:
+Xây dựng RegenerationModal cho phép giáo viên nhập prompt điều chỉnh và chọn phiên bản xem.
+
+Acceptance Criteria:
+Gửi yêu cầu sinh lại kèm parent_id; hiển thị phiên bản mới mà không mất bản cũ.",,,,,,,,,,,,,,,Sprint 4 - Quiz & Versioning,,,Frontend,,To Do,
+[BE-027] Implement Content Regeneration API with Version Lineage,BE-027,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Backend Engineer
+Master Task: ATC-403
+Sprint: Sprint 4 - Quiz & Versioning
+Priority: High
+Dependencies: is blocked by ATC-401, ATC-306
+Deliverable: RegenerationService.java
+
+Description:
+Tạo endpoint POST /api/workspaces/{id}/generation/{id}/regenerate tạo bản ghi mới với version = parent.version + 1.
+
+Acceptance Criteria:
+Bản ghi mới có version tăng dần, parent_id trỏ về bản cũ; dữ liệu cũ được bảo toàn.",,,,,,,,,,,,,,,Sprint 4 - Quiz & Versioning,,,Backend,,To Do,
+[QA-025] Test Content Regeneration Version Increment and Lineage,QA-025,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-403
+Sprint: Sprint 4 - Quiz & Versioning
+Priority: High
+Dependencies: is blocked by ATC-401, ATC-306
+Deliverable: Versioning Test Report
+
+Description:
+Kiểm thử sinh lại nhiều lần (v1 -> v2 -> v3) và xác minh tính toàn vẹn của cây phả hệ phiên bản.
+
+Acceptance Criteria:
+Bản ghi cũ không bị ghi đè; liên kết parent_id chính xác 100%.",,,,,,,,,,,,,,,Sprint 4 - Quiz & Versioning,,,Quality Assurance,,To Do,
+[DES-013] Design Generation History Timeline and Version Tree in Figma,DES-013,,Task,To Do,ATC,AI Teacher Copilot,software,,,,Medium,,,,,,,,,,,,,0,"Role: Designer
+Master Task: ATC-404
+Sprint: Sprint 4 - Quiz & Versioning
+Priority: Medium
+Dependencies: is blocked by ATC-403
+Deliverable: Figma History Screens
+
+Description:
+Thiết kế trang danh sách lịch sử bài soạn và sơ đồ cây phiên bản trực quan.
+
+Acceptance Criteria:
+Bản vẽ Figma cho History List Page, Version Timeline và Revert Action.",,,,,,,,,,,,,,,Sprint 4 - Quiz & Versioning,,,Design,,To Do,
+[FE-017] Implement Generation History List and Version Lineage Tree,FE-017,,Task,To Do,ATC,AI Teacher Copilot,software,,,,Medium,,,,,,,,,,,,,0,"Role: Frontend Engineer
+Master Task: ATC-404
+Sprint: Sprint 4 - Quiz & Versioning
+Priority: Medium
+Dependencies: is blocked by ATC-403
+Deliverable: HistoryListPage.jsx & VersionTimeline.jsx
+
+Description:
+Xây dựng HistoryListPage và VersionTimeline hiển thị lịch sử bài soạn theo thời gian.
+
+Acceptance Criteria:
+Giáo viên xem được toàn bộ các bài soạn trong workspace và mở lại phiên bản cũ.",,,,,,,,,,,,,,,Sprint 4 - Quiz & Versioning,,,Frontend,,To Do,
+[BE-028] Implement Generation History and Version Tree API,BE-028,,Task,To Do,ATC,AI Teacher Copilot,software,,,,Medium,,,,,,,,,,,,,0,"Role: Backend Engineer
+Master Task: ATC-404
+Sprint: Sprint 4 - Quiz & Versioning
+Priority: Medium
+Dependencies: is blocked by ATC-403
+Deliverable: HistoryController.java
+
+Description:
+Tạo endpoint GET /api/workspaces/{id}/generation/history và GET /api/workspaces/{id}/generation/{id}/lineage.
+
+Acceptance Criteria:
+Trả về danh sách bài soạn kèm thông tin phiên bản và chuỗi phả hệ version.",,,,,,,,,,,,,,,Sprint 4 - Quiz & Versioning,,,Backend,,To Do,
+[QA-026] Test Generation History Retrieval and Version Tree Navigation,QA-026,,Task,To Do,ATC,AI Teacher Copilot,software,,,,Medium,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-404
+Sprint: Sprint 4 - Quiz & Versioning
+Priority: Medium
+Dependencies: is blocked by ATC-403
+Deliverable: History API Test Report
+
+Description:
+Kiểm thử truy xuất lịch sử và mở xem nội dung các phiên bản cũ.
+
+Acceptance Criteria:
+API trả về đúng danh sách bài soạn của workspace; không lẫn lộn dữ liệu.",,,,,,,,,,,,,,,Sprint 4 - Quiz & Versioning,,,Quality Assurance,,To Do,
+[DES-014] Design Assessment Rubric Matrix and Criteria Editor in Figma,DES-014,,Task,To Do,ATC,AI Teacher Copilot,software,,,,Medium,,,,,,,,,,,,,0,"Role: Designer
+Master Task: ATC-405
+Sprint: Sprint 4 - Quiz & Versioning
+Priority: Medium
+Dependencies: is blocked by ATC-304, ATC-401
+Deliverable: Figma Rubric Screens
+
+Description:
+Thiết kế bảng ma trận Rubric đánh giá (tiêu chí, trọng số, các mức độ đạt chuẩn).
+
+Acceptance Criteria:
+Bản vẽ Figma cho Rubric Matrix Table và thanh chỉnh sửa tiêu chí.",,,,,,,,,,,,,,,Sprint 4 - Quiz & Versioning,,,Design,,To Do,
+[FE-018] Implement Assessment Rubric Table and Inline Criteria Editor,FE-018,,Task,To Do,ATC,AI Teacher Copilot,software,,,,Medium,,,,,,,,,,,,,0,"Role: Frontend Engineer
+Master Task: ATC-405
+Sprint: Sprint 4 - Quiz & Versioning
+Priority: Medium
+Dependencies: is blocked by ATC-304, ATC-401
+Deliverable: RubricTableView.jsx
+
+Description:
+Xây dựng RubricTableView cho phép xem và chỉnh sửa các mức điểm tiêu chí đánh giá.
+
+Acceptance Criteria:
+Hiển thị bảng Rubric rõ ràng; hỗ trợ sửa trọng số và tiêu chí trên giao diện.",,,,,,,,,,,,,,,Sprint 4 - Quiz & Versioning,,,Frontend,,To Do,
+[BE-029] Implement Structured Assessment Rubric Generation Pipeline,BE-029,,Task,To Do,ATC,AI Teacher Copilot,software,,,,Medium,,,,,,,,,,,,,0,"Role: Backend Engineer
+Master Task: ATC-405
+Sprint: Sprint 4 - Quiz & Versioning
+Priority: Medium
+Dependencies: is blocked by ATC-304, ATC-401
+Deliverable: rubric_generator.py
+
+Description:
+Xây dựng pipeline sinh Rubric đánh giá có cấu trúc qua RubricSchema.
+
+Acceptance Criteria:
+Sinh Rubric đánh giá phù hợp với mục tiêu bài giảng; lưu vào CSDL với content_type='RUBRIC'.",,,,,,,,,,,,,,,Sprint 4 - Quiz & Versioning,,,Backend,,To Do,
+[QA-027] Test Rubric Scoring Matrix and Curriculum Alignment,QA-027,,Task,To Do,ATC,AI Teacher Copilot,software,,,,Medium,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-405
+Sprint: Sprint 4 - Quiz & Versioning
+Priority: Medium
+Dependencies: is blocked by ATC-304, ATC-401
+Deliverable: Rubric Test Report
+
+Description:
+Kiểm thử tính logic của thang điểm Rubric và độ bám sát yêu cầu cần đạt của bài học.
+
+Acceptance Criteria:
+Tổng trọng số điểm = 100% hoặc thang điểm 10 chuẩn; tiêu chí rõ ràng.",,,,,,,,,,,,,,,Sprint 4 - Quiz & Versioning,,,Quality Assurance,,To Do,
+[DES-015] Design Student Exam Sheet and Teacher Answer Key in Figma,DES-015,,Task,To Do,ATC,AI Teacher Copilot,software,,,,Medium,,,,,,,,,,,,,0,"Role: Designer
+Master Task: ATC-406
+Sprint: Sprint 4 - Quiz & Versioning
+Priority: Medium
+Dependencies: is blocked by ATC-307, ATC-401
+Deliverable: Figma Quiz Export Layouts
+
+Description:
+Thiết kế layout phiếu đề thi cho học sinh và phiếu đáp án / hướng dẫn chấm cho giáo viên.
+
+Acceptance Criteria:
+Bản vẽ Figma cho mẫu đề thi học sinh (không đáp án) và phiếu hướng dẫn chấm.",,,,,,,,,,,,,,,Sprint 4 - Quiz & Versioning,,,Design,,To Do,
+[FE-019] Implement Student Exam and Teacher Answer Key Export Controls,FE-019,,Task,To Do,ATC,AI Teacher Copilot,software,,,,Medium,,,,,,,,,,,,,0,"Role: Frontend Engineer
+Master Task: ATC-406
+Sprint: Sprint 4 - Quiz & Versioning
+Priority: Medium
+Dependencies: is blocked by ATC-307, ATC-401
+Deliverable: QuizExportControls.jsx
+
+Description:
+Thêm tùy chọn xuất 'Đề thi học sinh' và 'Đáp án & Hướng dẫn chấm' trong Export Modal.
+
+Acceptance Criteria:
+Giáo viên tải được 2 file riêng biệt chỉ bằng 1 thao tác chọn lựa.",,,,,,,,,,,,,,,Sprint 4 - Quiz & Versioning,,,Frontend,,To Do,
+[BE-030] Implement Student Quiz Sheet Export without Answers,BE-030,,Task,To Do,ATC,AI Teacher Copilot,software,,,,Medium,,,,,,,,,,,,,0,"Role: Backend Engineer
+Master Task: ATC-406
+Sprint: Sprint 4 - Quiz & Versioning
+Priority: Medium
+Dependencies: is blocked by ATC-307, ATC-401
+Deliverable: QuizStudentDocxService.java
+
+Description:
+Mở rộng export engine tạo file Word/PDF đề thi sạch sẽ, ẩn toàn bộ đáp án và giải thích.
+
+Acceptance Criteria:
+File xuất ra chỉ có danh sách câu hỏi và các lựa chọn; không để lộ đáp án đúng.",,,,,,,,,,,,,,,Sprint 4 - Quiz & Versioning,,,Backend,,To Do,
+[BE-031] Implement Teacher Answer Key and Grading Guide Export,BE-031,,Task,To Do,ATC,AI Teacher Copilot,software,,,,Medium,,,,,,,,,,,,,0,"Role: Backend Engineer
+Master Task: ATC-406
+Sprint: Sprint 4 - Quiz & Versioning
+Priority: Medium
+Dependencies: is blocked by ATC-307, ATC-401
+Deliverable: QuizTeacherDocxService.java
+
+Description:
+Mở rộng export engine tạo file Word/PDF hướng dẫn chấm chi tiết kèm ma trận Bloom.
+
+Acceptance Criteria:
+File xuất ra có đáp án, lời giải chi tiết, cấp độ Bloom và trích dẫn nguồn tham khảo.",,,,,,,,,,,,,,,Sprint 4 - Quiz & Versioning,,,Backend,,To Do,
+[QA-028] Test Student Quiz Sheet and Teacher Grading Guide Exports,QA-028,,Task,To Do,ATC,AI Teacher Copilot,software,,,,Medium,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-406
+Sprint: Sprint 4 - Quiz & Versioning
+Priority: Medium
+Dependencies: is blocked by ATC-307, ATC-401
+Deliverable: Quiz Export Test Report
+
+Description:
+Kiểm thử đối chiếu file học sinh và file giáo viên để đảm bảo tuyệt đối không lộ đáp án.
+
+Acceptance Criteria:
+File học sinh sạch 100%; file giáo viên có lời giải và đáp án chính xác.",,,,,,,,,,,,,,,Sprint 4 - Quiz & Versioning,,,Quality Assurance,,To Do,
+[BE-032] Set Up Spring Boot and FastAPI Testcontainers Integration Harness,BE-032,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Backend Engineer
+Master Task: ATC-501
+Sprint: Sprint 5 - Testing & Optimization
+Priority: High
+Dependencies: is blocked by ATC-307, ATC-404
+Deliverable: TestcontainersConfig.java
+
+Description:
+Cấu hình môi trường test tích hợp sử dụng Testcontainers (Postgres + MinIO) cho CI.
+
+Acceptance Criteria:
+Bộ test harness tự động khởi chạy containers sạch và dọn dẹp sau khi chạy test.",,,,,,,,,,,,,,,Sprint 5 - Testing & Optimization,,,Backend,,To Do,
+[QA-029] Implement Automated End-to-End User Journey Test Suite,QA-029,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-501
+Sprint: Sprint 5 - Testing & Optimization
+Priority: High
+Dependencies: is blocked by ATC-307, ATC-404
+Deliverable: E2ETestSuite.java
+
+Description:
+Viết kịch bản test E2E tự động: Đăng ký -> Upload -> Ingest -> RAG -> Lesson -> Quiz -> Export.
+
+Acceptance Criteria:
+Toàn bộ luồng nghiệp vụ cốt lõi chạy thông suốt không có lỗi gián đoạn.",,,,,,,,,,,,,,,Sprint 5 - Testing & Optimization,,,Quality Assurance,,To Do,
+[QA-030] Validate Full Vertical Slice from Upload to Word Export,QA-030,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-501
+Sprint: Sprint 5 - Testing & Optimization
+Priority: High
+Dependencies: is blocked by ATC-307, ATC-404
+Deliverable: E2E Execution Report
+
+Description:
+Chạy và ghi nhận kết quả kiểm thử tự động trên luồng tích hợp hoàn chỉnh.
+
+Acceptance Criteria:
+100% kịch bản kiểm thử E2E pass xanh trên môi trường test tích hợp.",,,,,,,,,,,,,,,Sprint 5 - Testing & Optimization,,,Quality Assurance,,To Do,
+[BE-033] Implement RAG Retrieval Quality Metrics Logging,BE-033,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Backend Engineer
+Master Task: ATC-502
+Sprint: Sprint 5 - Testing & Optimization
+Priority: High
+Dependencies: is blocked by ATC-303, ATC-401
+Deliverable: evaluation_logger.py
+
+Description:
+Xây dựng module ghi nhận metrics đánh giá chất lượng RAG trong FastAPI.
+
+Acceptance Criteria:
+Ghi log độ tương đồng Cosine, thời gian truy xuất và số lượng chunk đạt chuẩn.",,,,,,,,,,,,,,,Sprint 5 - Testing & Optimization,,,Backend,,To Do,
+[QA-031] Execute RAG Evaluation Benchmark across 20–30 K-12 Test Cases,QA-031,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-502
+Sprint: Sprint 5 - Testing & Optimization
+Priority: High
+Dependencies: is blocked by ATC-303, ATC-401
+Deliverable: RAG Benchmark Dataset & Script
+
+Description:
+Thu thập và chạy benchmark trên bộ 20-30 tài liệu giáo khoa K-12 (Toán, Văn, KHTN, Sử, Địa).
+
+Acceptance Criteria:
+Bộ benchmark bao phủ đủ các khối lớp và định dạng tài liệu thực tế.",,,,,,,,,,,,,,,Sprint 5 - Testing & Optimization,,,Quality Assurance,,To Do,
+[QA-032] Measure RAG Groundedness and Citation Precision Metrics,QA-032,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-502
+Sprint: Sprint 5 - Testing & Optimization
+Priority: High
+Dependencies: is blocked by ATC-303, ATC-401
+Deliverable: RAG Evaluation Benchmark Report
+
+Description:
+Đo lường và lập báo cáo tỷ lệ Groundedness (mục tiêu >= 85%) và Citation Precision (>= 90%).
+
+Acceptance Criteria:
+Báo cáo chi tiết các trường hợp đạt chuẩn và các trường hợp cần tinh chỉnh prompt.",,,,,,,,,,,,,,,Sprint 5 - Testing & Optimization,,,Quality Assurance,,To Do,
+[BE-034] Optimize pgvector Query Plans and HNSW Index Performance,BE-034,,Task,To Do,ATC,AI Teacher Copilot,software,,,,Medium,,,,,,,,,,,,,0,"Role: Backend Engineer
+Master Task: ATC-503
+Sprint: Sprint 5 - Testing & Optimization
+Priority: Medium
+Dependencies: is blocked by ATC-302, ATC-502
+Deliverable: V2__optimize_hnsw_index.sql
+
+Description:
+Tinh chỉnh tham số HNSW index (m=16, ef_construction=64) và tối ưu HikariCP connection pool.
+
+Acceptance Criteria:
+Thời gian truy xuất vector pgvector giảm xuống < 200ms cho mỗi request tìm kiếm.",,,,,,,,,,,,,,,Sprint 5 - Testing & Optimization,,,Backend,,To Do,
+[OPS-006] Tune PostgreSQL Memory and pgvector Worker Configuration,OPS-006,,Task,To Do,ATC,AI Teacher Copilot,software,,,,Medium,,,,,,,,,,,,,0,"Role: DevOps Engineer
+Master Task: ATC-503
+Sprint: Sprint 5 - Testing & Optimization
+Priority: Medium
+Dependencies: is blocked by ATC-302, ATC-502
+Deliverable: postgresql.conf tuning
+
+Description:
+Cấu hình shared_buffers, work_mem và max_parallel_workers cho PostgreSQL container.
+
+Acceptance Criteria:
+Tối ưu hóa tài nguyên phần cứng, tránh nghẽn I/O khi tính toán vector.",,,,,,,,,,,,,,,Sprint 5 - Testing & Optimization,,,DevOps,,To Do,
+[QA-033] Benchmark Vector Retrieval Latency under Concurrent Load,QA-033,,Task,To Do,ATC,AI Teacher Copilot,software,,,,Medium,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-503
+Sprint: Sprint 5 - Testing & Optimization
+Priority: Medium
+Dependencies: is blocked by ATC-302, ATC-502
+Deliverable: Performance Benchmark Report
+
+Description:
+Thực hiện kiểm thử tải (Load Testing) đo độ trễ truy vấn vector dưới tải đồng thời.
+
+Acceptance Criteria:
+Độ trễ truy vấn vector trung bình < 200ms; tổng thời gian sinh giáo án < 15s.",,,,,,,,,,,,,,,Sprint 5 - Testing & Optimization,,,Quality Assurance,,To Do,
+[FE-020] Implement Error Boundary and Toast Notifications for Upload Failures,FE-020,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Frontend Engineer
+Master Task: ATC-504
+Sprint: Sprint 5 - Testing & Optimization
+Priority: High
+Dependencies: is blocked by ATC-206
+Deliverable: ErrorBoundary.jsx & ToastNotification.jsx
+
+Description:
+Cải thiện thông báo lỗi trên UI khi tài liệu bị lỗi phân tích hoặc quá tải.
+
+Acceptance Criteria:
+Hiển thị Toast lỗi rõ ràng kèm hướng dẫn khắc phục khi file không thể xử lý.",,,,,,,,,,,,,,,Sprint 5 - Testing & Optimization,,,Frontend,,To Do,
+[BE-035] Implement Exception Handlers for Corrupt Files and Empty Text,BE-035,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Backend Engineer
+Master Task: ATC-504
+Sprint: Sprint 5 - Testing & Optimization
+Priority: High
+Dependencies: is blocked by ATC-206
+Deliverable: GlobalExceptionHandler.java & parsers.py
+
+Description:
+Bổ sung xử lý ngoại lệ khi file PDF là file scan không có text layer hoặc file DOCX lỗi.
+
+Acceptance Criteria:
+Tự động đánh dấu tài liệu trạng thái FAILED kèm thông điệp lỗi chi tiết trong DB.",,,,,,,,,,,,,,,Sprint 5 - Testing & Optimization,,,Backend,,To Do,
+[QA-034] Test File Ingestion Edge Cases for Corrupt and Scanned Files,QA-034,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-504
+Sprint: Sprint 5 - Testing & Optimization
+Priority: High
+Dependencies: is blocked by ATC-206
+Deliverable: Edge Case Test Report
+
+Description:
+Kiểm thử hệ thống với tập file lỗi, file không có text, file mật khẩu bảo vệ.
+
+Acceptance Criteria:
+Hệ thống không bị crash (500); trả về thông báo lỗi thân thiện cho giáo viên.",,,,,,,,,,,,,,,Sprint 5 - Testing & Optimization,,,Quality Assurance,,To Do,
+[BE-036] Harden Authorization Filters and System Prompt Injection Defense,BE-036,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Backend Engineer
+Master Task: ATC-505
+Sprint: Sprint 5 - Testing & Optimization
+Priority: High
+Dependencies: is blocked by ATC-204, ATC-303
+Deliverable: SecurityHardeningPatch.java
+
+Description:
+Rà soát toàn bộ route handlers, thêm kiểm tra quyền sở hữu và lọc ký tự độc hại trong prompt.
+
+Acceptance Criteria:
+Không có lỗ hổng IDOR; ngăn chặn hoàn toàn việc bypass ranh giới prompt.",,,,,,,,,,,,,,,Sprint 5 - Testing & Optimization,,,Backend,,To Do,
+[QA-035] Conduct Penetration Testing on Cross-Workspace Leakage and Injections,QA-035,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-505
+Sprint: Sprint 5 - Testing & Optimization
+Priority: High
+Dependencies: is blocked by ATC-204, ATC-303
+Deliverable: Security Audit & Pentest Report
+
+Description:
+Thực hiện kiểm thử xâm nhập (Pen-test) thử nghiệm truy cập trái phép chéo workspace và inject prompt.
+
+Acceptance Criteria:
+Báo cáo an ninh xác nhận không có rò rỉ dữ liệu giữa các giáo viên.",,,,,,,,,,,,,,,Sprint 5 - Testing & Optimization,,,Quality Assurance,,To Do,
+[OPS-007] Configure Multi-Stage Production Dockerfiles for All Services,OPS-007,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: DevOps Engineer
+Master Task: ATC-601
+Sprint: Sprint 6 - Production & Handover
+Priority: High
+Dependencies: is blocked by ATC-501
+Deliverable: Production Dockerfiles
+
+Description:
+Viết Dockerfile multi-stage tối ưu dung lượng image và bảo mật cho 3 services.
+
+Acceptance Criteria:
+Image build nhẹ, non-root user và không chứa công cụ build thừa thãi.",,,,,,,,,,,,,,,Sprint 6 - Production & Handover,,,DevOps,,To Do,
+[OPS-008] Set Up Production Docker Compose with Isolated Internal Network,OPS-008,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: DevOps Engineer
+Master Task: ATC-601
+Sprint: Sprint 6 - Production & Handover
+Priority: High
+Dependencies: is blocked by ATC-501
+Deliverable: docker-compose.prod.yml
+
+Description:
+Cấu hình docker-compose.prod.yml kết nối 5 services qua mạng nội bộ atc-network an toàn.
+
+Acceptance Criteria:
+Cổng PostgreSQL, FastAPI không bị lộ ra ngoài Internet; chỉ mở cổng Nginx 80/443.",,,,,,,,,,,,,,,Sprint 6 - Production & Handover,,,DevOps,,To Do,
+[QA-036] Test Production Container Startup and Inter-Service Networking,QA-036,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-601
+Sprint: Sprint 6 - Production & Handover
+Priority: High
+Dependencies: is blocked by ATC-501
+Deliverable: Production Deployment Test Report
+
+Description:
+Kiểm thử khởi động cụm container production và kiểm tra giới hạn CPU/RAM.
+
+Acceptance Criteria:
+Toàn bộ container khởi chạy ổn định; giao tiếp nội bộ thông suốt qua service name.",,,,,,,,,,,,,,,Sprint 6 - Production & Handover,,,Quality Assurance,,To Do,
+"[OPS-009] Configure Nginx Reverse Proxy, SSL and Security Headers",OPS-009,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: DevOps Engineer
+Master Task: ATC-602
+Sprint: Sprint 6 - Production & Handover
+Priority: High
+Dependencies: is blocked by ATC-601
+Deliverable: nginx.conf & SSL config
+
+Description:
+Viết cấu hình nginx.conf định tuyến /api vào Spring Boot, static files cho React và bảo mật headers.
+
+Acceptance Criteria:
+Nginx chuyển hướng đúng SPA routes; cấu hình HTTPS SSL và security headers chuẩn A.",,,,,,,,,,,,,,,Sprint 6 - Production & Handover,,,DevOps,,To Do,
+"[QA-037] Test Nginx API Routing, CORS Policies and Security Headers",QA-037,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-602
+Sprint: Sprint 6 - Production & Handover
+Priority: High
+Dependencies: is blocked by ATC-601
+Deliverable: Nginx Security Audit Report
+
+Description:
+Kiểm thử định tuyến API, xử lý CORS preflight và chấm điểm bảo mật HTTP headers.
+
+Acceptance Criteria:
+Không có lỗi CORS trên môi trường production; điểm bảo mật headers đạt chuẩn.",,,,,,,,,,,,,,,Sprint 6 - Production & Handover,,,Quality Assurance,,To Do,
+[OPS-010] Automate PostgreSQL and MinIO Backups with Scheduled Cron Jobs,OPS-010,,Task,To Do,ATC,AI Teacher Copilot,software,,,,Medium,,,,,,,,,,,,,0,"Role: DevOps Engineer
+Master Task: ATC-603
+Sprint: Sprint 6 - Production & Handover
+Priority: Medium
+Dependencies: is blocked by ATC-601
+Deliverable: backup_db.sh & cron config
+
+Description:
+Viết script backup_db.sh tự động dump database nén .sql.gz và đồng bộ dữ liệu MinIO.
+
+Acceptance Criteria:
+Script chạy tự động qua cron job hàng ngày và lưu trữ bản backup an toàn.",,,,,,,,,,,,,,,Sprint 6 - Production & Handover,,,DevOps,,To Do,
+[OPS-011] Document Disaster Recovery Runbook and Restoration Procedures,OPS-011,,Task,To Do,ATC,AI Teacher Copilot,software,,,,Medium,,,,,,,,,,,,,0,"Role: DevOps Engineer
+Master Task: ATC-603
+Sprint: Sprint 6 - Production & Handover
+Priority: Medium
+Dependencies: is blocked by ATC-601
+Deliverable: Disaster_Recovery_Runbook.md
+
+Description:
+Viết tài liệu hướng dẫn quy trình khôi phục hệ thống từ bản backup khi gặp sự cố.
+
+Acceptance Criteria:
+Tài liệu Runbook chi tiết từng bước khôi phục dữ liệu trên môi trường trắng.",,,,,,,,,,,,,,,Sprint 6 - Production & Handover,,,DevOps,,To Do,
+[QA-038] Test Database Backup Integrity and Disaster Recovery Restoration,QA-038,,Task,To Do,ATC,AI Teacher Copilot,software,,,,Medium,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-603
+Sprint: Sprint 6 - Production & Handover
+Priority: Medium
+Dependencies: is blocked by ATC-601
+Deliverable: Backup Restoration Test Report
+
+Description:
+Kiểm thử thực tế khôi phục dữ liệu từ file backup lên máy chủ mới.
+
+Acceptance Criteria:
+Dữ liệu phục hồi nguyên vẹn 100% không bị mất mát hay lỗi index vector.",,,,,,,,,,,,,,,Sprint 6 - Production & Handover,,,Quality Assurance,,To Do,
+[BE-037] Document OpenAPI Specifications and Backend Architecture,BE-037,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Backend Engineer
+Master Task: ATC-604
+Sprint: Sprint 6 - Production & Handover
+Priority: High
+Dependencies: is blocked by ATC-501, ATC-502, ATC-503, ATC-504, ATC-505
+Deliverable: API_DOCS.md & OpenAPI Spec
+
+Description:
+Tổng hợp tài liệu Swagger/OpenAPI đầy đủ cho toàn bộ REST API của Spring Boot.
+
+Acceptance Criteria:
+File API_DOCS.md và Swagger UI hiển thị đủ mô tả request/response của 100% endpoints.",,,,,,,,,,,,,,,Sprint 6 - Production & Handover,,,Backend,,To Do,
+[FE-021] Document Frontend Architecture and State Management,FE-021,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Frontend Engineer
+Master Task: ATC-604
+Sprint: Sprint 6 - Production & Handover
+Priority: High
+Dependencies: is blocked by ATC-501, ATC-502, ATC-503, ATC-504, ATC-505
+Deliverable: Frontend Component Docs
+
+Description:
+Tổng hợp tài liệu kiến trúc frontend, cấu trúc store Zustand và sơ đồ luồng dữ liệu.
+
+Acceptance Criteria:
+Tài liệu FRONTEND_ARCHITECTURE.md được cập nhật đồng bộ với mã nguồn thực tế.",,,,,,,,,,,,,,,Sprint 6 - Production & Handover,,,Frontend,,To Do,
+[OPS-012] Document DevOps Deployment Guide and Environment Cheat-Sheet,OPS-012,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: DevOps Engineer
+Master Task: ATC-604
+Sprint: Sprint 6 - Production & Handover
+Priority: High
+Dependencies: is blocked by ATC-501, ATC-502, ATC-503, ATC-504, ATC-505
+Deliverable: Deployment_Guide.md & README.md
+
+Description:
+Viết tài liệu hướng dẫn triển khai hệ thống 1-click và bảng tra cứu biến môi trường.
+
+Acceptance Criteria:
+File README.md và Deployment Guide hướng dẫn chi tiết các bước setup từ đầu.",,,,,,,,,,,,,,,Sprint 6 - Production & Handover,,,DevOps,,To Do,
+[QA-039] Produce Final Quality Assurance Report and Test Summary,QA-039,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-604
+Sprint: Sprint 6 - Production & Handover
+Priority: High
+Dependencies: is blocked by ATC-501, ATC-502, ATC-503, ATC-504, ATC-505
+Deliverable: Final QA & SPQM Report
+
+Description:
+Tổng hợp kết quả kiểm thử, ma trận độ bao phủ và báo cáo chất lượng RAG toàn dự án.
+
+Acceptance Criteria:
+Báo cáo tổng kết chất lượng SPQM hoàn chỉnh sẵn sàng cho hội đồng nghiệm thu.",,,,,,,,,,,,,,,Sprint 6 - Production & Handover,,,Quality Assurance,,To Do,
+[QA-040] Execute Final System Acceptance Test Plan for 11 MVP Features,QA-040,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-605
+Sprint: Sprint 6 - Production & Handover
+Priority: High
+Dependencies: is blocked by ATC-601, ATC-604
+Deliverable: Final Acceptance Test Matrix
+
+Description:
+Kiểm thử nghiệm thu toàn diện 11 tính năng MVP theo đúng tiêu chí Acceptance Criteria.
+
+Acceptance Criteria:
+100% tính năng cốt lõi hoạt động trơn tru và đạt tiêu chuẩn nghiệm thu đồ án.",,,,,,,,,,,,,,,Sprint 6 - Production & Handover,,,Quality Assurance,,To Do,
+[QA-041] Conduct End-to-End Product Demonstration Walkthrough,QA-041,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: QA Engineer
+Master Task: ATC-605
+Sprint: Sprint 6 - Production & Handover
+Priority: High
+Dependencies: is blocked by ATC-601, ATC-604
+Deliverable: Demo Walkthrough Script & Video
+
+Description:
+Thực hiện kịch bản demo hoàn chỉnh: Upload tài liệu -> RAG -> Soạn giáo án -> Tạo Quiz -> Xuất file.
+
+Acceptance Criteria:
+Kịch bản demo chạy thông suốt, không phát sinh lỗi và làm nổi bật giá trị sản phẩm.",,,,,,,,,,,,,,,Sprint 6 - Production & Handover,,,Quality Assurance,,To Do,

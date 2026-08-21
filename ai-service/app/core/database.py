@@ -19,7 +19,6 @@ engine = create_async_engine(
 
 async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
-
 async def init_db() -> None:
     """Verify database connectivity on startup."""
     try:
@@ -32,12 +31,10 @@ async def init_db() -> None:
         logger.error("database_connection_failed", error=str(e))
         raise
 
-
 async def close_db() -> None:
     """Close database connections on shutdown."""
     await engine.dispose()
     logger.info("database_disconnected")
-
 
 async def get_db() -> AsyncSession:
     """Dependency — yields a database session."""

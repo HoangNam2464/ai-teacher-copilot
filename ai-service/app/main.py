@@ -18,7 +18,6 @@ from app.core.logging import setup_logging
 from app.core.database import init_db, close_db
 from app.api.routes import health, ingestion, retrieval, generation
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Startup and shutdown events."""
@@ -26,7 +25,6 @@ async def lifespan(app: FastAPI):
     await init_db()
     yield
     await close_db()
-
 
 app = FastAPI(
     title="AI Teacher Copilot — AI Service",
@@ -36,7 +34,6 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS — only needed if accessed directly during development
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://localhost:8080"],
@@ -44,7 +41,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Register routers
 app.include_router(health.router, tags=["Health"])
 app.include_router(ingestion.router, prefix="/ingestion", tags=["Ingestion"])
 app.include_router(retrieval.router, prefix="/retrieval", tags=["Retrieval"])
