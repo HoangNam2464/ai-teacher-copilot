@@ -5,7 +5,6 @@ import { PrivateRoute } from './PrivateRoute';
 import { DashboardLayout } from '../../core/layouts/DashboardLayout';
 import { AuthLayout } from '../../core/layouts/AuthLayout';
 
-// Feature Pages
 import { LoginPage } from '../../features/auth/pages/LoginPage';
 import { RegisterPage } from '../../features/auth/pages/RegisterPage';
 import { WorkspaceListPage } from '../../features/workspace/pages/WorkspaceListPage';
@@ -17,13 +16,12 @@ import { HistoryListPage } from '../../features/history/pages/HistoryListPage';
 export function AppRoutes() {
   return (
     <Routes>
-      {/* Auth Routes (Unauthenticated Layout) */}
+
       <Route element={<AuthLayout />}>
         <Route path={PATHS.LOGIN} element={<LoginPage />} />
         <Route path={PATHS.REGISTER} element={<RegisterPage />} />
       </Route>
 
-      {/* Protected Application Routes (Dashboard Layout) */}
       <Route
         path={PATHS.ROOT}
         element={
@@ -40,7 +38,6 @@ export function AppRoutes() {
         <Route path={PATHS.HISTORY} element={<HistoryListPage />} />
       </Route>
 
-      {/* Fallback */}
       <Route path="*" element={<Navigate to={PATHS.ROOT} replace />} />
     </Routes>
   );

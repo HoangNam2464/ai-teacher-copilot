@@ -8,10 +8,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 
-/**
- * Standard API response wrapper used across all endpoints.
- * Provides consistent response format for both success and error cases.
- */
 @Data
 @Builder
 @NoArgsConstructor

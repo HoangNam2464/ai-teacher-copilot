@@ -4,10 +4,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-/**
- * CORS configuration for React dev server.
- * In production, this should be tightened to the actual domain.
- */
 @Configuration
 public class CorsConfig implements WebMvcConfigurer {
 

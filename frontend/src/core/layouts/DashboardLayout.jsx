@@ -6,6 +6,36 @@ import { useWorkspace } from '../hooks/useWorkspace';
 import { PATHS } from '../../app/routes/paths';
 import apiClient from '../services/client';
 import { ENDPOINTS } from '../services/endpoints';
+import {
+  IconSparkles,
+  IconDashboard,
+  IconSchool,
+  IconBookOpen,
+  IconFileText,
+  IconTarget,
+  IconClock,
+  IconUser,
+  IconLogOut,
+} from '../components/icons/SvgIcons';
+
+function getSidebarIcon(iconName) {
+  switch (iconName) {
+    case 'dashboard':
+      return <IconDashboard size={18} />;
+    case 'workspaces':
+      return <IconSchool size={18} />;
+    case 'documents':
+      return <IconBookOpen size={18} />;
+    case 'lesson-planner':
+      return <IconFileText size={18} />;
+    case 'quiz-generator':
+      return <IconTarget size={18} />;
+    case 'history':
+      return <IconClock size={18} />;
+    default:
+      return <IconFileText size={18} />;
+  }
+}
 
 export function DashboardLayout() {
   const { user, logout } = useAuth();
@@ -13,12 +43,13 @@ export function DashboardLayout() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch user workspaces on mount
+
     async function fetchWorkspaces() {
       try {
         const response = await apiClient.get(ENDPOINTS.WORKSPACES);
-        if (response.data && Array.isArray(response.data)) {
-          setWorkspaces(response.data);
+        const list = Array.isArray(response.data) ? response.data : (response.data?.data || []);
+        if (Array.isArray(list)) {
+          setWorkspaces(list);
         }
       } catch (err) {
         console.error('Failed to load workspaces:', err);
@@ -34,11 +65,13 @@ export function DashboardLayout() {
 
   return (
     <div className="app-container">
-      {/* Sidebar */}
+
       <aside className="sidebar">
         <div className="sidebar-header">
           <div className="sidebar-brand">
-            <span>✨</span>
+            <span style={{ color: 'var(--color-primary)', display: 'flex' }}>
+              <IconSparkles size={22} />
+            </span>
             <span>Teacher Copilot</span>
           </div>
         </div>
@@ -50,20 +83,36 @@ export function DashboardLayout() {
               to={item.path}
               className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}
             >
-              <span>{item.icon}</span>
+              <span style={{ display: 'flex', alignItems: 'center' }}>
+                {getSidebarIcon(item.iconName)}
+              </span>
               <span>{item.label}</span>
             </NavLink>
           ))}
         </nav>
 
         <div style={{ padding: 'var(--space-4)', borderTop: '1px solid var(--color-border)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
-            <span style={{ fontSize: '1.25rem' }}>👤</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.75rem' }}>
+            <div
+              style={{
+                width: '34px',
+                height: '34px',
+                borderRadius: 'var(--radius-full)',
+                backgroundColor: 'var(--color-primary-light)',
+                color: 'var(--color-primary)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
+            >
+              <IconUser size={18} />
+            </div>
             <div style={{ overflow: 'hidden' }}>
-              <p style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--color-text-primary)', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+              <p style={{ fontSize: 'var(--font-size-xs)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--color-text-primary)', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
                 {user?.fullName || 'Giáo viên'}
               </p>
-              <p style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+              <p style={{ fontSize: 'var(--font-size-2xs)', color: 'var(--color-text-muted)', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
                 {user?.email || ''}
               </p>
             </div>
@@ -74,25 +123,26 @@ export function DashboardLayout() {
             style={{ width: '100%' }}
             onClick={handleLogout}
           >
-            Đăng xuất
+            <IconLogOut size={14} />
+            <span>Đăng xuất</span>
           </button>
         </div>
       </aside>
 
-      {/* Main Content Area */}
       <div className="main-wrapper">
-        {/* Top Header */}
+
         <header className="top-header">
-          <h2 style={{ fontSize: '1.125rem', fontWeight: 600 }}>
+          <h2 style={{ fontSize: 'var(--font-size-base)', fontWeight: 'var(--font-weight-semibold)', letterSpacing: '-0.01em' }}>
             AI Teacher Copilot for K-12
           </h2>
 
-          {/* Workspace Quick Selector */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)' }}>Không gian:</span>
+            <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', fontWeight: 'var(--font-weight-medium)' }}>
+              Không gian:
+            </span>
             <select
               className="form-select"
-              style={{ width: 'auto', padding: '0.35rem 0.75rem', fontSize: '0.875rem' }}
+              style={{ width: 'auto', padding: '0.35rem 0.75rem', fontSize: 'var(--font-size-xs)' }}
               value={activeWorkspace?.id || ''}
               onChange={(e) => {
                 const selected = workspaces.find((w) => w.id === e.target.value);
@@ -108,7 +158,6 @@ export function DashboardLayout() {
           </div>
         </header>
 
-        {/* Active Workspace Bar */}
         {activeWorkspace && (
           <div className="workspace-bar">
             <span>
@@ -117,7 +166,6 @@ export function DashboardLayout() {
           </div>
         )}
 
-        {/* Page Content Outlet */}
         <main className="page-content">
           <Outlet />
         </main>

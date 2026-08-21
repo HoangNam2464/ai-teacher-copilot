@@ -5,10 +5,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
 
-/**
- * WebClient configuration for calling FastAPI AI Service.
- * Uses the internal API key for authentication.
- */
 @Configuration
 public class WebClientConfig {
 

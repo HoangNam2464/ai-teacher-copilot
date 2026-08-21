@@ -1,11 +1,9 @@
-/* App Layout Grid */
 .app-container {
   display: flex;
   min-height: 100vh;
   background-color: var(--color-bg-app);
 }
 
-/* Sidebar */
 .sidebar {
   width: var(--sidebar-width);
   background-color: var(--color-bg-surface);
@@ -36,6 +34,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
+  letter-spacing: -0.01em;
 }
 
 .sidebar-menu {
@@ -57,6 +56,8 @@
   color: var(--color-text-secondary);
   border-radius: var(--radius-md);
   transition: all var(--transition-fast);
+  text-decoration: none !important;
+  position: relative;
 }
 
 .sidebar-item:hover {
@@ -70,16 +71,26 @@
   font-weight: var(--font-weight-semibold);
 }
 
-/* Main Content Area */
+.sidebar-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 15%;
+  bottom: 15%;
+  width: 3px;
+  background-color: var(--color-primary);
+  border-radius: 0 var(--radius-full) var(--radius-full) 0;
+}
+
 .main-wrapper {
   flex: 1;
   margin-left: var(--sidebar-width);
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  min-width: 0;
 }
 
-/* Top Header */
 .top-header {
   height: var(--header-height);
   background-color: var(--color-bg-surface);
@@ -91,9 +102,9 @@
   position: sticky;
   top: 0;
   z-index: 30;
+  box-shadow: var(--shadow-xs);
 }
 
-/* Active Workspace Context Bar */
 .workspace-bar {
   background-color: var(--color-bg-subtle);
   border-bottom: 1px solid var(--color-border);
@@ -103,32 +114,32 @@
   justify-content: space-between;
   font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
 }
 
 .page-content {
   flex: 1;
   padding: var(--space-6);
-  max-width: 1280px;
+  max-width: 1400px;
   width: 100%;
   margin: 0 auto;
 }
 
-/* Auth Layout (Centered) */
 .auth-layout {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  background-color: var(--color-bg-app);
   padding: var(--space-4);
 }
 
 .auth-card {
   width: 100%;
   max-width: 440px;
-  background: var(--color-bg-surface);
+  background-color: var(--color-bg-surface);
   border-radius: var(--radius-xl);
   padding: var(--space-8);
-  box-shadow: var(--shadow-xl);
+  box-shadow: var(--shadow-lg);
   border: 1px solid var(--color-border);
 }

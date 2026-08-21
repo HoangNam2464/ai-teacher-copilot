@@ -1,12 +1,17 @@
 import React from 'react';
 
 export function Spinner({ size = 'md', message = 'Đang tải...' }) {
+  const spinnerSize = size === 'sm' ? '1rem' : size === 'lg' ? '2.25rem' : '1.5rem';
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem', gap: '0.5rem' }}>
-      <div style={{ fontSize: size === 'sm' ? '1.25rem' : size === 'lg' ? '2.5rem' : '1.75rem', animation: 'spin 1s linear infinite' }}>
-        ⏳
-      </div>
-      {message && <p style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)' }}>{message}</p>}
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem', gap: '0.75rem' }}>
+      <div
+        className="spinner"
+        style={{ width: spinnerSize, height: spinnerSize }}
+        role="status"
+        aria-label={message}
+      />
+      {message && <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', fontWeight: 'var(--font-weight-medium)' }}>{message}</p>}
     </div>
   );
 }

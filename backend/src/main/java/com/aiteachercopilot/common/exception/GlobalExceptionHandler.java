@@ -13,9 +13,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/**
- * Global exception handler for consistent error responses.
- */
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
