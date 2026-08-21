@@ -5,9 +5,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
-/**
- * DTOs for authentication requests and responses.
- */
 public final class AuthDto {
 
     private AuthDto() {}

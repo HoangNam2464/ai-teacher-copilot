@@ -26,7 +26,13 @@ export function RegisterForm() {
       navigate(PATHS.DASHBOARD);
     } catch (err) {
       console.error('Registration error:', err);
-      setError(err.response?.data?.message || 'Đăng ký thất bại. Email có thể đã được sử dụng.');
+      const resData = err.response?.data;
+      if (resData?.data && typeof resData.data === 'object') {
+        const fieldErrors = Object.values(resData.data);
+        setError(fieldErrors.join(', '));
+      } else {
+        setError(resData?.error || resData?.message || 'Đăng ký thất bại. Vui lòng thử lại.');
+      }
     } finally {
       setLoading(false);
     }
@@ -65,13 +71,13 @@ export function RegisterForm() {
       </div>
 
       <div className="form-group">
-        <label className="form-label">Mật khẩu (tối thiểu 6 ký tự)</label>
+        <label className="form-label">Mật khẩu (tối thiểu 8 ký tự)</label>
         <input
           type="password"
           className="form-input"
           placeholder="••••••••"
           required
-          minLength={6}
+          minLength={8}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />

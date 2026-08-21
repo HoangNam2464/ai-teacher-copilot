@@ -25,7 +25,8 @@ export function LoginForm() {
       navigate(PATHS.DASHBOARD);
     } catch (err) {
       console.error('Login error:', err);
-      setError(err.response?.data?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra email và mật khẩu.');
+      const resData = err.response?.data;
+      setError(resData?.error || resData?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra email và mật khẩu.');
     } finally {
       setLoading(false);
     }

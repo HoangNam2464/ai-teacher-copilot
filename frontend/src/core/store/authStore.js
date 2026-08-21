@@ -1,9 +1,5 @@
 import { create } from 'zustand';
 
-/**
- * Authentication Store (Zustand)
- * Manages JWT access token, teacher profile, and session state.
- */
 export const useAuthStore = create((set) => ({
   token: localStorage.getItem('token') || null,
   user: JSON.parse(localStorage.getItem('user') || 'null'),

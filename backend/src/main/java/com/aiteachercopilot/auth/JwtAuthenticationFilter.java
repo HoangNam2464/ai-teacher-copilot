@@ -21,10 +21,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * JWT authentication filter — extracts and validates the Bearer token
- * from the Authorization header, then sets the SecurityContext.
- */
 @Slf4j
 @Component
 @RequiredArgsConstructor

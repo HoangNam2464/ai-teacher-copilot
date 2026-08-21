@@ -8,9 +8,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.Instant;
 import java.util.UUID;
 
-/**
- * User entity — represents a teacher or admin in the system.
- */
 @Entity
 @Table(name = "users")
 @Data
