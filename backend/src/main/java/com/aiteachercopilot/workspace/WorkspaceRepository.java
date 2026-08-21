@@ -6,9 +6,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Spring Data JPA repository for Workspace entity.
- */
 @Repository
 public interface WorkspaceRepository extends JpaRepository<Workspace, UUID> {
 

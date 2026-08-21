@@ -8,10 +8,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.Instant;
 import java.util.UUID;
 
-/**
- * Workspace entity — each teacher can own multiple workspaces
- * to organise documents and generated content by subject/grade.
- */
 @Entity
 @Table(name = "workspaces")
 @Data

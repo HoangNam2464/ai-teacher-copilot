@@ -1,9 +1,5 @@
 import { create } from 'zustand';
 
-/**
- * Workspace Store (Zustand)
- * Manages active workspace context, workspace list, and selection.
- */
 export const useWorkspaceStore = create((set, get) => ({
   workspaces: [],
   activeWorkspace: null,

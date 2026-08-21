@@ -6,9 +6,6 @@ import lombok.Data;
 import java.time.Instant;
 import java.util.UUID;
 
-/**
- * DTOs for Workspace operations.
- */
 public final class WorkspaceDto {
 
     private WorkspaceDto() {}

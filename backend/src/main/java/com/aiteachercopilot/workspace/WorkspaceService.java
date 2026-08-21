@@ -11,9 +11,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-/**
- * Workspace service — CRUD operations with owner-based isolation.
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -70,10 +67,6 @@ public class WorkspaceService {
         log.info("Workspace soft-deleted: {}", workspaceId);
     }
 
-    /**
-     * Verify workspace exists and belongs to the requesting user.
-     * Enforces workspace isolation.
-     */
     public Workspace findAndAuthorize(UUID workspaceId, UUID ownerId) {
         Workspace ws = workspaceRepository.findById(workspaceId)
                 .orElseThrow(() -> new ResourceNotFoundException("Workspace", workspaceId));

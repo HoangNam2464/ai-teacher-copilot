@@ -12,10 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Workspace REST controller.
- * All endpoints require authentication and enforce workspace ownership.
- */
 @RestController
 @RequestMapping("/workspaces")
 @RequiredArgsConstructor

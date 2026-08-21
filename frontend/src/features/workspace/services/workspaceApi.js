@@ -12,6 +12,11 @@ export const workspaceApi = {
     return response.data;
   },
 
+  async updateWorkspace(id, data) {
+    const response = await apiClient.put(ENDPOINTS.WORKSPACE_BY_ID(id), data);
+    return response.data;
+  },
+
   async deleteWorkspace(id) {
     const response = await apiClient.delete(ENDPOINTS.WORKSPACE_BY_ID(id));
     return response.data;
