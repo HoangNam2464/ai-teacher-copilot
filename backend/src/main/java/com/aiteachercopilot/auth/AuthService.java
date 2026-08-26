@@ -9,9 +9,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Authentication service — handles registration and login.
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -21,9 +18,6 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
 
-    /**
-     * Register a new teacher account.
-     */
     @Transactional
     public AuthDto.AuthResponse register(AuthDto.RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -45,9 +39,6 @@ public class AuthService {
                 user.getFullName(), user.getRole());
     }
 
-    /**
-     * Authenticate with email and password, return JWT token.
-     */
     @Transactional(readOnly = true)
     public AuthDto.AuthResponse login(AuthDto.LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
