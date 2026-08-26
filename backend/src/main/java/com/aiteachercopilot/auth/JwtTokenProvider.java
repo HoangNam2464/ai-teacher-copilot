@@ -11,10 +11,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.UUID;
 
-/**
- * JWT token provider — generates and validates tokens.
- * Tokens contain the user ID as the subject and email as a claim.
- */
 @Slf4j
 @Component
 public class JwtTokenProvider {
@@ -29,9 +25,6 @@ public class JwtTokenProvider {
         this.expirationMs = expirationMs;
     }
 
-    /**
-     * Generate a JWT token for the given user.
-     */
     public String generateToken(UUID userId, String email) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + expirationMs);
@@ -45,9 +38,6 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    /**
-     * Extract the user ID from a valid token.
-     */
     public UUID getUserIdFromToken(String token) {
         Claims claims = Jwts.parser()
                 .verifyWith(key)
@@ -57,9 +47,6 @@ public class JwtTokenProvider {
         return UUID.fromString(claims.getSubject());
     }
 
-    /**
-     * Validate the given token.
-     */
     public boolean validateToken(String token) {
         try {
             Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
