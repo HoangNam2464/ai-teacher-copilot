@@ -12,11 +12,6 @@ export function AuthLayout() {
         <div className="auth-card">
           <Outlet />
         </div>
-        <footer className="auth-centered-footer">
-          <span>AI Teacher Copilot © 2026</span>
-          <span className="dot-separator">•</span>
-          <span>Chuẩn Giáo dục K-12</span>
-        </footer>
       </main>
     </div>
   );

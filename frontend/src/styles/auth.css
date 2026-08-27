@@ -268,18 +268,3 @@
   color: hsl(172 84% 22%);
 }
 
-/* Subtle Centered Footer Outside Card */
-.auth-centered-footer {
-  margin-top: var(--space-6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  font-size: 0.725rem;
-  color: hsl(var(--muted-foreground));
-  text-align: center;
-}
-
-.dot-separator {
-  opacity: 0.5;
-}
