@@ -4,8 +4,10 @@ import { PATHS } from './paths';
 import { PrivateRoute } from './PrivateRoute';
 import { DashboardLayout } from '../../core/layouts/DashboardLayout';
 import { AuthLayout } from '../../core/layouts/AuthLayout';
+import { PublicLayout } from '../../core/layouts/PublicLayout';
 
 // Feature Pages
+import { HomePage } from '../../features/landing/pages/HomePage';
 import { LoginPage } from '../../features/auth/pages/LoginPage';
 import { RegisterPage } from '../../features/auth/pages/RegisterPage';
 import { WorkspaceListPage } from '../../features/workspace/pages/WorkspaceListPage';
@@ -17,22 +19,25 @@ import { HistoryListPage } from '../../features/history/pages/HistoryListPage';
 export function AppRoutes() {
   return (
     <Routes>
-      {/* Auth Routes (Unauthenticated Layout) */}
+      {/* 1. Public Marketing Route (Group B - Landing Page) */}
+      <Route element={<PublicLayout />}>
+        <Route path={PATHS.ROOT} element={<HomePage />} />
+      </Route>
+
+      {/* 2. Authentication Routes (Group A - Action Screen) */}
       <Route element={<AuthLayout />}>
         <Route path={PATHS.LOGIN} element={<LoginPage />} />
         <Route path={PATHS.REGISTER} element={<RegisterPage />} />
       </Route>
 
-      {/* Protected Application Routes (Dashboard Layout) */}
+      {/* 3. Protected Workspace & Productivity Routes (Group C/D - Dashboard) */}
       <Route
-        path={PATHS.ROOT}
         element={
           <PrivateRoute>
             <DashboardLayout />
           </PrivateRoute>
         }
       >
-        <Route index element={<Navigate to={PATHS.WORKSPACES} replace />} />
         <Route path={PATHS.WORKSPACES} element={<WorkspaceListPage />} />
         <Route path={PATHS.DOCUMENTS} element={<DocumentManagementPage />} />
         <Route path={PATHS.LESSON_PLANNER} element={<LessonPlannerPage />} />
