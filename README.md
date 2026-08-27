@@ -1,430 +1,417 @@
-# AI Teacher Copilot for K-12 Teachers
+<p align="center">
+  <h1 align="center">🎓 AI Teacher Copilot</h1>
+  <p align="center">
+    <strong>Hệ thống AI hỗ trợ giáo viên K-12 tạo học liệu từ tài liệu giảng dạy</strong>
+  </p>
+  <p align="center">
+    Lesson Planner · Quiz Generator · RAG & Citation · Word/PDF Export
+  </p>
+</p>
 
-Hệ thống **AI Teaching Assistant** hỗ trợ giáo viên K-12 tạo học liệu dựa trên tài liệu giảng dạy do giáo viên cung cấp.
+<p align="center">
+  <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT License">
+  <img src="https://img.shields.io/badge/status-In%20Development-orange" alt="Status">
+  <img src="https://img.shields.io/badge/Java-17-red?logo=openjdk&logoColor=white" alt="Java 17">
+  <img src="https://img.shields.io/badge/Python-3.12-blue?logo=python&logoColor=white" alt="Python 3.12">
+  <img src="https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black" alt="React 18">
+  <img src="https://img.shields.io/badge/PostgreSQL-16-336791?logo=postgresql&logoColor=white" alt="PostgreSQL 16">
+</p>
 
-Dự án bao gồm 3 phần chính:
-
-* **Frontend:** Xây dựng bằng React, cung cấp giao diện cho giáo viên.
-* **Backend:** Xây dựng bằng Java Spring Boot, phụ trách authentication, workspace, business logic, document metadata, history và REST API.
-* **AI Service:** Xây dựng bằng Python FastAPI, phụ trách document processing, embedding, retrieval, RAG và AI content generation.
-
-Hệ thống sử dụng **PostgreSQL + pgvector** để lưu dữ liệu và vector embedding, **MinIO** để lưu trữ file và **OpenAI/Gemini** làm LLM Provider.
-
----
-
-## ✨ Chức năng nổi bật
-
-* **Teacher Workspace:** Giáo viên đăng nhập và làm việc trong workspace cá nhân.
-
-* **Document Knowledge Base:** Upload, xử lý và quản lý tài liệu giảng dạy; tài liệu được parse, chunk, embedding và index để phục vụ RAG.
-
-* **AI Lesson Planner:** Sinh giáo án có cấu trúc dựa trên môn, lớp, chủ đề và tài liệu nguồn.
-
-* **Quiz Generator:** Sinh câu hỏi/đề kiểm tra dựa trên Knowledge Base, có hỗ trợ gắn nhãn **Bloom Taxonomy**.
-
-* **RAG & Citation:** AI truy xuất các đoạn nội dung liên quan từ tài liệu nguồn và trả về citation để giáo viên kiểm tra.
-
-* **Review / Edit / Regenerate:** Giáo viên có thể kiểm tra, chỉnh sửa hoặc tạo lại nội dung AI.
-
-* **Document History:** Lưu lại lịch sử nội dung đã được tạo và chỉnh sửa.
-
-* **Word/PDF Export:** Xuất nội dung đã kiểm tra sang Word hoặc PDF.
-
-Các chức năng bắt buộc của MVP gồm Authentication, Teacher Workspace, Document Upload/KB, Document Processing, RAG, Lesson Planner, Quiz Generator, Review/Edit/Regenerate, Document History, Citation và Word/PDF Export.
+<p align="center">
+  <a href="#-giới-thiệu">Giới thiệu</a> ·
+  <a href="#-chức-năng-mvp">Chức năng</a> ·
+  <a href="#️-kiến-trúc-hệ-thống">Kiến trúc</a> ·
+  <a href="#-tech-stack">Tech Stack</a> ·
+  <a href="#-hướng-dẫn-khởi-chạy">Khởi chạy</a> ·
+  <a href="#-rag-pipeline">RAG Pipeline</a> ·
+  <a href="#-mvp-status">MVP Status</a> ·
+  <a href="#-license">License</a>
+</p>
 
 ---
 
-## 🛠 Yêu cầu hệ thống (Prerequisites)
+## 📖 Giới thiệu
 
-1. **Java JDK 17+**
+**AI Teacher Copilot for K-12 Teachers** là hệ thống AI hỗ trợ giáo viên tạo học liệu (giáo án, đề kiểm tra) tự động từ tài liệu giảng dạy do giáo viên cung cấp, có trích dẫn nguồn minh bạch và hỗ trợ phân loại theo Bloom Taxonomy.
 
-2. **Python 3.x** & **pip**
+Hệ thống áp dụng kiến trúc **RAG (Retrieval-Augmented Generation)** kết hợp với **Structured Output** và cơ chế **Citation Traceability** để đảm bảo toàn bộ nội dung AI được grounded trực tiếp từ tài liệu của giáo viên — không hallucinate.
 
-3. **Node.js** & **npm**
-
-4. **Docker** & **Docker Compose**
-
-5. **Git**
-
-6. **OpenAI API Key hoặc Gemini API Key**
-
-Hệ thống sử dụng Docker Compose cho môi trường development, PostgreSQL + pgvector làm database/vector store và MinIO làm file storage.
+> ⚠️ AI output là **bản nháp/đề xuất**. Giáo viên là người quyết định cuối cùng.
 
 ---
 
-## 🚀 Hướng dẫn Khởi chạy (Dành cho Giảng viên kiểm tra)
+## ✨ Chức năng MVP
 
-Vui lòng mở các cửa sổ Terminal độc lập để chạy đồng thời các thành phần của hệ thống.
+| # | Chức năng | Mô tả |
+| :---: | :--- | :--- |
+| 1 | 🔐 **Authentication** | Đăng ký, đăng nhập, JWT, Spring Security |
+| 2 | 🗂️ **Teacher Workspace** | Workspace cá nhân quản lý toàn bộ tài liệu và học liệu |
+| 3 | 📁 **Document Upload & KB** | Upload PDF/DOCX, lưu MinIO, quản lý Knowledge Base |
+| 4 | ⚙️ **Document Processing** | Parse → Chunk → Embedding → pgvector index |
+| 5 | 🔍 **RAG Retrieval** | Metadata-filtered vector search, insufficient evidence handling |
+| 6 | 📝 **AI Lesson Planner** | Sinh giáo án có cấu trúc, trích dẫn nguồn chunk |
+| 7 | 📊 **Quiz Generator** | MCQ + Short Answer + Bloom Taxonomy tagging |
+| 8 | ✏️ **Review / Edit / Regenerate** | Chỉnh sửa inline, tạo lại theo hướng dẫn, lịch sử phiên bản |
+| 9 | 🔗 **Citation Traceability** | Truy vết từ output → chunk → tài liệu gốc + số trang |
+| 10 | 📤 **Word / PDF Export** | Xuất DOCX và PDF chuyên nghiệp kèm citation footer |
 
-Hệ thống gồm:
+---
 
-```text
-Terminal 1 → Infrastructure (PostgreSQL + pgvector + MinIO)
-Terminal 2 → AI Service (FastAPI)
-Terminal 3 → Backend (Spring Boot)
-Terminal 4 → Frontend (React)
+## 🏗️ Kiến trúc Hệ thống
+
 ```
+┌──────────────────────────────────────────────────────────────────────┐
+│                     AI Teacher Copilot Platform                      │
+├──────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│   ┌─────────────────────────────────────────────────────────────┐   │
+│   │              React 18 + Vite + TypeScript                    │   │
+│   │         (Teacher UI · Workspace · Review · Export)           │   │
+│   └───────────────────────────┬─────────────────────────────────┘   │
+│                               │  REST API (JWT)                      │
+│   ┌───────────────────────────▼─────────────────────────────────┐   │
+│   │              Spring Boot 3  (Java 17)                        │   │
+│   │   Auth · Workspace · Document Metadata · Generation          │   │
+│   │   Review History · REST API Gateway                          │   │
+│   └────────┬──────────────────────────────────────┬─────────────┘   │
+│            │  Internal HTTP                        │                 │
+│   ┌────────▼──────────────┐     ┌─────────────────▼───────────┐     │
+│   │   FastAPI (Python 3.12)│     │     PostgreSQL 16            │     │
+│   │   Document Processing  │     │     + pgvector extension     │     │
+│   │   Embedding · RAG      │     │     (Vector Store)           │     │
+│   │   Prompt Orchestration │     └─────────────────────────────┘     │
+│   │   Structured Output    │                                         │
+│   └────────┬──────────────┘     ┌─────────────────────────────┐     │
+│            │                    │     MinIO                    │     │
+│   ┌────────▼──────────────┐     │     (Object Storage)         │     │
+│   │   Gemini / OpenAI API  │     │     PDF · DOCX files         │     │
+│   │   (LLM Provider)       │     └─────────────────────────────┘     │
+│   └────────────────────────┘                                         │
+└──────────────────────────────────────────────────────────────────────┘
+
+ Frontend ──(REST/JWT)──▶ Spring Boot ──(Internal)──▶ FastAPI
+                              │
+                              └──▶ PostgreSQL + pgvector
+                              └──▶ MinIO
+```
+
+**Nguyên tắc kiến trúc:**
+- Frontend chỉ giao tiếp với Spring Boot qua REST API — **không gọi FastAPI trực tiếp**
+- FastAPI là **internal service** — không expose ra Internet
+- Document content là **Untrusted Data** — bắt buộc wrap trong `<sources>...</sources>` boundary trước khi đưa vào LLM prompt
+
+---
+
+## 🛠 Tech Stack
+
+| Layer | Công nghệ | Vai trò |
+| :--- | :--- | :--- |
+| **Frontend** | React 18, Vite, TypeScript, Zustand, Axios | Teacher UI, Workspace, Review |
+| **Backend** | Spring Boot 3, Java 17, Maven, Flyway | Auth, Business Logic, REST API Gateway |
+| **AI Service** | FastAPI, Python 3.12, Pydantic v2 | Document Processing, RAG, LLM |
+| **Vector Store** | PostgreSQL 16 + pgvector | Embedding storage & semantic retrieval |
+| **Object Storage** | MinIO | PDF/DOCX file storage |
+| **LLM Provider** | Gemini / OpenAI (Provider Abstraction) | Text generation & embedding |
+| **Database Migration** | Flyway | Schema versioning |
+| **Infrastructure** | Docker, Docker Compose | Local dev environment |
+| **CI/CD** | GitHub Actions | Automated testing pipeline |
+
+---
+
+## 🚀 Hướng dẫn Khởi chạy
+
+### Yêu cầu hệ thống
+
+| Công cụ | Phiên bản |
+| :--- | :--- |
+| Java JDK | 17+ |
+| Python | 3.12+ |
+| Node.js | 20+ |
+| Docker & Docker Compose | Latest |
+
+### Bước 0: Cấu hình Environment Variables
+
+```bash
+# Sao chép file env mẫu và điền thông tin thực tế
+cp .env.example .env
+```
+
+Các biến quan trọng cần điền:
+
+```env
+# Database
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=ai_teacher_copilot
+DB_USERNAME=postgres
+DB_PASSWORD=your_password
+
+# MinIO
+MINIO_ENDPOINT=localhost:9000
+MINIO_ACCESS_KEY=your_access_key
+MINIO_SECRET_KEY=your_secret_key
+
+# LLM Provider (chọn 1 trong 2)
+OPENAI_API_KEY=sk-...
+GEMINI_API_KEY=AI...
+
+# JWT
+JWT_SECRET=your_jwt_secret_key
+```
+
+> ⚠️ **Tuyệt đối không** commit file `.env` chứa credentials thực lên Git.
 
 ---
 
 ### Bước 1: Khởi chạy Infrastructure (Terminal 1)
 
-Tại thư mục gốc của project:
-
 ```bash
+# Tại thư mục gốc của project
 docker compose up -d
 ```
 
-Kiểm tra trạng thái các container:
-
 ```bash
+# Kiểm tra trạng thái
 docker compose ps
 ```
 
-Đảm bảo các service cần thiết đã được khởi động trước khi chạy Backend và AI Service.
-
-**Lưu ý:** Không tắt Terminal hoặc dừng Docker trong quá trình kiểm tra hệ thống.
+Đợi PostgreSQL và MinIO **healthy** trước khi chạy các service tiếp theo.
 
 ---
 
 ### Bước 2: Khởi chạy AI Service — FastAPI (Terminal 2)
 
-Mở cửa sổ Terminal thứ 2 và đi vào thư mục AI Service:
-
 ```bash
 cd ai-service
 ```
 
-#### Windows:
-
+**Windows:**
 ```bash
 python -m venv venv
 venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload --port 8001
 ```
 
-#### Mac/Linux:
-
+**Mac/Linux:**
 ```bash
 python3 -m venv venv
 source venv/bin/activate
-```
-
-Cài đặt thư viện:
-
-```bash
 pip install -r requirements.txt
+uvicorn app.main:app --reload --port 8001
 ```
 
-Khởi chạy FastAPI:
-
-```bash
-uvicorn app.main:app --reload
-```
-
-AI Service phụ trách:
-
-* Document parsing
-* Chunking
-* Embedding
-* Retrieval
-* RAG orchestration
-* LLM integration
-* Structured output
-
-FastAPI được thiết kế để phục vụ **nội bộ**, không expose trực tiếp ra Internet.
-
-**Lưu ý:** Không tắt Terminal này.
+FastAPI chạy tại: `http://localhost:8001` (internal only — không truy cập từ browser)
 
 ---
 
 ### Bước 3: Khởi chạy Backend — Spring Boot (Terminal 3)
 
-Mở cửa sổ Terminal thứ 3:
-
 ```bash
 cd backend
 ```
 
-Nếu project sử dụng Maven Wrapper:
-
-#### Windows:
-
+**Windows:**
 ```bash
 mvnw.cmd spring-boot:run
 ```
 
-#### Mac/Linux:
-
+**Mac/Linux:**
 ```bash
 ./mvnw spring-boot:run
 ```
 
-Spring Boot Backend chịu trách nhiệm:
-
-* Authentication
-* User management
-* Teacher Workspace
-* Business logic
-* Document metadata
-* Review / History
-* REST API
-
-Frontend chỉ giao tiếp với hệ thống thông qua Spring Boot Backend.
-
-**Lưu ý:** Không tắt Terminal này.
+Spring Boot chạy tại: `http://localhost:8080`
 
 ---
 
 ### Bước 4: Khởi chạy Frontend — React (Terminal 4)
 
-Mở cửa sổ Terminal thứ 4:
-
 ```bash
 cd frontend
-```
-
-Cài đặt thư viện:
-
-```bash
 npm install
-```
-
-Khởi chạy Frontend:
-
-```bash
 npm run dev
 ```
 
-Sau khi chạy thành công, Terminal sẽ hiển thị địa chỉ truy cập Frontend.
-
-Mở URL được hiển thị trong trình duyệt để sử dụng hệ thống.
+Mở trình duyệt tại URL hiển thị trong Terminal (thường là `http://localhost:5173`).
 
 ---
 
-## 🔐 Cấu hình Environment Variables
+## 🔄 Quy trình sử dụng
 
-Trước khi khởi chạy hệ thống, cần cấu hình các thông tin kết nối cho:
-
-* PostgreSQL.
-* MinIO.
-* FastAPI.
-* Spring Boot.
-* LLM Provider.
-
-Ví dụ:
-
-```env
-DATABASE_URL=...
-MINIO_ENDPOINT=...
-MINIO_ACCESS_KEY=...
-MINIO_SECRET_KEY=...
-
-OPENAI_API_KEY=...
 ```
-
-> Tên biến environment thực tế phải khớp với configuration của source code hiện tại.
-
-**Không commit API key, password hoặc secret thật lên GitHub.**
-
-API key/secret không được expose ra Frontend và thông tin xác thực nhạy cảm phải được lưu thông qua environment/secrets.
-
----
-
-## 🔄 Quy trình sử dụng hệ thống
-
-Sau khi toàn bộ service đã được khởi chạy:
-
-```text
-Teacher Login
-     ↓
+Đăng nhập
+    ↓
 Teacher Workspace
-     ↓
-Upload Teaching Document
-     ↓
-Document Processing
-     ↓
-Knowledge Base
-     ↓
-Select Subject / Grade / Topic
-     ↓
-RAG Retrieval
-     ↓
-AI Generation
-     ↓
-Citation
-     ↓
+    ↓
+Upload tài liệu (PDF / DOCX)
+    ↓
+Document Processing (Parse → Chunk → Embed → pgvector)
+    ↓
+Knowledge Base sẵn sàng
+    ↓
+Chọn: Môn · Lớp · Chủ đề · Tài liệu nguồn
+    ↓
+RAG Retrieval (metadata filter + vector similarity)
+    ↓
+AI Generation (Lesson Plan / Quiz)
+    ↓
+Citation (nguồn chunk + số trang)
+    ↓
 Review / Edit / Regenerate
-     ↓
+    ↓
 Document History
-     ↓
+    ↓
 Word / PDF Export
-```
-
-Quy trình này là vertical loop cốt lõi của MVP: **upload → RAG → generate → review → export**.
-
----
-
-## 📚 Demo kiểm tra
-
-Giảng viên có thể kiểm tra hệ thống theo quy trình:
-
-### 1. Đăng nhập
-
-Đăng nhập bằng tài khoản giáo viên.
-
-### 2. Upload tài liệu
-
-Upload một tài liệu giảng dạy được hỗ trợ.
-
-### 3. Kiểm tra Knowledge Base
-
-Chờ hệ thống hoàn tất:
-
-```text
-Upload
-→ Parse
-→ Chunk
-→ Embedding
-→ Index
-```
-
-### 4. Tạo Lesson Plan
-
-Chọn:
-
-```text
-Subject
-Grade
-Topic
-Source Document
-Lesson Planner
-```
-
-Sau đó yêu cầu hệ thống sinh giáo án.
-
-### 5. Kiểm tra Citation
-
-Kiểm tra các nguồn được sử dụng trong kết quả AI.
-
-### 6. Review / Edit / Regenerate
-
-Giáo viên có thể:
-
-```text
-Review
-Edit
-Regenerate
-```
-
-### 7. Tạo Quiz
-
-Chọn **Quiz Generator** và cấu hình yêu cầu cho đề kiểm tra.
-
-Bloom Taxonomy được sử dụng như một thuộc tính trong quá trình sinh Quiz, không phải một feature độc lập.
-
-### 8. Export
-
-Xuất nội dung sau khi kiểm tra sang:
-
-```text
-Word
-PDF
 ```
 
 ---
 
 ## 🧠 RAG Pipeline
 
-Hệ thống xử lý tài liệu theo pipeline:
-
-```text
-Document
-   ↓
-Parse
-   ↓
-Chunk
-   ↓
-Embedding
-   ↓
-PostgreSQL + pgvector
-   ↓
-Semantic Retrieval
-   ↓
-Top-K Relevant Chunks
-   ↓
+```
+Tài liệu (PDF/DOCX)
+    ↓ [FastAPI: Document Processing]
+Parse cấu trúc
+    ↓
+Chunking thông minh (structure-aware)
+    ↓
+Embedding (OpenAI / Gemini Embedding API)
+    ↓
+Lưu vào PostgreSQL + pgvector
+    ↓ [FastAPI: Retrieval]
+Query embedding
+    ↓
+Metadata filter (workspace_id + subject + grade)
+    ↓
+Vector similarity search (Top-K chunks)
+    ↓ [FastAPI: Generation]
 Prompt Orchestration
-   ↓
-LLM
-   ↓
-Structured Output
-   ↓
-Citation
+  └─ System Prompt
+  └─ <sources> chunk_1 ... chunk_k </sources>   ← UNTRUSTED boundary
+    ↓
+LLM (Gemini / OpenAI)
+    ↓
+Structured Output (Pydantic v2 validation)
+    ↓
+Citation (source_chunk_ids → document + page)
+    ↓
+Spring Boot lưu kết quả + trả về Frontend
 ```
 
-Mỗi chunk được lưu metadata về workspace, tài liệu/phiên bản, môn học và vị trí nguồn để phục vụ retrieval isolation và citation.
+**Prompt Security:** Retrieved content được wrap trong `<sources>...</sources>` — nghiêm cấm inject vào system instructions để phòng chống Prompt Injection.
 
 ---
 
 ## 📊 AI Quality Evaluation
 
-Trong MVP, chất lượng AI được đánh giá ở mức tối giản trên khoảng **20–30 mẫu output**.
+Chất lượng AI được đánh giá trên ~20–30 mẫu output với các chỉ số:
 
-Các chỉ số chính:
+| Chỉ số | Mô tả |
+| :--- | :--- |
+| **Groundedness** | Nội dung có bám sát tài liệu nguồn không? |
+| **Citation Coverage** | Tỷ lệ câu hỏi/mục giáo án có trích dẫn nguồn |
+| **Citation Relevance** | Citation có thực sự liên quan đến nội dung không? |
+| **Acceptance Rate** | Tỷ lệ giáo viên chấp nhận output không chỉnh sửa |
+| **Edit Rate** | Mức độ giáo viên cần chỉnh sửa output |
+| **Retrieval Quality** | Cosine similarity score của các chunks được retrieve |
 
-* **Groundedness**
-* **Citation Coverage**
-* **Citation Relevance**
-* **Acceptance Rate**
-* **Edit Rate**
-* **Retrieval Quality**
+---
 
-Việc có citation không đồng nghĩa với việc citation chính xác hoặc nội dung được grounded hoàn toàn; evaluation cần xem xét cả citation relevance và groundedness.
+## 📋 MVP Status
+
+| Tính năng | Trạng thái | Module |
+| :--- | :---: | :--- |
+| Authentication & JWT | 🚧 In Progress | `backend/auth` |
+| Teacher Workspace | 🚧 In Progress | `backend/workspace` |
+| Document Upload & MinIO | 🔲 Planned | `backend/document` |
+| Document Processing | 🔲 Planned | `ai-service/ingestion` |
+| RAG Retrieval | 🔲 Planned | `ai-service/retrieval` |
+| AI Lesson Planner | 🔲 Planned | `ai-service/generation` |
+| Quiz Generator + Bloom | 🔲 Planned | `ai-service/generation` |
+| Review / Edit / Regenerate | 🔲 Planned | `backend/generation` |
+| Citation Traceability | 🔲 Planned | `ai-service/generation` |
+| Word / PDF Export | 🔲 Planned | `backend/generation` |
+
+**Trạng thái:** 🚧 In Development &nbsp;|&nbsp; **Model:** Solo Developer &nbsp;|&nbsp; **Timeline:** 6 tháng MVP
 
 ---
 
 ## ⚠️ Lưu ý
 
-* AI output chỉ là **bản nháp/đề xuất**.
-* Giáo viên vẫn là người quyết định cuối cùng.
-* Hệ thống không tự gửi nội dung cho học sinh.
-* Hệ thống không tự đánh giá học sinh trong MVP.
-* Tài liệu upload được xem là **untrusted data**.
-* Nội dung trong tài liệu không được phép override system/developer instructions.
-* Không đưa API key hoặc secret vào source code.
-* Không sử dụng dữ liệu Student PII trong MVP.
+- AI output chỉ là **bản nháp / đề xuất** — giáo viên là người quyết định cuối cùng
+- Hệ thống **không tự gửi** nội dung cho học sinh, không tự đánh giá học sinh
+- Tài liệu upload được xử lý là **Untrusted Data** — không thể override system instructions
+- **Student PII** (tên, điểm, mã học sinh) nằm ngoài phạm vi MVP — nghiêm cấm xử lý
+- **Không commit** API key hoặc credentials lên Git
 
 ---
 
-## 📌 Project Status
+## 📂 Cấu trúc Repository
 
-**Status:** 🚧 In Development
-
-**Development Model:** Solo Developer
-
-**Target:** 6 Months / 24 Weeks
-
-**MVP Core:**
-
-```text
-Authentication
-    +
-Teacher Workspace
-    +
-Document Knowledge Base
-    +
-RAG
-    +
-AI Lesson Planner
-    +
-Quiz Generator
-    +
-Review / Edit / Regenerate
-    +
-Citation
-    +
-Document History
-    +
-Word / PDF Export
+```
+ai-teacher-copilot/
+├── backend/                    ← Spring Boot 3 (Java 17)
+│   └── src/main/java/com/aiteacher/
+│       ├── auth/               ← JWT, Spring Security
+│       ├── workspace/          ← Teacher Workspace
+│       ├── document/           ← Document metadata
+│       ├── generation/         ← Review, History, Export
+│       └── user/               ← User management
+├── ai-service/                 ← FastAPI (Python 3.12)
+│   └── app/
+│       ├── ingestion/          ← Parse, Chunk, Embed
+│       ├── retrieval/          ← pgvector search
+│       ├── generation/         ← Prompt, LLM, Output
+│       ├── providers/          ← Gemini / OpenAI abstraction
+│       └── core/               ← Config, Security
+├── frontend/                   ← React 18 + Vite + TypeScript
+│   └── src/
+│       ├── components/         ← UI Components
+│       ├── pages/              ← Route pages
+│       ├── services/           ← API clients
+│       ├── stores/             ← Zustand state
+│       └── lib/                ← Axios client, utils
+├── docs/                       ← Tài liệu thiết kế
+├── infrastructure/             ← Docker, configs
+├── scripts/                    ← Dev automation scripts
+└── .github/workflows/          ← CI/CD Pipelines
 ```
 
-Scope, Architecture và ERD hiện là **đề xuất chờ Mentor xác nhận**. README này cần được cập nhật nếu Mentor thay đổi phạm vi hoặc kiến trúc trước khi implementation chính thức.
+---
+
+## 📚 Tài liệu liên quan
+
+| Tài liệu | Mô tả |
+| :--- | :--- |
+| [`AI_TEACHER_COPILOT_BLUEPRINT.md`](./docs/AI_TEACHER_COPILOT_BLUEPRINT.md) | Thiết kế kiến trúc hệ thống đầy đủ |
+| [`API_DOCS.md`](./API_DOCS.md) | REST API documentation |
+| [`CONTRIBUTING.md`](./CONTRIBUTING.md) | Quy chuẩn phát triển & đóng góp |
+| [`CHANGELOG.md`](./CHANGELOG.md) | Lịch sử thay đổi theo phiên bản |
+| [`FUTURE_GOAL.md`](./FUTURE_GOAL.md) | Lộ trình mở rộng sau MVP |
+| [`SECURITY.md`](./SECURITY.md) | Chính sách bảo mật & báo cáo lỗ hổng |
+
+---
+
+## 📄 License
+
+Dự án này được cấp phép theo **MIT License**.
+
+```
+MIT License — Copyright (c) 2026 Nguyen Hoang Nam
+```
+
+Xem file [`LICENSE`](./LICENSE) để biết đầy đủ nội dung.
+
+---
+
+## 📋 Notice
+
+Thông tin về các thư viện và công nghệ mã nguồn mở được sử dụng trong dự án xem tại [`NOTICE`](./NOTICE).
+
+---
+
+<p align="center">
+  <strong>AI Teacher Copilot for K-12 Teachers</strong><br>
+  Đồ án tốt nghiệp · Nguyen Hoang Nam · 2026–2027
+</p>

@@ -1,124 +1,70 @@
 ---
 description: >-
   Rules for implementing Citation Traceability in AI Teacher Copilot.
-  Every AI-generated content item must be traceable back to its source chunks,
-  source document, and source page. Citation is a core trust mechanism.
+  Guarantees grounding provenance from generated learning materials
+  back to original source documents, chunks, and page numbers.
 trigger: model_decision
 ---
 
-# Feature Rules: Citation
+# Feature Rules: Citation Traceability
 
-## Scope
+## 1. Scope
 
-**Includes:**
-- Every generation response includes `sourceChunkIds`
-- API endpoint to resolve chunk IDs → citation detail (document name, page, excerpt)
-- Frontend citation panel: highlights which chunks were used
-- Citation indicator on each generated section/question
+### Includes
+- Capturing `source_chunk_ids` during lesson plan and quiz generation
+- Storing citation relations in `content_citations` table
+- Resolving chunk IDs to document metadata (file name, page number, content excerpt)
+- Frontend citation badges and provenance inspection panel
 
-**Excludes:**
-- APA/MLA formatted citations (DEFERRED — display raw source reference at MVP)
-- Inline footnote numbering in export (→ feature-export concern)
-- Citation quality scoring / grounding score (EVALUATE)
-
----
-
-## Core Principle
-
-```
-Generated Content
-      │
-      ▼
-sourceChunkIds: ["chunk-abc", "chunk-def", ...]
-      │
-      ▼
-GET /api/citations/resolve?chunkIds=...
-      │
-      ▼
-[
-  { chunkId, documentName, sourcePage, excerpt, documentId }
-]
-```
-
-Citation is provenance, not just display. It MUST be computed at generation time
-and stored. It CANNOT be reconstructed after the fact.
+### Excludes (Deferred / Evaluation Path)
+- APA/MLA/Chicago automated bibliography style formatting
+- Real-time automated citation grounding scoring (evaluated offline)
 
 ---
 
-## Files Involved
+## 2. Architecture & Responsibility
 
-### Spring Boot
-```
-backend/src/main/java/com/aiteachercopilot/
-└── citation/                           (NEW package)
-    ├── CitationController.java         ← GET /api/citations/resolve
-    └── CitationService.java            ← calls FastAPI to resolve chunk metadata
-```
-
-### FastAPI
-```
-ai-service/app/
-├── api/routes/retrieval.py             ← GET /retrieval/chunks?ids=...
-└── retrieval/service.py                ← fetch chunks by id from pgvector table
-```
-
-### Database (pgvector)
-```
-document_chunks table (already defined in models.py):
-  id, document_id, workspace_id, content, chunk_index,
-  embedding, source_page, subject, grade_level, topic
-```
+- **Core Backend (`backend/`)**:
+  - Manages `content_citations` database table.
+  - Exposes public endpoint for frontend to resolve chunk IDs to document references.
+- **AI Service (`ai-service/`)**:
+  - Emits chunk IDs alongside structured generation output.
+  - Provides internal endpoint to fetch chunk details by IDs from pgvector.
 
 ---
 
-## Implementation Rules
+## 3. Implementation & Security Constraints
 
-### At Generation Time
-1. Every generation MUST save `source_chunk_ids` to `generation_history.source_chunk_ids`
-2. `sourceChunkIds` in API response MUST match what was actually retrieved — NEVER fabricated
-3. If retrieval returns 0 chunks → `sourceChunkIds = []`, `insufficientEvidence = true`
-
-### Citation Resolution
-1. `GET /api/citations/resolve?chunkIds=id1,id2,...`
-2. Spring Boot calls FastAPI `GET /retrieval/chunks?ids=id1,id2,...`
-3. FastAPI queries pgvector table for those chunk IDs
-4. Returns: `chunkId`, `documentId`, `documentName` (joined from Spring Boot doc table), `sourcePage`, `excerpt` (first 200 chars of chunk content)
-5. Workspace isolation: NEVER return chunks from a different workspace
-
-### Excerpt Rules
-1. Excerpt = first 200 characters of chunk content
-2. Excerpt is display-only — do NOT use for re-retrieval
-3. Excerpt must NOT expose personally identifiable information (unlikely in curriculum docs, but validate)
-
-### Frontend Citation Panel
-1. Each generated section/question shows a citation badge (number of sources)
-2. Click badge → expand citation panel showing: document name, page number, excerpt
-3. Citation panel is READ-ONLY — no editing from here
+1. **Provenance Integrity**: `source_chunk_ids` must only contain IDs of chunks actually retrieved and provided to the LLM. Synthesizing or fabricating citations is prohibited.
+2. **Generation-Time Capture**: Citations must be recorded at generation time; they cannot be reliably reconstructed post-hoc.
+3. **Workspace Isolation**: Citation resolution endpoints must verify that all requested chunk IDs belong to the caller's workspace.
+4. **Excerpt Sanitization**: Citation excerpts display a safe preview (first 200 characters) of the source chunk to assist teacher verification.
 
 ---
 
-## API Contract
+## 4. API Contract
 
-```
-GET /api/citations/resolve?chunkIds=uuid1,uuid2,...&workspaceId=uuid
-Response 200: [
+```text
+GET /api/workspaces/{workspaceId}/citations/resolve?chunkIds=UUID1,UUID2
+Response: 200 OK [
   {
-    chunkId: str,
+    chunkId: UUID,
     documentId: UUID,
-    documentName: str,
-    sourcePage: int,
-    excerpt: str        ← first 200 chars
+    fileName: string,
+    sourcePage: number,
+    excerpt: string
   }
 ]
-Response 403: if any chunkId belongs to different workspace
+Errors:   403 Forbidden (cross-workspace chunk access)
 ```
 
 ---
 
-## Definition of Done
-- [ ] Every generation response includes non-empty `sourceChunkIds` (when evidence exists)
-- [ ] `sourceChunkIds` stored in `generation_history`
-- [ ] Citation resolve endpoint returns document name, page, excerpt per chunk ID
-- [ ] Workspace isolation: cross-workspace chunk access returns 403
-- [ ] Frontend citation panel shows source details on click
-- [ ] CI passes
+## 5. Definition of Done
+
+- [ ] Generated lesson plans and quizzes contain non-empty `source_chunk_ids` when evidence is present.
+- [ ] Citation relations saved in `content_citations` table.
+- [ ] Resolution endpoint returns document name, page number, and text excerpt.
+- [ ] Cross-workspace citation queries return 403 Forbidden.
+- [ ] Frontend displays citation badges that open the source reference panel.
+- [ ] CI tests pass (`backend-ci.yml`).

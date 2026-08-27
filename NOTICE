@@ -1,0 +1,88 @@
+AI Teacher Copilot for K-12 Teachers
+Copyright (c) 2026 Nguyen Hoang Nam
+
+This product is licensed under the MIT License.
+See the LICENSE file in the root directory for the full license text.
+
+-------------------------------------------------------------------------------
+
+THIRD-PARTY NOTICES
+
+This project incorporates components from the following open-source projects.
+All trademarks referenced herein are the property of their respective owners.
+
+-------------------------------------------------------------------------------
+
+1. Spring Boot
+   Copyright (c) 2012-2025 Pivotal, Inc. and contributors
+   License: Apache License 2.0
+   URL: https://spring.io/projects/spring-boot
+
+2. FastAPI
+   Copyright (c) 2018 Sebastián Ramírez
+   License: MIT License
+   URL: https://fastapi.tiangolo.com
+
+3. React
+   Copyright (c) Meta Platforms, Inc. and affiliates
+   License: MIT License
+   URL: https://react.dev
+
+4. pgvector
+   Copyright (c) 2021 Andrew Kane
+   License: MIT License
+   URL: https://github.com/pgvector/pgvector
+
+5. MinIO
+   Copyright (c) 2015-2024 MinIO, Inc.
+   License: GNU AGPL v3.0 (client SDK: Apache 2.0)
+   URL: https://min.io
+
+6. Pydantic
+   Copyright (c) 2017-2024 Samuel Colvin and contributors
+   License: MIT License
+   URL: https://docs.pydantic.dev
+
+7. Flyway
+   Copyright (c) 2010-2024 Redgate Software Ltd
+   License: Apache License 2.0
+   URL: https://flywaydb.org
+
+8. Zustand
+   Copyright (c) 2019 Paul Henschel and contributors
+   License: MIT License
+   URL: https://github.com/pmndrs/zustand
+
+9. Vite
+   Copyright (c) 2019-present Evan You and Vite contributors
+   License: MIT License
+   URL: https://vitejs.dev
+
+10. Axios
+    Copyright (c) 2014-present Matt Zabriskie & Collaborators
+    License: MIT License
+    URL: https://axios-http.com
+
+-------------------------------------------------------------------------------
+
+AI MODEL PROVIDERS
+
+This project integrates with the following AI provider APIs. Use of these
+APIs is subject to the respective provider's Terms of Service:
+
+- Google Gemini API   — https://ai.google.dev/terms
+- OpenAI API          — https://openai.com/policies/terms-of-use
+
+API keys and credentials are NOT included in this repository.
+Users must supply their own API keys via environment variables.
+
+-------------------------------------------------------------------------------
+
+ACADEMIC USE NOTICE
+
+This software was developed as a capstone project at
+Duy Tan University, Vietnam, in partial fulfillment of the
+requirements for the degree of Information Technology.
+
+Academic Year: 2026-2027
+Supervisor: Thanh Tran
