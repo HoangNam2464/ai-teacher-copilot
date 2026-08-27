@@ -400,6 +400,8 @@ ai-teacher-copilot/
 | Tài liệu | Mô tả |
 | :--- | :--- |
 | [`AI_TEACHER_COPILOT_BLUEPRINT.md`](./docs/AI_TEACHER_COPILOT_BLUEPRINT.md) | Thiết kế kiến trúc hệ thống đầy đủ |
+| [`ENGINEERING_KNOWLEDGE.md`](./docs/ENGINEERING_KNOWLEDGE.md) | Bộ tri thức kỹ thuật RAG, Provider Abstraction & Security |
+| [`UI_UX_KNOWLEDGE.md`](./docs/UI_UX_KNOWLEDGE.md) | Bộ tri thức thiết kế UI/UX, Design System & Interactions |
 | [`API_DOCS.md`](./API_DOCS.md) | REST API documentation |
 | [`CONTRIBUTING.md`](./CONTRIBUTING.md) | Quy chuẩn phát triển & đóng góp |
 | [`CHANGELOG.md`](./CHANGELOG.md) | Lịch sử thay đổi theo phiên bản |
