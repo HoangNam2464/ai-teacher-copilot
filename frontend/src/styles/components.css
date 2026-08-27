@@ -362,3 +362,47 @@
 .bloom-badge--evaluate   { background: hsl(var(--bloom-evaluate-bg));   color: hsl(var(--bloom-evaluate-fg)); }
 .bloom-badge--create     { background: hsl(var(--bloom-create-bg));     color: hsl(var(--bloom-create-fg)); }
 
+/* ==========================================================================
+   Modern Tinted Badges (10-20% alpha background + border + contrast text)
+   ========================================================================== */
+.badge-tint {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.65rem;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius-full);
+  line-height: 1.3;
+}
+
+.badge-tint--teal {
+  background-color: hsl(var(--primary) / 0.1);
+  border: 1px solid hsl(var(--primary) / 0.25);
+  color: hsl(var(--primary));
+}
+
+.badge-tint--blue {
+  background-color: rgb(59 130 246 / 0.1);
+  border: 1px solid rgb(59 130 246 / 0.25);
+  color: rgb(37 99 235);
+}
+
+.badge-tint--violet {
+  background-color: rgb(139 92 246 / 0.1);
+  border: 1px solid rgb(139 92 246 / 0.25);
+  color: rgb(124 58 237);
+}
+
+.badge-tint--amber {
+  background-color: rgb(245 158 11 / 0.1);
+  border: 1px solid rgb(245 158 11 / 0.25);
+  color: rgb(217 119 6);
+}
+
+.badge-tint--green {
+  background-color: rgb(16 185 129 / 0.1);
+  border: 1px solid rgb(16 185 129 / 0.25);
+  color: rgb(5 150 105);
+}
+
