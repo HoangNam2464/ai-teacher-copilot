@@ -1,0 +1,173 @@
+# ==============================================================================
+# AI Teacher Copilot — All-In-One Full Stack Docker Compose Configuration
+# ==============================================================================
+# Runs the ENTIRE system in Docker with a single command:
+#   docker compose -f docker-compose.full.yml up --build -d
+#
+# Services included:
+# 1. PostgreSQL 16 + pgvector (Database & Embeddings)
+# 2. MinIO S3 (Object Storage for PDF/DOCX)
+# 3. MinIO Init (Auto-create buckets)
+# 4. FastAPI AI Service (RAG & LLM Engine)
+# 5. Spring Boot 3 Backend (Core Gateway & Security)
+# 6. React 18 Frontend (Nginx Web Client)
+# ==============================================================================
+
+services:
+  # ----------------------------------------------------------------------------
+  # 1. Database (PostgreSQL 16 + pgvector)
+  # ----------------------------------------------------------------------------
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: atc-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-aiteachercopilot}
+      POSTGRES_USER: ${POSTGRES_USER:-aiteacher}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme_db_password}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infrastructure/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-aiteacher} -d ${POSTGRES_DB:-aiteachercopilot}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - atc-network
+
+  # ----------------------------------------------------------------------------
+  # 2. Object Storage (MinIO)
+  # ----------------------------------------------------------------------------
+  minio:
+    image: minio/minio:latest
+    container_name: atc-minio
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-changeme_minio_password}
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - atc-network
+
+  # MinIO Bucket Auto-initialization
+  minio-init:
+    image: minio/mc:latest
+    container_name: atc-minio-init
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:9000 $${MINIO_ROOT_USER:-minioadmin} $${MINIO_ROOT_PASSWORD:-changeme_minio_password};
+      mc mb --ignore-existing local/${MINIO_BUCKET_DOCUMENTS:-documents};
+      mc mb --ignore-existing local/${MINIO_BUCKET_EXPORTS:-exports};
+      echo 'MinIO buckets created successfully';
+      exit 0;
+      "
+    networks:
+      - atc-network
+
+  # ----------------------------------------------------------------------------
+  # 3. AI Service (FastAPI - Internal RAG Engine)
+  # ----------------------------------------------------------------------------
+  ai-service:
+    build:
+      context: ./ai-service
+      dockerfile: ../infrastructure/docker/ai-service.Dockerfile
+    container_name: atc-ai-service
+    environment:
+      FASTAPI_PORT: 8000
+      ENVIRONMENT: production
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-aiteacher}:${POSTGRES_PASSWORD:-changeme_db_password}@postgres:5432/${POSTGRES_DB:-aiteachercopilot}
+      AI_SERVICE_API_KEY: ${AI_SERVICE_API_KEY:-changeme_internal_ai_service_shared_secret_key}
+      AI_PROVIDER: ${AI_PROVIDER:-gemini}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o-mini}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - atc-network
+
+  # ----------------------------------------------------------------------------
+  # 4. Backend Gateway (Spring Boot 3 - Java 17)
+  # ----------------------------------------------------------------------------
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ../infrastructure/docker/backend.Dockerfile
+    container_name: atc-backend
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-aiteachercopilot}
+      POSTGRES_USER: ${POSTGRES_USER:-aiteacher}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme_db_password}
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-changeme_minio_password}
+      MINIO_BUCKET_DOCUMENTS: ${MINIO_BUCKET_DOCUMENTS:-documents}
+      MINIO_BUCKET_EXPORTS: ${MINIO_BUCKET_EXPORTS:-exports}
+      AI_SERVICE_URL: http://ai-service:8000
+      AI_SERVICE_API_KEY: ${AI_SERVICE_API_KEY:-changeme_internal_ai_service_shared_secret_key}
+      JWT_SECRET: ${JWT_SECRET:-changeme_jwt_secret_at_least_32_characters_long_for_hmac256}
+      JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS:-86400000}
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      ai-service:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - atc-network
+
+  # ----------------------------------------------------------------------------
+  # 5. Frontend Client (React 18 + Nginx)
+  # ----------------------------------------------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ../infrastructure/docker/frontend.Dockerfile
+    container_name: atc-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      backend:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - atc-network
+
+volumes:
+  postgres_data:
+    driver: local
+  minio_data:
+    driver: local
+
+networks:
+  atc-network:
+    driver: bridge
