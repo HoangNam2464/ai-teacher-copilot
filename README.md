@@ -59,40 +59,48 @@ Hệ thống áp dụng kiến trúc **RAG (Retrieval-Augmented Generation)** k�
 
 ## 🏗️ Kiến trúc Hệ thống
 
-```
-┌──────────────────────────────────────────────────────────────────────┐
-│                     AI Teacher Copilot Platform                      │
-├──────────────────────────────────────────────────────────────────────┤
-│                                                                      │
-│   ┌─────────────────────────────────────────────────────────────┐   │
-│   │              React 18 + Vite + TypeScript                    │   │
-│   │         (Teacher UI · Workspace · Review · Export)           │   │
-│   └───────────────────────────┬─────────────────────────────────┘   │
-│                               │  REST API (JWT)                      │
-│   ┌───────────────────────────▼─────────────────────────────────┐   │
-│   │              Spring Boot 3  (Java 17)                        │   │
-│   │   Auth · Workspace · Document Metadata · Generation          │   │
-│   │   Review History · REST API Gateway                          │   │
-│   └────────┬──────────────────────────────────────┬─────────────┘   │
-│            │  Internal HTTP                        │                 │
-│   ┌────────▼──────────────┐     ┌─────────────────▼───────────┐     │
-│   │   FastAPI (Python 3.12)│     │     PostgreSQL 16            │     │
-│   │   Document Processing  │     │     + pgvector extension     │     │
-│   │   Embedding · RAG      │     │     (Vector Store)           │     │
-│   │   Prompt Orchestration │     └─────────────────────────────┘     │
-│   │   Structured Output    │                                         │
-│   └────────┬──────────────┘     ┌─────────────────────────────┐     │
-│            │                    │     MinIO                    │     │
-│   ┌────────▼──────────────┐     │     (Object Storage)         │     │
-│   │   Gemini / OpenAI API  │     │     PDF · DOCX files         │     │
-│   │   (LLM Provider)       │     └─────────────────────────────┘     │
-│   └────────────────────────┘                                         │
-└──────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph Client ["🖥️ Client Tier (Browser)"]
+        FE["React 18 + Vite + TypeScript\n(Teacher Workspace · Review · Export)"]
+    end
 
- Frontend ──(REST/JWT)──▶ Spring Boot ──(Internal)──▶ FastAPI
-                              │
-                              └──▶ PostgreSQL + pgvector
-                              └──▶ MinIO
+    subgraph BackendGateway ["🛡️ Backend Gateway (Java 17)"]
+        SB["Spring Boot 3\n• Auth & Spring Security (JWT)\n• Workspace & Document Metadata\n• Review History & State Engine\n• Word / PDF Exporter"]
+    end
+
+    subgraph AIService ["🧠 AI Service (Python 3.12 - Internal Only)"]
+        FA["FastAPI Service\n• Document Parser & Structure Chunking\n• Embedding Generation\n• pgvector Semantic Retrieval\n• Prompt Orchestration & Pydantic Validation"]
+    end
+
+    subgraph DataStorage ["💾 Storage & Vector Database"]
+        PG[("PostgreSQL 16\n+ pgvector extension\n(Metadata & Embeddings)")]
+        MINIO[("MinIO\n(Object Storage: PDF / DOCX)")]
+    end
+
+    subgraph AIProviders ["☁️ LLM Providers"]
+        LLM["Gemini 2.5 / OpenAI GPT-4o\n(Provider Abstraction)"]
+    end
+
+    FE -->|REST API + JWT| SB
+    SB -->|Internal HTTP + API Key| FA
+    SB -->|JPA / Flyway| PG
+    SB -->|S3 Client| MINIO
+    FA -->|Vector Similarity Query| PG
+    FA -->|Prompt + < sources > boundary| LLM
+
+    %% Styling
+    classDef client fill:#E0F2FE,stroke:#0284C7,stroke-width:2px,color:#0369A1;
+    classDef backend fill:#FEF3C7,stroke:#D97706,stroke-width:2px,color:#92400E;
+    classDef ai fill:#DCFCE7,stroke:#16A34A,stroke-width:2px,color:#15803D;
+    classDef storage fill:#F3E8FF,stroke:#9333EA,stroke-width:2px,color:#6B21A8;
+    classDef provider fill:#FFE4E6,stroke:#E11D48,stroke-width:2px,color:#9F1239;
+
+    class FE client;
+    class SB backend;
+    class FA ai;
+    class PG,MINIO storage;
+    class LLM provider;
 ```
 
 **Nguyên tắc kiến trúc:**
@@ -269,34 +277,41 @@ Word / PDF Export
 
 ## 🧠 RAG Pipeline
 
-```
-Tài liệu (PDF/DOCX)
-    ↓ [FastAPI: Document Processing]
-Parse cấu trúc
-    ↓
-Chunking thông minh (structure-aware)
-    ↓
-Embedding (OpenAI / Gemini Embedding API)
-    ↓
-Lưu vào PostgreSQL + pgvector
-    ↓ [FastAPI: Retrieval]
-Query embedding
-    ↓
-Metadata filter (workspace_id + subject + grade)
-    ↓
-Vector similarity search (Top-K chunks)
-    ↓ [FastAPI: Generation]
-Prompt Orchestration
-  └─ System Prompt
-  └─ <sources> chunk_1 ... chunk_k </sources>   ← UNTRUSTED boundary
-    ↓
-LLM (Gemini / OpenAI)
-    ↓
-Structured Output (Pydantic v2 validation)
-    ↓
-Citation (source_chunk_ids → document + page)
-    ↓
-Spring Boot lưu kết quả + trả về Frontend
+```mermaid
+flowchart TD
+    subgraph Ingestion ["1️⃣ Document Ingestion (FastAPI)"]
+        DOC["📄 Uploaded Document (PDF / DOCX)"] --> PARSE["Structure-aware Parser"]
+        PARSE --> CHUNK["Smart Chunker\n(512 tokens, 50 overlap)"]
+        CHUNK --> EMB1["Embedding API\n(Gemini / OpenAI)"]
+        EMB1 --> PGV[("PostgreSQL 16\n+ pgvector")]
+    end
+
+    subgraph Retrieval ["2️⃣ Semantic Retrieval (FastAPI)"]
+        QUERY["🔍 Teacher Topic / Subject / Grade"] --> EMB2["Query Embedding"]
+        EMB2 --> FILTER["Metadata Filter\n(workspace_id + subject + grade)"]
+        FILTER --> VSEARCH["Vector Similarity Search\n(Top-K Chunks)"]
+        PGV -.-> VSEARCH
+    end
+
+    subgraph Generation ["3️⃣ Prompt & Generation (FastAPI)"]
+        VSEARCH --> PROMPT["Prompt Orchestration\n• System Instructions\n• < sources > Untrusted Chunks </ sources >"]
+        PROMPT --> LLM["LLM Provider\n(Gemini 2.5 / GPT-4o)"]
+        LLM --> VALIDATE["Pydantic v2 Schema Validation\n(LessonPlanOutput / QuizOutput)"]
+        VALIDATE --> CITE["Citation Resolver\n(source_chunk_ids → Doc + Page)"]
+    end
+
+    CITE --> OUTPUT["📦 Spring Boot Gateway → React UI Render / Export"]
+
+    %% Styling
+    classDef ing fill:#EFF6FF,stroke:#3B82F6,stroke-width:1.5px,color:#1E40AF;
+    classDef ret fill:#FEFCE8,stroke:#EAB308,stroke-width:1.5px,color:#854D0E;
+    classDef gen fill:#F0FDF4,stroke:#22C55E,stroke-width:1.5px,color:#166534;
+    classDef out fill:#FAF5FF,stroke:#A855F7,stroke-width:1.5px,color:#6B21A8;
+
+    class DOC,PARSE,CHUNK,EMB1,PGV ing;
+    class QUERY,EMB2,FILTER,VSEARCH ret;
+    class PROMPT,LLM,VALIDATE,CITE gen;
+    class OUTPUT out;
 ```
 
 **Prompt Security:** Retrieved content được wrap trong `<sources>...</sources>` — nghiêm cấm inject vào system instructions để phòng chống Prompt Injection.
