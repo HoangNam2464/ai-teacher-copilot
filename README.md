@@ -169,6 +169,18 @@ JWT_SECRET=your_jwt_secret_key
 
 > ⚠️ **Tuyệt đối không** commit file `.env` chứa credentials thực lên Git.
 
+### Lựa chọn khởi chạy
+
+Bạn có thể chọn 1 trong 2 cách khởi chạy (Xem chi tiết tại [`docs/RUN_GUIDE.md`](./docs/RUN_GUIDE.md)):
+
+* **🌟 Cách 1: Khởi chạy Trọn Gói 1 Lệnh (All-In-One Docker — Khuyên dùng khi Demo / Nộp bài):**
+  ```bash
+  docker compose -f docker-compose.full.yml up --build -d
+  ```
+  Truy cập Web Client tại: `http://localhost:3000`
+
+* **🛠️ Cách 2: Khởi chạy Chế độ Lập trình (Dev Mode — Hot Reload khi đang code):**
+
 ---
 
 ### Bước 1: Khởi chạy Infrastructure (Terminal 1)
