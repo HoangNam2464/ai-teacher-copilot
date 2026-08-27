@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { PATHS } from '../../../app/routes/paths';
 import { Button } from '../../../core/components/ui/Button';
 import { GradientText } from '../../../core/components/craft/GradientText';
@@ -16,7 +17,8 @@ import { BloomTaxonomyTag } from '../../../core/components/ui/BloomTaxonomyTag';
 import { CitationBadge } from '../../../core/components/citation/CitationBadge';
 
 export function HeroSection() {
-  const [activeTab, setActiveTab] = useState('lesson'); // 'lesson' | 'quiz' | 'matrix'
+  const { t } = useTranslation();
+  const [activeTab, setActiveTab] = useState('lesson');
 
   return (
     <section className="hero-section" id="hero">
@@ -24,28 +26,27 @@ export function HeroSection() {
         {/* Top Tag */}
         <div className="hero-badge-pill">
           <SparklesIcon size={14} />
-          <span>AI Chuyên Biệt Cho Giáo Viên K-12</span>
+          <span>{t('hero.badge')}</span>
           <span className="hero-badge-divider" />
-          <span className="hero-badge-highlight">Chuẩn GDPT 2018 &amp; 5512</span>
+          <span className="hero-badge-highlight">{t('hero.badgeHighlight')}</span>
         </div>
 
         {/* Main Headline with GradientText */}
         <h1 className="hero-headline">
-          Kiến Tạo Kế Hoạch Bài Dạy &amp; Đề Thi Chuẩn Sư Phạm{' '}
-          <GradientText underline>Chỉ Trong Vài Phút</GradientText>
+          {t('hero.titleLine1')}{' '}
+          <GradientText underline>{t('hero.titleGradient')}</GradientText>
         </h1>
 
         {/* Subtitle */}
         <p className="hero-description">
-          Trợ lý AI bám sát sách giáo khoa, tự động hóa ma trận nhận thức Bloom,
-          trích dẫn nguồn minh bạch và đồng hành cùng thầy cô giảm 70% thời gian chuẩn bị hồ sơ chuyên môn.
+          {t('hero.description')}
         </p>
 
         {/* Action CTAs */}
         <div className="hero-cta-group">
           <Link to={PATHS.REGISTER}>
             <Button variant="primary" size="lg" className="hero-primary-btn">
-              <span>Bắt Đầu Soạn Giáo Án Miễn Phí</span>
+              <span>{t('hero.ctaPrimary')}</span>
               <motion.span
                 animate={{ x: [0, 4, 0] }}
                 transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
@@ -56,7 +57,7 @@ export function HeroSection() {
           </Link>
           <a href="#how-it-works">
             <Button variant="outline" size="lg" className="hero-secondary-btn">
-              <span>Khám Phá Quy Trình 3 Bước</span>
+              <span>{t('hero.ctaSecondary')}</span>
             </Button>
           </a>
         </div>
@@ -65,21 +66,20 @@ export function HeroSection() {
         <div className="hero-trust-tags">
           <div className="trust-tag-item">
             <CheckCircle2Icon size={15} />
-            <span>Đúng khung Công Văn 5512</span>
+            <span>{t('hero.trustPoints.cv5512')}</span>
           </div>
           <div className="trust-tag-item">
             <ShieldCheckIcon size={15} />
-            <span>Đối soát trang SGK gốc</span>
+            <span>{t('hero.trustPoints.ragSGK')}</span>
           </div>
           <div className="trust-tag-item">
             <CheckCircle2Icon size={15} />
-            <span>Xuất file Word &amp; PDF 1-click</span>
+            <span>{t('hero.trustPoints.exportWord')}</span>
           </div>
         </div>
 
         {/* Interactive UI Mockup Card with Ambient Glow Layer */}
         <div className="hero-mockup-wrapper">
-          {/* Ambient Glow Background behind Mockup */}
           <div className="hero-mockup-glow" aria-hidden="true" />
 
           <div className="hero-mockup-card">

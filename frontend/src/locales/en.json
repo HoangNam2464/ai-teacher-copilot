@@ -1,0 +1,104 @@
+{
+  "brand": {
+    "name": "AI Teacher Copilot",
+    "tagline": "Curriculum-Grounded AI Teaching Assistant for K-12",
+    "subtitle": "Draft lesson plans, SGK citations, and Bloom matrix quizzes"
+  },
+  "nav": {
+    "features": "Features",
+    "howItWorks": "How It Works",
+    "testimonials": "Testimonials",
+    "faq": "FAQ",
+    "login": "Sign In",
+    "register": "Start Free",
+    "workspace": "Go to Workspaces"
+  },
+  "hero": {
+    "badge": "Specialized AI for K-12 Teachers",
+    "badgeHighlight": "Standard GDPT 2018 & CV 5512",
+    "titleLine1": "Craft Lesson Plans & Balanced Quizzes",
+    "titleGradient": "In Just Minutes",
+    "description": "Curriculum-grounded AI assistant: Traceable textbook citations, automated Bloom taxonomy tagging, saving teachers 70% of lesson preparation time.",
+    "ctaPrimary": "Start Drafting Free",
+    "ctaSecondary": "Explore 3-Step Process",
+    "trustPoints": {
+      "cv5512": "Strictly adheres to Official CV 5512",
+      "ragSGK": "Verifiable textbook source grounding",
+      "exportWord": "1-click Word & PDF export"
+    }
+  },
+  "trustedBy": {
+    "title": "Developed and trusted by K-12 educators across Vietnam",
+    "teachersCount": "1,200+",
+    "teachersLabel": "Active K-12 Teachers",
+    "standardsRate": "100%",
+    "standardsLabel": "Curriculum Compliance",
+    "timeSavedRate": "70%",
+    "timeSavedLabel": "Prep Time Saved",
+    "provincesCount": "63/63",
+    "provincesLabel": "Provinces Covered"
+  },
+  "features": {
+    "tag": "Breakthrough Capabilities",
+    "title": "Complete Pedagogical Copilot System",
+    "subtitle": "Combining Generative AI with RAG knowledge grounding, specialized for K-12 educational standards.",
+    "lessonPlan": {
+      "tag": "Pedagogical Core",
+      "title": "Structured Lesson Plans (CV 5512)",
+      "desc": "Automatically generates the complete 4-activity structure: Warm-up, Knowledge Construction, Practice, and Application with Teacher/Student interaction tables."
+    },
+    "ragGrounding": {
+      "title": "Transparent Textbook RAG Grounding",
+      "desc": "Eliminates hallucinations. Every objective and content item is cross-referenced with exact page numbers from official textbooks."
+    },
+    "bloomQuiz": {
+      "title": "Bloom Taxonomy Assessment Matrix",
+      "desc": "Generates multiple-choice and open-ended question banks classified across Bloom's levels (Remember, Understand, Apply, Analyze)."
+    },
+    "exportDocx": {
+      "title": "Publication-Ready Word & PDF Export",
+      "desc": "Download formatted documents with standard 2-2-3-2 cm margins, clean tables, citation footers, and rendered KaTeX formulas."
+    }
+  },
+  "howItWorks": {
+    "tag": "Pedagogical Workflow",
+    "title": "Simplify Teaching Prep in 3 Easy Steps",
+    "subtitle": "A seamless pipeline allowing teachers to save maximum time while maintaining pedagogical excellence.",
+    "step1": {
+      "badge": "Semantic Indexing",
+      "title": "Upload Textbooks & Materials",
+      "desc": "Upload textbook PDFs or lecture documents to your dedicated subject workspace."
+    },
+    "step2": {
+      "badge": "Accurate RAG Grounding",
+      "title": "AI Generates Curriculum Draft",
+      "desc": "Select lesson topic and grade. The AI analyzes context and drafts 4-stage activities or Bloom quizzes."
+    },
+    "step3": {
+      "badge": "Standard DOCX Export",
+      "title": "Review & Export in 1-Click",
+      "desc": "Fine-tune according to classroom dynamics, verify evidence citations, and export clean Word/PDF files."
+    }
+  },
+  "faq": {
+    "tag": "Common Inquiries",
+    "title": "Frequently Asked Questions",
+    "subtitle": "Everything you need to know about getting started with AI Teacher Copilot."
+  },
+  "cta": {
+    "badge": "100% Free for K-12 Teachers",
+    "title": "Ready to Elevate Your Teaching Materials?",
+    "subtitle": "Experience the AI assistant for 5512 lesson plans, textbook citations, and Bloom quizzes today. No credit card required.",
+    "button": "Create Free Teacher Account",
+    "guarantees": {
+      "setup": "Set up in 30 seconds",
+      "privacy": "Secure pedagogical workspace",
+      "export": "Unlimited Word exports"
+    }
+  },
+  "footer": {
+    "desc": "AI assistant specialized for Vietnamese K-12 educators. Advancing teaching quality and reducing administrative workload.",
+    "rights": "© 2026 AI Teacher Copilot for K-12 Teachers. All rights reserved.",
+    "motto": "Designed for the advancement of Vietnamese education."
+  }
+}

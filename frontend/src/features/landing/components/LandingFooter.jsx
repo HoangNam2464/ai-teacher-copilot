@@ -1,9 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { PATHS } from '../../../app/routes/paths';
 import { BrainCircuitIcon } from '../../../core/components/ui/Icons';
 
 export function LandingFooter() {
+  const { t } = useTranslation();
+
   return (
     <footer className="landing-footer">
       <div className="landing-footer-container">
@@ -14,14 +17,14 @@ export function LandingFooter() {
               <div className="landing-brand-icon" aria-hidden="true">
                 <BrainCircuitIcon size={20} />
               </div>
-              <span className="landing-brand-text">AI Teacher Copilot</span>
+              <span className="landing-brand-text">{t('brand.name')}</span>
             </div>
             <p className="footer-brand-desc">
-              Trợ lý AI chuyên biệt cho giáo viên K-12 Việt Nam. Đồng hành nâng cao hiệu quả giảng dạy và giảm tải hồ sơ sư phạm.
+              {t('footer.desc')}
             </p>
           </div>
 
-          {/* Links Col 1: Sản phẩm */}
+          {/* Links Col 1 */}
           <div className="footer-links-col">
             <h4 className="footer-col-title">Sản Phẩm</h4>
             <ul className="footer-links-list">
@@ -32,17 +35,17 @@ export function LandingFooter() {
             </ul>
           </div>
 
-          {/* Links Col 2: Truy cập */}
+          {/* Links Col 2 */}
           <div className="footer-links-col">
             <h4 className="footer-col-title">Tài Khoản</h4>
             <ul className="footer-links-list">
-              <li><Link to={PATHS.LOGIN}>Đăng Nhập</Link></li>
-              <li><Link to={PATHS.REGISTER}>Đăng Ký Tài Khoản</Link></li>
-              <li><Link to={PATHS.WORKSPACES}>Không Gian Làm Việc</Link></li>
+              <li><Link to={PATHS.LOGIN}>{t('nav.login')}</Link></li>
+              <li><Link to={PATHS.REGISTER}>{t('nav.register')}</Link></li>
+              <li><Link to={PATHS.WORKSPACES}>{t('nav.workspace')}</Link></li>
             </ul>
           </div>
 
-          {/* Links Col 3: Chuẩn Mực */}
+          {/* Links Col 3 */}
           <div className="footer-links-col">
             <h4 className="footer-col-title">Chuẩn Sư Phạm</h4>
             <ul className="footer-links-list">
@@ -54,8 +57,8 @@ export function LandingFooter() {
         </div>
 
         <div className="footer-bottom-row">
-          <div>© 2026 AI Teacher Copilot for K-12 Teachers. All rights reserved.</div>
-          <div>Thiết kế vì sự phát triển của nền Giáo dục Việt Nam.</div>
+          <div>{t('footer.rights')}</div>
+          <div>{t('footer.motto')}</div>
         </div>
       </div>
     </footer>

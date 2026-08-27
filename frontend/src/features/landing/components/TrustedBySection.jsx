@@ -1,17 +1,20 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export function TrustedBySection() {
+  const { t } = useTranslation();
+
   const stats = [
-    { value: '1,200+', label: 'Giáo viên K-12 tin dùng' },
-    { value: '100%', label: 'Bám sát khung Công Văn 5512' },
-    { value: '70%', label: 'Giảm thời gian soạn học liệu' },
-    { value: '63/63', label: 'Tỉnh thành trên toàn quốc' },
+    { value: t('trustedBy.teachersCount'), label: t('trustedBy.teachersLabel') },
+    { value: t('trustedBy.standardsRate'), label: t('trustedBy.standardsLabel') },
+    { value: t('trustedBy.timeSavedRate'), label: t('trustedBy.timeSavedLabel') },
+    { value: t('trustedBy.provincesCount'), label: t('trustedBy.provincesLabel') },
   ];
 
   return (
     <section className="trusted-by-section">
       <div className="trusted-by-container">
-        <p className="trusted-by-title">Được phát triển và đồng hành cùng cộng đồng giáo viên Việt Nam</p>
+        <p className="trusted-by-title">{t('trustedBy.title')}</p>
         <div className="stats-grid">
           {stats.map((stat, i) => (
             <div key={i} className="stat-card">
