@@ -1,62 +1,105 @@
 import React from 'react';
 
 /**
- * Input — Reusable form input component.
+ * Input — Standard Form Input Component (shadcn/ui + Radix style).
  *
- * @param {string}   id          - Required. Unique ID for the input (links label).
- * @param {string}   label       - Label text displayed above the input.
- * @param {string}   type        - HTML input type. Default: 'text'.
- * @param {string}   placeholder - Placeholder text.
- * @param {string}   value       - Controlled value.
- * @param {function} onChange    - onChange handler.
- * @param {string}   error       - Error message shown below input (red state).
- * @param {string}   hint        - Helper text shown below input (grey, no error).
- * @param {boolean}  disabled    - Disables the input. Default: false.
- * @param {boolean}  required    - Marks field as required. Default: false.
- * @param {string}   className   - Additional class names.
+ * @param {string}          id          - Unique ID linking label & input.
+ * @param {string}          label       - Label text above input.
+ * @param {React.ReactNode} labelRight  - Optional element on the right of the label (e.g. "Quên mật khẩu?").
+ * @param {string}          type        - HTML input type. Default: 'text'.
+ * @param {string}          placeholder - Placeholder string.
+ * @param {string}          value       - Controlled value.
+ * @param {function}        onChange    - onChange handler.
+ * @param {function}        onBlur      - onBlur handler for inline validation.
+ * @param {string}          error       - Error message string (activates destructive state).
+ * @param {string}          hint        - Helper hint text.
+ * @param {boolean}         disabled    - Disabled state.
+ * @param {boolean}         required    - Shows required indicator (*).
+ * @param {React.ReactNode} leftIcon    - Optional leading icon.
+ * @param {React.ReactNode} rightAction - Optional trailing action (e.g. eye toggle).
+ * @param {string}          className   - Outer wrapper extra class.
  */
 export function Input({
   id,
   label,
+  labelRight = null,
   type = 'text',
   placeholder = '',
   value,
   onChange,
+  onBlur,
   error = '',
   hint = '',
   disabled = false,
   required = false,
+  leftIcon = null,
+  rightAction = null,
   className = '',
+  autoComplete,
   ...props
 }) {
+  const errorId = error ? `${id}-error` : undefined;
+  const hintId = hint ? `${id}-hint` : undefined;
+  const describedBy = errorId || hintId || undefined;
+
   return (
     <div className={`form-group ${className}`}>
-      {label && (
-        <label htmlFor={id} className="form-label">
-          {label}
-          {required && <span className="form-required" aria-hidden="true"> *</span>}
-        </label>
+      {(label || labelRight) && (
+        <div className="form-label-row">
+          {label && (
+            <label htmlFor={id} className="form-label">
+              {label}
+              {required && (
+                <span className="form-required" aria-hidden="true">
+                  {' '}*
+                </span>
+              )}
+            </label>
+          )}
+          {labelRight && <div className="form-label-right">{labelRight}</div>}
+        </div>
       )}
-      <input
-        id={id}
-        type={type}
-        value={value}
-        onChange={onChange}
-        placeholder={placeholder}
-        disabled={disabled}
-        required={required}
-        aria-describedby={error ? `${id}-error` : hint ? `${id}-hint` : undefined}
-        aria-invalid={error ? 'true' : undefined}
-        className={`form-input ${error ? 'form-input--error' : ''}`}
-        {...props}
-      />
+
+      <div className="form-input-container">
+        {leftIcon && (
+          <span className="form-input-icon-left" aria-hidden="true">
+            {leftIcon}
+          </span>
+        )}
+
+        <input
+          id={id}
+          type={type}
+          value={value}
+          onChange={onChange}
+          onBlur={onBlur}
+          placeholder={placeholder}
+          disabled={disabled}
+          required={required}
+          autoComplete={autoComplete}
+          aria-describedby={describedBy}
+          aria-invalid={Boolean(error)}
+          className={`form-input ${leftIcon ? 'form-input--with-left-icon' : ''} ${
+            rightAction ? 'form-input--with-right-action' : ''
+          } ${error ? 'form-input--error' : ''}`}
+          {...props}
+        />
+
+        {rightAction && (
+          <div className="form-input-action-wrapper" style={{ display: 'contents' }}>
+            {rightAction}
+          </div>
+        )}
+      </div>
+
       {error && (
-        <span id={`${id}-error`} className="form-error" role="alert">
+        <span id={errorId} className="form-error" role="alert">
           {error}
         </span>
       )}
+
       {!error && hint && (
-        <span id={`${id}-hint`} className="form-hint">
+        <span id={hintId} className="form-hint">
           {hint}
         </span>
       )}
@@ -65,19 +108,7 @@ export function Input({
 }
 
 /**
- * Textarea — Reusable multiline text area component.
- *
- * @param {string}   id          - Required. Unique ID for the textarea.
- * @param {string}   label       - Label text displayed above the textarea.
- * @param {string}   placeholder - Placeholder text.
- * @param {string}   value       - Controlled value.
- * @param {function} onChange    - onChange handler.
- * @param {number}   rows        - Number of visible rows. Default: 4.
- * @param {string}   error       - Error message shown below textarea.
- * @param {string}   hint        - Helper text shown below textarea.
- * @param {boolean}  disabled    - Disables the textarea. Default: false.
- * @param {boolean}  required    - Marks field as required. Default: false.
- * @param {string}   className   - Additional class names.
+ * Textarea — Standard Multiline Text Input.
  */
 export function Textarea({
   id,
@@ -85,6 +116,7 @@ export function Textarea({
   placeholder = '',
   value,
   onChange,
+  onBlur,
   rows = 4,
   error = '',
   hint = '',
@@ -93,34 +125,43 @@ export function Textarea({
   className = '',
   ...props
 }) {
+  const errorId = error ? `${id}-error` : undefined;
+  const hintId = hint ? `${id}-hint` : undefined;
+  const describedBy = errorId || hintId || undefined;
+
   return (
     <div className={`form-group ${className}`}>
       {label && (
         <label htmlFor={id} className="form-label">
           {label}
-          {required && <span className="form-required" aria-hidden="true"> *</span>}
+          {required && (
+            <span className="form-required" aria-hidden="true">
+              {' '}*
+            </span>
+          )}
         </label>
       )}
       <textarea
         id={id}
         value={value}
         onChange={onChange}
+        onBlur={onBlur}
         placeholder={placeholder}
         rows={rows}
         disabled={disabled}
         required={required}
-        aria-describedby={error ? `${id}-error` : hint ? `${id}-hint` : undefined}
-        aria-invalid={error ? 'true' : undefined}
+        aria-describedby={describedBy}
+        aria-invalid={Boolean(error)}
         className={`form-textarea ${error ? 'form-input--error' : ''}`}
         {...props}
       />
       {error && (
-        <span id={`${id}-error`} className="form-error" role="alert">
+        <span id={errorId} className="form-error" role="alert">
           {error}
         </span>
       )}
       {!error && hint && (
-        <span id={`${id}-hint`} className="form-hint">
+        <span id={hintId} className="form-hint">
           {hint}
         </span>
       )}

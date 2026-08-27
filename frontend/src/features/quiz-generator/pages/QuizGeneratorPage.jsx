@@ -4,6 +4,7 @@ import { useWorkspace } from '../../../core/hooks/useWorkspace';
 import { Button } from '../../../core/components/ui/Button';
 import { Card } from '../../../core/components/ui/Card';
 import { Badge } from '../../../core/components/ui/Badge';
+import { BloomTaxonomyTag } from '../../../core/components/ui/BloomTaxonomyTag';
 import { CitationBadge } from '../../../core/components/citation/CitationBadge';
 import { CitationDrawer } from '../../../core/components/citation/CitationDrawer';
 import { ExportDropdown } from '../../../core/components/export/ExportDropdown';
@@ -187,7 +188,7 @@ export function QuizGeneratorPage() {
                       </strong>
                       <div style={{ display: 'flex', gap: '0.35rem' }}>
                         {q.bloom_taxonomy_level && (
-                          <Badge variant="info">{q.bloom_taxonomy_level}</Badge>
+                          <BloomTaxonomyTag level={q.bloom_taxonomy_level} />
                         )}
                         <CitationBadge
                           count={q.source_chunk_ids?.length || 0}

@@ -4,10 +4,14 @@ import { RegisterForm } from '../components/RegisterForm';
 export function RegisterPage() {
   return (
     <div>
-      <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1.25rem', textAlign: 'center' }}>
-        Đăng Ký Tài Khoản
-      </h2>
+      <div className="auth-form-header">
+        <h2>Đăng Ký Tài Khoản</h2>
+        <p>
+          Bắt đầu kiến tạo giáo án &amp; đề thi bám sát chuẩn GDPT 2018.
+        </p>
+      </div>
       <RegisterForm />
     </div>
   );
 }
+

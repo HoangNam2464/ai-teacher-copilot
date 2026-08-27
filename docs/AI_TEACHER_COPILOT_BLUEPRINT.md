@@ -430,7 +430,7 @@ export const CitationBadge: React.FC<CitationBadgeProps> = ({
   return (
     <button
       onClick={onOpenSourceModal}
-      className="inline-flex items-center gap-1 mx-1 px-2 py-0.5 rounded-md text-xs font-medium bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 hover:bg-emerald-200 transition-colors"
+      className="inline-flex items-center gap-1 mx-1 px-2 py-0.5 rounded-md text-xs font-medium bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-colors"
       title={`Tài liệu: ${filename} (Trang ${pageNumber})`}
     >
       <BookOpen className="w-3 h-3" />

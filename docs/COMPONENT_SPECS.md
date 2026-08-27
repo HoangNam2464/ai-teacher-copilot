@@ -1,6 +1,6 @@
 # AI Teacher Copilot — Component Specifications
 
-> Tài liệu đặc tả chính thức các UI component trong `frontend/src/core/components/`.
+> ⚠️ Token màu, radius, phân loại trang, và công thức craft/polish đã chuyển về SOURCE_OF_TRUTH.md. File này chỉ giữ phần đặc tả nghiệp vụ/component logic riêng, không được định nghĩa lại token hay quy tắc composition.
 > Mọi component đều sử dụng CSS design tokens từ `styles/variables.css` — không hard-code màu hay spacing.
 
 ---
@@ -14,22 +14,23 @@
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `children` | `ReactNode` | — | Nội dung bên trong button |
-| `variant` | `'primary' \| 'secondary' \| 'danger'` | `'primary'` | Kiểu hiển thị button |
-| `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Kích thước button |
+| `variant` | `'default' \| 'primary' \| 'secondary' \| 'outline' \| 'ghost' \| 'destructive'` | `'default'` | Kiểu hiển thị button |
+| `size` | `'sm' \| 'default' \| 'lg' \| 'icon'` | `'default'` | Kích thước button (cố định) |
 | `disabled` | `boolean` | `false` | Vô hiệu hóa button |
-| `loading` | `boolean` | `false` | Hiển thị spinner, disable tương tác |
+| `loading` | `boolean` | `false` | Hiển thị spinner SVG, disable tương tác |
+| `loadingText` | `string` | `''` | Text thay thế khi loading |
 | `className` | `string` | `''` | Class bổ sung |
 | `...props` | `HTMLButtonAttributes` | — | Chuyển tiếp xuống `<button>` |
 
 ### Behavior & Interactions
 
-- **Hover**: `primary` → màu đậm hơn + shadow nhẹ; `secondary` → background subtle
-- **Loading state**: Button bị disable, icon ⏳ xuất hiện bên trái
-- **Disabled state**: opacity 0.6, cursor `not-allowed`
+- **Hover**: `default/primary` → gradient Teal đậm hơn; `secondary` → background subtle
+- **Loading state**: Button bị disable, vector spinner xoay mượt mà xuất hiện bên trái, text đổi sang `loadingText` nếu có
+- **Disabled state**: opacity 0.5, pointer-events `none`, cursor `not-allowed`
 - **Transition**: `150ms cubic-bezier(0.4, 0, 0.2, 1)` trên tất cả properties
 
 ### CSS Classes
-`.btn`, `.btn-primary`, `.btn-secondary`, `.btn-danger`, `.btn-sm`, `.btn-lg`
+`.btn`, `.btn-default`, `.btn-secondary`, `.btn-outline`, `.btn-ghost`, `.btn-destructive`, `.btn-sm`, `.btn-lg`, `.btn-icon`
 
 ---
 
@@ -43,14 +44,18 @@
 |------|------|---------|-------------|
 | `id` | `string` | **required** | ID unique, dùng để link `<label>` |
 | `label` | `string` | — | Label hiển thị phía trên input |
+| `labelRight` | `ReactNode` | `null` | Phần tử bên phải hàng label (vd "Quên mật khẩu?") |
 | `type` | `string` | `'text'` | HTML input type (`text`, `email`, `password`, ...) |
 | `placeholder` | `string` | `''` | Placeholder text |
 | `value` | `string` | — | Giá trị controlled |
 | `onChange` | `function` | — | Handler khi value thay đổi |
-| `error` | `string` | `''` | Thông báo lỗi (hiển thị màu đỏ bên dưới) |
+| `onBlur` | `function` | — | Handler khi blur (inline validation) |
+| `error` | `string` | `''` | Thông báo lỗi (hiển thị màu đỏ bên dưới với role="alert") |
 | `hint` | `string` | `''` | Gợi ý helper (hiển thị màu xám, chỉ khi không có error) |
 | `disabled` | `boolean` | `false` | Vô hiệu hóa input |
 | `required` | `boolean` | `false` | Đánh dấu field bắt buộc (dấu `*` đỏ) |
+| `leftIcon` | `ReactNode` | `null` | Leading icon bên trong input |
+| `rightAction` | `ReactNode` | `null` | Trailing action (vd nút toggle ẩn/hiện mật khẩu) |
 | `className` | `string` | `''` | Class bổ sung cho form-group wrapper |
 
 ### Props — Textarea (tương tự Input, thêm)
@@ -61,12 +66,12 @@
 
 ### Behavior & Interactions
 
-- **Focus**: border xanh `--color-border-focus` + ring glow `rgba(59,130,246,0.15)`
-- **Error state**: border đỏ + ring đỏ nhạt + message dưới với `role="alert"`
+- **Focus**: border `--color-border-focus` + ring glow `hsl(var(--ring) / 0.15)`
+- **Error state**: border đỏ `hsl(var(--destructive))` + message dưới với `role="alert"`
 - **Accessibility**: `aria-invalid`, `aria-describedby` tự động được set khi có error/hint
 
 ### CSS Classes
-`.form-group`, `.form-label`, `.form-input`, `.form-textarea`, `.form-input--error`, `.form-error`, `.form-hint`, `.form-required`
+`.form-group`, `.form-label-row`, `.form-label`, `.form-label-right`, `.form-input`, `.form-textarea`, `.form-input--error`, `.form-error`, `.form-hint`, `.form-required`
 
 ---
 
@@ -85,7 +90,7 @@
 
 ### Behavior & Interactions
 
-- **Default**: background trắng, border nhẹ, border-radius `12px`, shadow nhỏ
+- **Default**: background `hsl(var(--card))`, border `hsl(var(--border))`, border-radius `12–16px` (`var(--radius-2xl)`), shadow `var(--shadow-card)`
 - **Hoverable**: hover → shadow tăng + border đậm hơn (transition 150ms)
 
 ### CSS Classes
@@ -110,7 +115,25 @@
 
 ---
 
-## 5. Spinner
+## 5. Alert
+
+**File**: [`core/components/ui/Alert.jsx`](../frontend/src/core/components/ui/Alert.jsx)
+
+### Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `variant` | `'destructive' \| 'success' \| 'warning' \| 'default'` | `'default'` | Kiểu thông báo |
+| `title` | `string` | `''` | Tiêu đề thông báo |
+| `children` | `ReactNode` | — | Nội dung thông báo |
+| `className` | `string` | `''` | Class bổ sung |
+
+### CSS Classes
+`.alert`, `.alert-destructive`, `.alert-success`, `.alert-warning`, `.alert-icon`, `.alert-body`, `.alert-title`, `.alert-description`
+
+---
+
+## 6. Spinner
 
 **File**: [`core/components/ui/Spinner.jsx`](../frontend/src/core/components/ui/Spinner.jsx)
 
@@ -122,12 +145,12 @@
 | `message` | `string` | `'Đang tải...'` | Text hiển thị bên dưới icon. `''` để ẩn |
 
 ### Behavior
-- Icon ⏳ với `animation: spin 1s linear infinite`
+- Vector SVG Spinner với `animation: spin 1s linear infinite`
 - Layout column center, thích hợp dùng trong page-level loading states
 
 ---
 
-## 6. Toast & ToastContainer
+## 7. Toast & ToastContainer
 
 **File**: [`core/components/feedback/Toast.jsx`](../frontend/src/core/components/feedback/Toast.jsx)
 
@@ -148,29 +171,9 @@
 | `toasts` | `Array<ToastProps>` | `[]` | Danh sách toast đang hiển thị |
 | `onClose` | `function(id)` | — | Callback propagated tới từng Toast |
 
-### Behavior & Interactions
-
-- **Position**: Fixed bottom-right, z-index 9999
-- **Animation**: Slide in từ phải (`translateX`) khi xuất hiện
-- **Auto-dismiss**: Timer reset khi `duration` thay đổi
-- **Close button**: Nút `✕` ở góc phải, opacity 0.6 → 1 khi hover
-- **Accessibility**: `role="alert"`, `aria-live="assertive"` trên mỗi Toast
-
-### Usage Pattern
-```jsx
-const [toasts, setToasts] = useState([]);
-const addToast = (message, variant = 'info') =>
-  setToasts(prev => [...prev, { id: Date.now(), message, variant }]);
-const removeToast = (id) =>
-  setToasts(prev => prev.filter(t => t.id !== id));
-
-// In render:
-<ToastContainer toasts={toasts} onClose={removeToast} />
-```
-
 ---
 
-## 7. ConfirmModal
+## 8. ConfirmModal
 
 **File**: [`core/components/feedback/ConfirmModal.jsx`](../frontend/src/core/components/feedback/ConfirmModal.jsx)
 
@@ -188,17 +191,9 @@ const removeToast = (id) =>
 | `onConfirm` | `function` | — | Callback khi xác nhận |
 | `onCancel` | `function` | — | Callback khi hủy hoặc đóng |
 
-### Behavior & Interactions
-
-- **Open**: Nút Cancel được focus tự động (safer UX — tránh confirm vô tình)
-- **Escape key**: Tự động gọi `onCancel`
-- **Backdrop click**: Click bên ngoài modal box → gọi `onCancel`
-- **Loading state**: Cả hai nút bị disable, nút confirm hiển thị `'Đang xử lý...'`
-- **Animation**: overlay fade-in + modal scale + slide up
-
 ---
 
-## 8. EmptyState
+## 9. EmptyState
 
 **File**: [`core/components/feedback/EmptyState.jsx`](../frontend/src/core/components/feedback/EmptyState.jsx)
 
@@ -206,7 +201,7 @@ const removeToast = (id) =>
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `icon` | `string` | `'📭'` | Emoji/icon character |
+| `icon` | `ReactNode` | `<Inbox />` | Vector SVG icon component |
 | `title` | `string` | — | Tiêu đề chính |
 | `description` | `string` | — | Text mô tả thứ cấp |
 | `action` | `ReactNode` | — | Slot cho action (thường là `<Button>`) |
@@ -215,7 +210,7 @@ const removeToast = (id) =>
 ### Usage Pattern
 ```jsx
 <EmptyState
-  icon="📄"
+  icon={<FileText size={32} className="text-muted-foreground" />}
   title="Chưa có tài liệu nào"
   description="Tải lên tài liệu đầu tiên để bắt đầu xây dựng kho tri thức."
   action={<Button onClick={handleUpload}>Tải tài liệu lên</Button>}
@@ -224,7 +219,7 @@ const removeToast = (id) =>
 
 ---
 
-## 9. ErrorBoundary
+## 10. ErrorBoundary
 
 **File**: [`core/components/feedback/ErrorBoundary.jsx`](../frontend/src/core/components/feedback/ErrorBoundary.jsx)
 
@@ -235,46 +230,11 @@ const removeToast = (id) =>
 | `children` | `ReactNode` | — | Component subtree được bảo vệ |
 | `fallback` | `ReactNode \| function({error, reset})` | — | UI fallback tùy chỉnh |
 
-### Behavior
-
-- **Default fallback**: Icon ⚠️ + title đỏ + message + nút "Thử lại"
-- **Custom fallback (ReactNode)**: Render trực tiếp
-- **Custom fallback (function)**: Nhận `{ error, reset }` — `reset()` xóa error state
-- **`componentDidCatch`**: Log to console trong dev; tích hợp Sentry/monitoring trong production
-
-### Usage Pattern
-```jsx
-// Bao bọc từng feature page:
-<ErrorBoundary>
-  <LessonPlannerPage />
-</ErrorBoundary>
-
-// Custom fallback với reset:
-<ErrorBoundary fallback={({ error, reset }) => (
-  <EmptyState
-    icon="⚠️"
-    title="Có lỗi xảy ra"
-    description={error.message}
-    action={<Button onClick={reset}>Thử lại</Button>}
-  />
-)}>
-  <QuizGeneratorPage />
-</ErrorBoundary>
-```
-
 ---
 
-## 10. CitationBadge & CitationDrawer
+## 11. CitationBadge & CitationDrawer
 
-**File**: [`core/components/citation/CitationBadge.jsx`](../frontend/src/core/components/citation/CitationBadge.jsx)
-**File**: [`core/components/citation/CitationDrawer.jsx`](../frontend/src/core/components/citation/CitationDrawer.jsx)
+**File**: [`core/components/citation/CitationBadge.jsx`](../frontend/src/core/components/citation/CitationBadge.jsx)  
+**File**: [`core/components/citation/CitationDrawer.jsx`](../frontend/src/core/components/citation/CitationDrawer.jsx)  
 
 > Xem chi tiết trong [feature-citation rule](../.agents/rules/feature-citation.md).
-
----
-
-## 11. ExportDropdown
-
-**File**: [`core/components/export/ExportDropdown.jsx`](../frontend/src/core/components/export/ExportDropdown.jsx)
-
-> Xem chi tiết trong [feature-export rule](../.agents/rules/feature-export.md).

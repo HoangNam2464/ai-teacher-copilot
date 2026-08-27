@@ -4,9 +4,12 @@ import { LoginForm } from '../components/LoginForm';
 export function LoginPage() {
   return (
     <div>
-      <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1.25rem', textAlign: 'center' }}>
-        Đăng Nhập
-      </h2>
+      <div className="auth-form-header">
+        <h2>Đăng Nhập Hệ Thống</h2>
+        <p>
+          Chào mừng Thầy/Cô quay trở lại với không gian soạn giáo án &amp; đề thi AI Copilot.
+        </p>
+      </div>
       <LoginForm />
     </div>
   );
