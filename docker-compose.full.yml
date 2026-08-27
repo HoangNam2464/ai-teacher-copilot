@@ -90,19 +90,27 @@ services:
     container_name: atc-ai-service
     environment:
       FASTAPI_PORT: 8000
-      ENVIRONMENT: production
+      FASTAPI_ENV: production
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
-      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-aiteacher}:${POSTGRES_PASSWORD:-changeme_db_password}@postgres:5432/${POSTGRES_DB:-aiteachercopilot}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-aiteachercopilot}
+      POSTGRES_USER: ${POSTGRES_USER:-aiteacher}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme_db_password}
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-changeme_minio_password}
+      MINIO_BUCKET_DOCUMENTS: ${MINIO_BUCKET_DOCUMENTS:-documents}
       AI_SERVICE_API_KEY: ${AI_SERVICE_API_KEY:-changeme_internal_ai_service_shared_secret_key}
       AI_PROVIDER: ${AI_PROVIDER:-gemini}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
-      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
-      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o-mini}
     ports:
       - "8000:8000"
     depends_on:
       postgres:
+        condition: service_healthy
+      minio:
         condition: service_healthy
     restart: unless-stopped
     networks:

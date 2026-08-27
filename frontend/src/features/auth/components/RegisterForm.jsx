@@ -3,145 +3,338 @@ import { useNavigate, Link } from 'react-router-dom';
 import { authApi } from '../services/authApi';
 import { useAuth } from '../../../core/hooks/useAuth';
 import { Button } from '../../../core/components/ui/Button';
+import { Alert } from '../../../core/components/ui/Alert';
+import {
+  GoogleIcon,
+  GithubIcon,
+  EyeIcon,
+  EyeOffIcon,
+} from '../../../core/components/ui/Icons';
 import { validateEmail } from '../../../core/utils/validators';
 import { PATHS } from '../../../app/routes/paths';
 
 export function RegisterForm() {
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    password: '',
+    agreedToTerms: false,
+  });
+
+  const [touched, setTouched] = useState({});
+  const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
+  const [apiError, setApiError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
   const { setAuth } = useAuth();
   const navigate = useNavigate();
 
+  const validateField = (name, value, allValues = formData) => {
+    let error = '';
+
+    switch (name) {
+      case 'fullName':
+        if (!value.trim()) {
+          error = 'Please enter your full name.';
+        } else if (value.trim().length < 2) {
+          error = 'Full name must be at least 2 characters.';
+        }
+        break;
+
+      case 'email':
+        if (!value.trim()) {
+          error = 'Please enter your email address.';
+        } else if (!validateEmail(value.trim())) {
+          error = 'Please enter a valid email address.';
+        }
+        break;
+
+      case 'password':
+        if (!value) {
+          error = 'Please create a password.';
+        } else if (value.length < 8) {
+          error = 'Password must be at least 8 characters.';
+        } else if (!/[a-z]/.test(value) || !/[A-Z]/.test(value)) {
+          error = 'Password must contain uppercase and lowercase letters.';
+        } else if (!/[0-9]/.test(value)) {
+          error = 'Password must contain at least one number.';
+        }
+        break;
+
+      case 'agreedToTerms':
+        if (!value) {
+          error = 'You must agree to the Terms of Service & Privacy Policy.';
+        }
+        break;
+
+      default:
+        break;
+    }
+
+    return error;
+  };
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    const fieldValue = type === 'checkbox' ? checked : value;
+
+    const newFormData = {
+      ...formData,
+      [name]: fieldValue,
+    };
+
+    setFormData(newFormData);
+
+    if (touched[name]) {
+      const fieldError = validateField(name, fieldValue, newFormData);
+      setErrors((prev) => ({ ...prev, [name]: fieldError }));
+    }
+  };
+
+  const handleBlur = (e) => {
+    const { name, value, type, checked } = e.target;
+    const fieldValue = type === 'checkbox' ? checked : value;
+
+    setTouched((prev) => ({ ...prev, [name]: true }));
+    const fieldError = validateField(name, fieldValue, formData);
+    setErrors((prev) => ({ ...prev, [name]: fieldError }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setApiError('');
+    setSuccessMessage('');
 
-    // 1. Validate full name
-    if (!fullName.trim()) {
-      setError('Vui lòng nhập họ và tên giáo viên.');
-      return;
-    }
+    const allTouched = {
+      fullName: true,
+      email: true,
+      password: true,
+      agreedToTerms: true,
+    };
+    setTouched(allTouched);
 
-    // 2. Validate email format
-    if (!validateEmail(email)) {
-      setError('Email không đúng định dạng. Ví dụ: teacher@school.edu.vn');
-      return;
-    }
+    const newErrors = {
+      fullName: validateField('fullName', formData.fullName, formData),
+      email: validateField('email', formData.email, formData),
+      password: validateField('password', formData.password, formData),
+      agreedToTerms: validateField('agreedToTerms', formData.agreedToTerms, formData),
+    };
 
-    // 3. Validate password rules
-    if (password.length < 6) {
-      setError('Mật khẩu phải có ít nhất 6 ký tự.');
-      return;
-    }
+    setErrors(newErrors);
 
-    // 4. Validate password confirmation
-    if (password !== confirmPassword) {
-      setError('Mật khẩu xác nhận không khớp.');
+    const hasError = Object.values(newErrors).some((err) => Boolean(err));
+    if (hasError) {
+      const firstErrorField = Object.keys(newErrors).find((key) => Boolean(newErrors[key]));
+      if (firstErrorField) {
+        const el = document.getElementById(firstErrorField);
+        if (el) el.focus();
+      }
       return;
     }
 
     setLoading(true);
 
     try {
-      const data = await authApi.register(email, password, fullName);
-      setAuth(data.token, { email: data.email, fullName: data.fullName, role: data.role });
-      navigate(PATHS.DASHBOARD);
+      const responseData = await authApi.register(
+        formData.email.trim(),
+        formData.password,
+        formData.fullName.trim()
+      );
+
+      setSuccessMessage('Account created successfully! Redirecting...');
+
+      if (responseData && responseData.token) {
+        setAuth(responseData.token, {
+          email: responseData.email || formData.email.trim(),
+          fullName: responseData.fullName || formData.fullName.trim(),
+          role: responseData.role || 'TEACHER',
+        });
+      }
+
+      setTimeout(() => {
+        navigate(PATHS.WORKSPACES);
+      }, 1000);
     } catch (err) {
       console.error('Registration error:', err);
-      setError(err.response?.data?.message || err.message || 'Đăng ký thất bại. Email có thể đã được sử dụng.');
+      const serverMessage =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        err.message ||
+        'Registration failed. Email might already be registered.';
+      setApiError(serverMessage);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} noValidate>
-      {error && (
-        <div
-          role="alert"
-          style={{
-            padding: '0.75rem 1rem',
-            marginBottom: '1rem',
-            backgroundColor: 'var(--color-danger-light, #fee2e2)',
-            color: 'var(--color-danger-text, #991b1b)',
-            borderRadius: 'var(--radius-md, 8px)',
-            fontSize: '0.875rem',
-            border: '1px solid #fecaca',
-          }}
+    <form onSubmit={handleSubmit} noValidate aria-label="Registration form">
+      {/* Social Login Row */}
+      <div className="social-auth-row">
+        <button
+          type="button"
+          className="social-auth-btn"
+          title="Sign up with Google"
+          aria-label="Sign up with Google"
+          onClick={() => alert('Google Sign-In integration available in production.')}
         >
-          ⚠️ {error}
+          <GoogleIcon size={20} />
+        </button>
+        <button
+          type="button"
+          className="social-auth-btn github-btn"
+          title="Sign up with GitHub"
+          aria-label="Sign up with GitHub"
+          onClick={() => alert('GitHub Sign-In integration available in production.')}
+        >
+          <GithubIcon size={20} />
+        </button>
+      </div>
+
+      {/* Divider */}
+      <div className="auth-divider">
+        <span>OR SIGN UP WITH EMAIL</span>
+      </div>
+
+      {/* API Feedback Alerts */}
+      {apiError && <Alert variant="destructive">{apiError}</Alert>}
+      {successMessage && <Alert variant="success">{successMessage}</Alert>}
+
+      {/* Full Name */}
+      <div className="form-group auth-form-group">
+        <label className="form-label" htmlFor="fullName">
+          Full Name
+        </label>
+        <input
+          id="fullName"
+          name="fullName"
+          type="text"
+          placeholder="John Doe"
+          className={`form-input ${touched.fullName && errors.fullName ? 'form-input--error' : ''}`}
+          value={formData.fullName}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          disabled={loading || Boolean(successMessage)}
+          autoComplete="name"
+          required
+        />
+        {touched.fullName && errors.fullName && (
+          <span className="form-error" role="alert">
+            {errors.fullName}
+          </span>
+        )}
+      </div>
+
+      {/* Email */}
+      <div className="form-group auth-form-group">
+        <label className="form-label" htmlFor="email">
+          Email
+        </label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          placeholder="you@example.com"
+          className={`form-input ${touched.email && errors.email ? 'form-input--error' : ''}`}
+          value={formData.email}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          disabled={loading || Boolean(successMessage)}
+          autoComplete="email"
+          required
+        />
+        {touched.email && errors.email && (
+          <span className="form-error" role="alert">
+            {errors.email}
+          </span>
+        )}
+      </div>
+
+      {/* Password */}
+      <div className="form-group auth-form-group">
+        <label className="form-label" htmlFor="password">
+          Password
+        </label>
+        <div className="form-input-wrapper">
+          <input
+            id="password"
+            name="password"
+            type={showPassword ? 'text' : 'password'}
+            placeholder="Create a strong password"
+            className={`form-input ${touched.password && errors.password ? 'form-input--error' : ''}`}
+            value={formData.password}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            disabled={loading || Boolean(successMessage)}
+            autoComplete="new-password"
+            required
+            style={{ paddingRight: '2.5rem' }}
+          />
+          <button
+            type="button"
+            className="form-input-action-right"
+            onClick={() => setShowPassword(!showPassword)}
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+            tabIndex={0}
+          >
+            {showPassword ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
+          </button>
+        </div>
+        <div className="password-helper-text">
+          Must be at least 8 characters with uppercase, lowercase, and number
+        </div>
+        {touched.password && errors.password && (
+          <span className="form-error" role="alert">
+            {errors.password}
+          </span>
+        )}
+      </div>
+
+      {/* Terms & Privacy Checkbox */}
+      <label className="auth-terms-row" htmlFor="agreedToTerms">
+        <input
+          id="agreedToTerms"
+          name="agreedToTerms"
+          type="checkbox"
+          checked={formData.agreedToTerms}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          disabled={loading || Boolean(successMessage)}
+          className="auth-terms-checkbox"
+          aria-describedby={errors.agreedToTerms ? 'terms-error' : undefined}
+        />
+        <span>
+          I agree to the{' '}
+          <span className="auth-terms-link">Terms of Service</span> and{' '}
+          <span className="auth-terms-link">Privacy Policy</span>
+        </span>
+      </label>
+      {touched.agreedToTerms && errors.agreedToTerms && (
+        <div id="terms-error" className="form-error" role="alert" style={{ marginTop: '-0.75rem', marginBottom: 'var(--space-3)' }}>
+          {errors.agreedToTerms}
         </div>
       )}
 
-      <div className="form-group" style={{ marginBottom: '1rem' }}>
-        <label className="form-label" style={{ display: 'block', marginBottom: '0.35rem', fontWeight: 500 }}>
-          Họ và tên giáo viên
-        </label>
-        <input
-          type="text"
-          className="form-input"
-          placeholder="Thầy / Cô Nguyễn Văn A"
-          required
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
-        />
-      </div>
-
-      <div className="form-group" style={{ marginBottom: '1rem' }}>
-        <label className="form-label" style={{ display: 'block', marginBottom: '0.35rem', fontWeight: 500 }}>
-          Email giáo viên
-        </label>
-        <input
-          type="email"
-          className="form-input"
-          placeholder="teacher@school.edu.vn"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-      </div>
-
-      <div className="form-group" style={{ marginBottom: '1rem' }}>
-        <label className="form-label" style={{ display: 'block', marginBottom: '0.35rem', fontWeight: 500 }}>
-          Mật khẩu (tối thiểu 6 ký tự)
-        </label>
-        <input
-          type="password"
-          className="form-input"
-          placeholder="••••••••"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-      </div>
-
-      <div className="form-group" style={{ marginBottom: '1.25rem' }}>
-        <label className="form-label" style={{ display: 'block', marginBottom: '0.35rem', fontWeight: 500 }}>
-          Xác nhận mật khẩu
-        </label>
-        <input
-          type="password"
-          className="form-input"
-          placeholder="••••••••"
-          required
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-        />
-      </div>
-
-      <Button type="submit" variant="primary" loading={loading} style={{ width: '100%', marginTop: '0.5rem' }}>
-        Tạo tài khoản giáo viên
+      {/* Submit Button */}
+      <Button
+        type="submit"
+        variant="default"
+        size="lg"
+        loading={loading}
+        loadingText="Creating account..."
+        disabled={Boolean(successMessage)}
+        className="auth-submit-btn"
+      >
+        Create Account
       </Button>
 
-      <div style={{ textAlign: 'center', marginTop: '1.25rem', fontSize: '0.875rem', color: 'var(--color-text-secondary, #64748b)' }}>
-        Đã có tài khoản?{' '}
-        <Link to={PATHS.LOGIN} style={{ fontWeight: 600, color: 'var(--color-primary, #16a34a)' }}>
-          Đăng nhập ngay
+      {/* Switch to Login */}
+      <div className="auth-footer-switch">
+        Already have an account?{' '}
+        <Link to={PATHS.LOGIN} className="auth-footer-link">
+          Sign in
         </Link>
       </div>
     </form>
