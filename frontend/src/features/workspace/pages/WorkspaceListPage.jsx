@@ -5,6 +5,11 @@ import { useWorkspace } from '../../../core/hooks/useWorkspace';
 import { Button } from '../../../core/components/ui/Button';
 import { Spinner } from '../../../core/components/ui/Spinner';
 
+/**
+ * Workspace List Page Component.
+ * Implements FE-008: Workspace List, Creation Modal & Selector.
+ * Allows teachers to view, create, delete, and select their active workspace.
+ */
 export function WorkspaceListPage() {
   const { workspaces, activeWorkspace, setWorkspaces, setActiveWorkspace } = useWorkspace();
   const [loading, setLoading] = useState(false);
