@@ -34,22 +34,27 @@ async def process_document_pipeline(document_id: str, workspace_id: str, minio_k
         text = DocumentParser.parse(file_bytes, minio_key)
         
         # 3. Chunk
+        from app.ingestion.models import DocumentMetadata
+        metadata = DocumentMetadata(
+            workspace_id=uuid.UUID(workspace_id),
+            document_id=uuid.UUID(document_id)
+        )
         chunker = StructureAwareChunker()
-        chunks = chunker.chunk(text)
+        chunks = chunker.chunk(text, metadata)
         
         # 4. Embed & Save
         async with async_session() as session:
-            for idx, chunk_text in enumerate(chunks):
-                if not chunk_text.strip():
+            for c in chunks:
+                if not c.text.strip():
                     continue
-                embedding = await get_embedding(chunk_text)
+                embedding = await get_embedding(c.text)
                 
                 doc_chunk = DocumentChunk(
                     id=str(uuid.uuid4()),
                     document_id=document_id,
                     workspace_id=workspace_id,
-                    content=chunk_text,
-                    chunk_index=idx,
+                    content=c.text,
+                    chunk_index=c.chunk_index,
                     embedding=embedding
                 )
                 session.add(doc_chunk)
