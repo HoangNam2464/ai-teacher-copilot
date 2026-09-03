@@ -9,7 +9,7 @@ from app.core.database import async_session
 from app.core.models import DocumentChunk
 from app.ingestion.parser import DocumentParser
 from app.ingestion.chunker import StructureAwareChunker
-from app.providers.gemini import get_embedding
+from app.providers.factory import get_ai_provider
 
 logger = structlog.get_logger()
 
@@ -43,16 +43,26 @@ async def process_document_pipeline(document_id: str, workspace_id: str, minio_k
         chunks = chunker.chunk(text, metadata)
         
         # 4. Embed & Save
+        ai_provider = get_ai_provider()
+        
         async with async_session() as session:
             for c in chunks:
                 if not c.text.strip():
                     continue
-                embedding = await get_embedding(c.text)
+                
+                try:
+                    embeddings = await ai_provider.generate_embeddings([c.text])
+                    if not embeddings:
+                        raise ValueError("Provider returned empty embeddings")
+                    embedding = embeddings[0]
+                except Exception as e:
+                    logger.error("chunk_embedding_failed", doc_id=document_id, chunk_index=c.chunk_index, error=str(e))
+                    raise Exception(f"Failed to generate embedding for chunk {c.chunk_index}: {e}")
                 
                 doc_chunk = DocumentChunk(
                     id=str(uuid.uuid4()),
-                    document_id=document_id,
-                    workspace_id=workspace_id,
+                    document_id=uuid.UUID(document_id),
+                    workspace_id=uuid.UUID(workspace_id),
                     content=c.text,
                     chunk_index=c.chunk_index,
                     embedding=embedding

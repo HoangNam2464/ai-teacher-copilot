@@ -1,10 +1,12 @@
 from sqlalchemy import select
 from app.core.database import async_session
 from app.core.models import DocumentChunk
-from app.providers.gemini import get_embedding
+from app.providers.factory import get_ai_provider
 
 async def search_similar_chunks(query: str, workspace_id: str, top_k: int = 5):
-    query_embedding = await get_embedding(query)
+    provider = get_ai_provider()
+    embeddings = await provider.generate_embeddings([query])
+    query_embedding = embeddings[0]
     
     async with async_session() as session:
         # L2 distance <-> operator for pgvector
