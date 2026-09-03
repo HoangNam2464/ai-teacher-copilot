@@ -2,23 +2,16 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { authApi } from '@/services/auth/authApi';
 import { useAuth } from '@/hooks/useAuth';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Alert } from '@/components/ui/Alert';
-import {
-  GoogleIcon,
-  GithubIcon,
-  EyeIcon,
-  EyeOffIcon,
-} from '@/components/ui/Icons';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { validateEmail } from '@/utils/validators';
 import { PATHS } from '@/routes/paths';
 
 export function LoginForm() {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
-
+  const [formData, setFormData] = useState({ email: '', password: '' });
   const [touched, setTouched] = useState({});
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
@@ -31,15 +24,10 @@ export function LoginForm() {
   const validateField = (name, value) => {
     let error = '';
     if (name === 'email') {
-      if (!value.trim()) {
-        error = 'Please enter your email address.';
-      } else if (!validateEmail(value.trim())) {
-        error = 'Please enter a valid email address.';
-      }
+      if (!value.trim()) error = 'Vui lòng nhập email.';
+      else if (!validateEmail(value.trim())) error = 'Email không hợp lệ.';
     } else if (name === 'password') {
-      if (!value) {
-        error = 'Please enter your password.';
-      }
+      if (!value) error = 'Vui lòng nhập mật khẩu.';
     }
     return error;
   };
@@ -47,18 +35,13 @@ export function LoginForm() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-
-    if (touched[name]) {
-      const fieldError = validateField(name, value);
-      setErrors((prev) => ({ ...prev, [name]: fieldError }));
-    }
+    if (touched[name]) setErrors((prev) => ({ ...prev, [name]: validateField(name, value) }));
   };
 
   const handleBlur = (e) => {
     const { name, value } = e.target;
     setTouched((prev) => ({ ...prev, [name]: true }));
-    const fieldError = validateField(name, value);
-    setErrors((prev) => ({ ...prev, [name]: fieldError }));
+    setErrors((prev) => ({ ...prev, [name]: validateField(name, value) }));
   };
 
   const handleSubmit = async (e) => {
@@ -69,87 +52,50 @@ export function LoginForm() {
       email: validateField('email', formData.email),
       password: validateField('password', formData.password),
     };
-
     setTouched({ email: true, password: true });
     setErrors(newErrors);
 
     if (newErrors.email || newErrors.password) {
       const firstErrorField = newErrors.email ? 'email' : 'password';
-      const el = document.getElementById(firstErrorField);
-      if (el) el.focus();
+      document.getElementById(firstErrorField)?.focus();
       return;
     }
 
     setLoading(true);
-
     try {
       const responseData = await authApi.login(formData.email.trim(), formData.password);
-
-      if (responseData && responseData.token) {
+      if (responseData?.token) {
         setAuth(responseData.token, {
           email: responseData.email || formData.email.trim(),
           fullName: responseData.fullName || '',
           role: responseData.role || 'TEACHER',
         });
       }
-
       navigate(PATHS.WORKSPACES);
     } catch (err) {
       console.error('Login error:', err);
-      const serverMessage =
+      setApiError(
         err.response?.data?.message ||
         err.response?.data?.error ||
         err.message ||
-        'Invalid email or password. Please try again.';
-      setApiError(serverMessage);
+        'Email hoặc mật khẩu không chính xác.'
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} noValidate aria-label="Login form">
-      {/* Social Login Row */}
-      <div className="social-auth-row">
-        <button
-          type="button"
-          className="social-auth-btn"
-          title="Sign in with Google"
-          aria-label="Sign in with Google"
-          onClick={() => alert('Google Sign-In integration available in production.')}
-        >
-          <GoogleIcon size={20} />
-        </button>
-        <button
-          type="button"
-          className="social-auth-btn github-btn"
-          title="Sign in with GitHub"
-          aria-label="Sign in with GitHub"
-          onClick={() => alert('GitHub Sign-In integration available in production.')}
-        >
-          <GithubIcon size={20} />
-        </button>
-      </div>
-
-      {/* Divider */}
-      <div className="auth-divider">
-        <span>OR SIGN IN WITH EMAIL</span>
-      </div>
-
-      {/* API Error Alert */}
+    <form onSubmit={handleSubmit} className="space-y-4" noValidate>
       {apiError && <Alert variant="destructive">{apiError}</Alert>}
 
-      {/* Email */}
-      <div className="form-group auth-form-group">
-        <label className="form-label" htmlFor="login-email">
-          Email
-        </label>
-        <input
-          id="login-email"
+      <div className="space-y-2">
+        <Label htmlFor="email">Email</Label>
+        <Input
+          id="email"
           name="email"
           type="email"
-          placeholder="you@example.com"
-          className={`form-input ${touched.email && errors.email ? 'form-input--error' : ''}`}
+          placeholder="email@truong.edu.vn"
           value={formData.email}
           onChange={handleChange}
           onBlur={handleBlur}
@@ -158,76 +104,54 @@ export function LoginForm() {
           required
         />
         {touched.email && errors.email && (
-          <span className="form-error" role="alert">
-            {errors.email}
-          </span>
+          <p className="text-[13px] text-destructive font-medium">{errors.email}</p>
         )}
       </div>
 
-      {/* Password */}
-      <div className="form-group auth-form-group">
-        <div className="form-label-row">
-          <label className="form-label" htmlFor="login-password">
-            Password
-          </label>
-          <Link
-            to={PATHS.FORGOT_PASSWORD}
-            className="form-label-link"
-            style={{ fontSize: 'var(--font-size-xs)' }}
-          >
-            Forgot password?
-          </Link>
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <Label htmlFor="password">Mật khẩu</Label>
+          <a href="#" className="text-sm font-medium text-emerald-600 hover:text-emerald-500">
+            Quên mật khẩu?
+          </a>
         </div>
-        <div className="form-input-wrapper">
-          <input
-            id="login-password"
+        <div className="relative">
+          <Input
+            id="password"
             name="password"
             type={showPassword ? 'text' : 'password'}
             placeholder="••••••••••••"
-            className={`form-input ${touched.password && errors.password ? 'form-input--error' : ''}`}
             value={formData.password}
             onChange={handleChange}
             onBlur={handleBlur}
             disabled={loading}
             autoComplete="current-password"
+            className="pr-10"
             required
-            style={{ paddingRight: '2.5rem' }}
           />
           <button
             type="button"
-            className="form-input-action-right"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
             onClick={() => setShowPassword(!showPassword)}
-            aria-label={showPassword ? 'Hide password' : 'Show password'}
-            tabIndex={0}
+            disabled={loading}
           >
-            {showPassword ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
+            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
         </div>
         {touched.password && errors.password && (
-          <span className="form-error" role="alert">
-            {errors.password}
-          </span>
+          <p className="text-[13px] text-destructive font-medium">{errors.password}</p>
         )}
       </div>
 
-      {/* Submit Button */}
-      <Button
-        type="submit"
-        variant="default"
-        size="lg"
-        loading={loading}
-        loadingText="Signing in..."
-        className="auth-submit-btn"
-        style={{ marginTop: 'var(--space-4)' }}
-      >
-        Sign In
+      <Button type="submit" className="w-full mt-2" disabled={loading}>
+        {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        Đăng nhập
       </Button>
 
-      {/* Switch to Register */}
-      <div className="auth-footer-switch">
-        Don&apos;t have an account?{' '}
-        <Link to={PATHS.REGISTER} className="auth-footer-link">
-          Sign up
+      <div className="text-center text-sm text-muted-foreground mt-4">
+        Chưa có tài khoản?{' '}
+        <Link to={PATHS.REGISTER} className="font-medium text-emerald-600 hover:text-emerald-500">
+          Đăng ký miễn phí
         </Link>
       </div>
     </form>

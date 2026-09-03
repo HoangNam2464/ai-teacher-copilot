@@ -1,11 +1,12 @@
-/* AI Teacher Copilot — Master Design System Entry Point */
-@import './variables.css';
-@import './base.css';
-@import './components.css';
-@import './layout.css';
-@import './auth.css';
+/* ============================================================
+   AI Teacher Copilot — Global Stylesheet
+   Order: CSS Variables → Tailwind Base → Tailwind Utils → Custom
+   ============================================================ */
 
-/* Tailwind CSS */
+/* 1. Design Tokens (CSS Custom Properties) */
+@import './variables.css';
+
+/* 2. Tailwind CSS — must be AFTER @import and BEFORE custom utilities */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

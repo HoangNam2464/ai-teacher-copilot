@@ -1,165 +1,105 @@
-:root {
-  /* ==========================================================================
-     HSL Semantic Tokens — Inspired by Studyield & shadcn/ui Architecture
-     Adapted with Deep Academic Teal palette for K-12 Teachers
-     ========================================================================== */
+@layer base {
+  :root {
+    /* ==========================================================================
+       HSL Semantic Tokens — shadcn/ui Architecture
+       Adapted with Deep Academic Teal palette for K-12 Teachers
+       ========================================================================== */
 
-  /* Base Canvas & Text */
-  --background: 172 25% 98%;      /* Near-white with very subtle teal tint */
-  --foreground: 222 47% 11%;      /* High contrast dark text #0f172a */
+    /* Base Canvas & Text */
+    --background: 172 25% 98%;
+    --foreground: 222 47% 11%;
 
-  /* Surfaces & Popovers */
-  --card: 0 0% 100%;              /* Clean white surface */
-  --card-foreground: 222 47% 11%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 222 47% 11%;
+    /* Surfaces & Popovers */
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
 
-  /* Brand Primary: Deep Academic Teal (#0D9488) */
-  --primary: 172 84% 32%;
-  --primary-foreground: 0 0% 100%;
+    /* Brand Primary: Deep Academic Teal (#0D9488) */
+    --primary: 172 84% 32%;
+    --primary-foreground: 0 0% 100%;
 
-  /* Neutral Secondary, Muted & Accent */
-  --secondary: 210 40% 96%;
-  --secondary-foreground: 222 47% 11%;
+    /* Neutral Secondary, Muted & Accent */
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 47% 11%;
 
-  --muted: 210 40% 96%;
-  --muted-foreground: 215 16% 47%;
+    /* Destructive & Feedback */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-  --accent: 210 40% 96%;
-  --accent-foreground: 222 47% 11%;
+    /* Borders, Inputs & Focus Rings */
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 172 84% 32%;
+    --radius: 0.5rem;
 
-  /* Destructive & Feedback */
-  --destructive: 0 84% 60%;
-  --destructive-foreground: 0 0% 100%;
-  --destructive-light: 0 84% 97%;
-  --destructive-border: 0 84% 88%;
+    /* Bloom Taxonomy Badge Tokens */
+    --bloom-remember-bg: 214 100% 96%;
+    --bloom-remember-fg: 214 84% 40%;
+    --bloom-understand-bg: 189 94% 95%;
+    --bloom-understand-fg: 192 82% 31%;
+    --bloom-apply-bg: 172 60% 94%;
+    --bloom-apply-fg: 172 84% 24%;
+    --bloom-analyze-bg: 38 100% 95%;
+    --bloom-analyze-fg: 32 81% 33%;
+    --bloom-evaluate-bg: 270 60% 96%;
+    --bloom-evaluate-fg: 271 60% 42%;
+    --bloom-create-bg: 340 82% 96%;
+    --bloom-create-fg: 336 68% 38%;
 
-  --success: 152 69% 40%;
-  --success-foreground: 0 0% 100%;
-  --success-light: 150 60% 97%;
-  --success-border: 152 60% 85%;
+    /* Typography */
+    --font-family-base: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
-  --warning: 38 92% 50%;
-  --warning-foreground: 0 0% 100%;
-  --warning-light: 48 96% 97%;
-  --warning-border: 45 93% 85%;
+    /* Backward Compatibility */
+    --color-primary: hsl(var(--primary));
+    --color-primary-hover: hsl(172 84% 28%);
+    --color-primary-light: hsl(172 60% 96%);
+    --color-primary-dark: hsl(172 84% 22%);
+    --color-secondary: hsl(var(--secondary));
+    --color-bg-app: hsl(var(--background));
+    --color-bg-surface: hsl(var(--card));
+    --color-bg-subtle: hsl(var(--muted));
+    --color-text-primary: hsl(var(--foreground));
+    --color-text-secondary: hsl(var(--muted-foreground));
+    --color-border: hsl(var(--border));
+    --color-border-focus: hsl(var(--ring));
+  }
 
-  --info: 199 89% 48%;
-  --info-foreground: 0 0% 100%;
-  --info-light: 204 94% 97%;
-  --info-border: 199 89% 85%;
+  * {
+    @apply border-border;
+  }
 
-  /* ==========================================================================
-     Bloom Taxonomy Badge Tokens (Nhóm C/D - Fixed 6 pairs)
-     ========================================================================== */
-  /* Nhận biết (Remember) */
-  --bloom-remember-bg: 214 100% 96%;
-  --bloom-remember-fg: 214 84% 40%;
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-family-base);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 
-  /* Thông hiểu (Understand) */
-  --bloom-understand-bg: 189 94% 95%;
-  --bloom-understand-fg: 192 82% 31%;
+  html {
+    font-size: 16px;
+  }
 
-  /* Vận dụng (Apply) */
-  --bloom-apply-bg: 172 60% 94%;
-  --bloom-apply-fg: 172 84% 24%;
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+}
 
-  /* Vận dụng cao / Phân tích (Analyze) */
-  --bloom-analyze-bg: 38 100% 95%;
-  --bloom-analyze-fg: 32 81% 33%;
-
-  /* Đánh giá (Evaluate) */
-  --bloom-evaluate-bg: 270 60% 96%;
-  --bloom-evaluate-fg: 271 60% 42%;
-
-  /* Sáng tạo (Create) */
-  --bloom-create-bg: 340 82% 96%;
-  --bloom-create-fg: 336 68% 38%;
-
-  /* Borders, Inputs & Focus Rings */
-  --border: 214 32% 91%;
-  --input: 214 32% 91%;
-  --ring: 172 84% 32%;
-
-  /* Standard Radius Hierarchy: 8px default, max 16px for outer card */
-  --radius-sm: 0.25rem;   /* 4px */
-  --radius: 0.5rem;       /* 8px — Standard for input, button, items */
-  --radius-md: 0.5rem;    /* 8px */
-  --radius-lg: 0.625rem;  /* 10px */
-  --radius-xl: 0.875rem;  /* 14px */
-  --radius-2xl: 1rem;     /* 16px — Max allowed for outer card */
-  --radius-full: 9999px;
-
-  /* Backward Compatibility CSS Variables mapped to HSL */
-  --color-primary: hsl(var(--primary));
-  --color-primary-hover: hsl(172 84% 28%);
-  --color-primary-light: hsl(172 60% 96%);
-  --color-primary-dark: hsl(172 84% 22%);
-
-  --color-secondary: hsl(var(--secondary));
-  --color-secondary-hover: hsl(210 40% 92%);
-
-  --color-bg-app: hsl(var(--background));
-  --color-bg-surface: hsl(var(--card));
-  --color-bg-subtle: hsl(var(--muted));
-  --color-bg-muted: hsl(214 32% 91%);
-
-  --color-text-primary: hsl(var(--foreground));
-  --color-text-secondary: hsl(var(--muted-foreground));
-  --color-text-muted: hsl(215 16% 58%);
-  --color-text-inverse: hsl(0 0% 100%);
-
-  --color-border: hsl(var(--border));
-  --color-border-hover: hsl(214 32% 82%);
-  --color-border-focus: hsl(var(--ring));
-  --color-ring: hsl(var(--ring) / 0.2);
-
-  --color-success: hsl(var(--success));
-  --color-success-light: hsl(var(--success-light));
-  --color-success-text: hsl(152 69% 25%);
-
-  --color-danger: hsl(var(--destructive));
-  --color-danger-light: hsl(var(--destructive-light));
-  --color-danger-text: hsl(0 84% 35%);
-
-  --color-warning: hsl(var(--warning));
-  --color-warning-light: hsl(var(--warning-light));
-  --color-warning-text: hsl(38 92% 25%);
-
-  /* Typography */
-  --font-family-base: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-family-mono: 'JetBrains Mono', monospace;
-
-  --font-size-xs: 0.75rem;     /* 12px */
-  --font-size-sm: 0.875rem;    /* 14px */
-  --font-size-base: 1rem;      /* 16px */
-  --font-size-lg: 1.125rem;    /* 18px */
-  --font-size-xl: 1.25rem;     /* 20px */
-  --font-size-2xl: 1.5rem;     /* 24px */
-
-  --font-weight-normal: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
-
-  /* Spacing (4px grid) */
-  --space-1: 0.25rem;   /* 4px */
-  --space-2: 0.5rem;    /* 8px */
-  --space-3: 0.75rem;   /* 12px */
-  --space-4: 1rem;      /* 16px */
-  --space-5: 1.25rem;   /* 20px */
-  --space-6: 1.5rem;    /* 24px */
-  --space-8: 2rem;      /* 32px */
-  --space-10: 2.5rem;   /* 40px */
-  --space-12: 3rem;     /* 48px */
-
-  /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.06), 0 4px 6px -4px rgba(0, 0, 0, 0.03);
-  --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
-
-  /* Transitions */
-  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
 }

@@ -199,7 +199,7 @@ export function Header() {
               >
                 <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center overflow-hidden">
                   <span className="text-sm font-semibold text-emerald-600">
-                    {user?.fullName?.charAt(0).toUpperCase() || 'T'}
+                    {user?.initials || 'T'}
                   </span>
                 </div>
                 <span className="text-sm font-medium pr-1">Workspace</span>
@@ -337,11 +337,11 @@ export function Header() {
                     >
                       <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center">
                         <span className="text-base font-semibold text-emerald-600">
-                          {user?.fullName?.charAt(0).toUpperCase() || 'T'}
+                          {user?.initials || 'T'}
                         </span>
                       </div>
                       <div className="flex-1">
-                        <p className="text-sm font-medium">{user?.fullName || 'Giáo viên'}</p>
+                        <p className="text-sm font-medium">{user?.displayName || 'Giáo viên'}</p>
                         <p className="text-xs text-muted-foreground">Vào Workspace</p>
                       </div>
                       <ArrowRight className="w-4 h-4 text-muted-foreground" />

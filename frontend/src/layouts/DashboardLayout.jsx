@@ -27,7 +27,7 @@ const sidebarItems = [
 ];
 
 export function DashboardLayout() {
-  const { user, logout } = useAuth();
+  const { user, logout, displayName, initials } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -134,11 +134,11 @@ export function DashboardLayout() {
               >
                 <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center">
                   <span className="text-sm font-medium text-emerald-600">
-                    {user?.fullName?.charAt(0).toUpperCase() || 'T'}
+                    {initials}
                   </span>
                 </div>
                 <div className="hidden sm:block text-left">
-                  <p className="text-sm font-medium">{user?.fullName || 'Giáo viên'}</p>
+                  <p className="text-sm font-medium">{displayName}</p>
                   <p className="text-xs text-muted-foreground capitalize">{user?.role || 'Teacher'}</p>
                 </div>
                 <ChevronDown className="w-4 h-4 text-muted-foreground" />

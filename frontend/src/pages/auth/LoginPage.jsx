@@ -1,17 +1,13 @@
 import React from 'react';
 import { LoginForm } from '@/components/auth/LoginForm';
-import { BrainCircuitIcon } from '@/components/ui/Icons';
 
 export function LoginPage() {
   return (
-    <div className="auth-form-wrapper">
-      <div className="auth-header-centered">
-        <div className="auth-logo-badge" aria-hidden="true">
-          <BrainCircuitIcon size={28} />
-        </div>
-        <h1 className="auth-title auth-title--primary">Welcome Back</h1>
-        <p className="auth-subtitle">
-          Sign in to your account to access your workspaces.
+    <div className="space-y-6">
+      <div className="text-center space-y-2">
+        <h1 className="text-2xl font-bold tracking-tight">Chào mừng trở lại</h1>
+        <p className="text-sm text-muted-foreground">
+          Đăng nhập vào tài khoản để truy cập Workspace của bạn
         </p>
       </div>
       <LoginForm />

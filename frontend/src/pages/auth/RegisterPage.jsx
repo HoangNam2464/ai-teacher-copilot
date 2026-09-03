@@ -1,17 +1,13 @@
 import React from 'react';
 import { RegisterForm } from '@/components/auth/RegisterForm';
-import { BrainCircuitIcon } from '@/components/ui/Icons';
 
 export function RegisterPage() {
   return (
-    <div className="auth-form-wrapper">
-      <div className="auth-header-centered">
-        <div className="auth-logo-badge" aria-hidden="true">
-          <BrainCircuitIcon size={28} />
-        </div>
-        <h1 className="auth-title auth-title--primary">Create Your Account</h1>
-        <p className="auth-subtitle">
-          Start learning smarter today. No credit card required.
+    <div className="space-y-6">
+      <div className="text-center space-y-2">
+        <h1 className="text-2xl font-bold tracking-tight">Tạo tài khoản mới</h1>
+        <p className="text-sm text-muted-foreground">
+          Bắt đầu soạn giáo án thông minh ngay hôm nay
         </p>
       </div>
       <RegisterForm />
