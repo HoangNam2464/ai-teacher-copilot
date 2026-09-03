@@ -30,4 +30,4 @@ class DocumentParser:
         elif extension in ["docx", "doc"]:
             return DocumentParser.parse_docx(file_bytes)
         else:
-            return file_bytes.decode("utf-8", errors="ignore")
+            raise ValueError(f"Unsupported file format: {extension}")
