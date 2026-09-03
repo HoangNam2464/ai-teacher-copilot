@@ -23,6 +23,12 @@ public class WorkspaceController {
 
     private final WorkspaceService workspaceService;
 
+    /**
+     * Creates a new workspace for the authenticated teacher.
+     * @param user The authenticated user
+     * @param request The workspace details (name, description, subject, grade level)
+     * @return The created workspace data
+     */
     @PostMapping
     public ResponseEntity<ApiResponse<WorkspaceDto.Response>> create(
             @AuthenticationPrincipal User user,
@@ -32,6 +38,11 @@ public class WorkspaceController {
                 .body(ApiResponse.success("Workspace created", response));
     }
 
+    /**
+     * Lists all active workspaces owned by the authenticated teacher.
+     * @param user The authenticated user
+     * @return List of workspaces
+     */
     @GetMapping
     public ResponseEntity<ApiResponse<List<WorkspaceDto.Response>>> list(
             @AuthenticationPrincipal User user) {
@@ -39,6 +50,13 @@ public class WorkspaceController {
         return ResponseEntity.ok(ApiResponse.success(workspaces));
     }
 
+    /**
+     * Gets a specific workspace by ID, enforcing ownership.
+     * @param user The authenticated user
+     * @param id The workspace ID
+     * @return The workspace details
+     * @throws ForbiddenException if the user is not the owner
+     */
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<WorkspaceDto.Response>> getById(
             @AuthenticationPrincipal User user,
@@ -47,6 +65,13 @@ public class WorkspaceController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
+    /**
+     * Updates an existing workspace. Only the owner can perform this action.
+     * @param user The authenticated user
+     * @param id The workspace ID
+     * @param request The updated workspace details
+     * @return The updated workspace data
+     */
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<WorkspaceDto.Response>> update(
             @AuthenticationPrincipal User user,
@@ -56,6 +81,12 @@ public class WorkspaceController {
         return ResponseEntity.ok(ApiResponse.success("Workspace updated", response));
     }
 
+    /**
+     * Soft-deletes a workspace. Only the owner can perform this action.
+     * @param user The authenticated user
+     * @param id The workspace ID
+     * @return Empty response on success
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> delete(
             @AuthenticationPrincipal User user,
