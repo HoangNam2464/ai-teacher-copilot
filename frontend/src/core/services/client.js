@@ -17,6 +17,7 @@ apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     if (token) {
+      // FE-007: Attach Bearer token to all outbound authenticated requests
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
@@ -29,9 +30,11 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      // Clear token and redirect to login if session expires
+      // FE-007: Clear session data on unauthorized error
       localStorage.removeItem('token');
       localStorage.removeItem('user');
+      
+      // Prevent redirect loop if already on login page
       if (window.location.pathname !== '/login') {
         window.location.href = '/login';
       }
