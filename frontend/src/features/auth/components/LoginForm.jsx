@@ -13,6 +13,12 @@ import {
 import { validateEmail } from '../../../core/utils/validators';
 import { PATHS } from '../../../app/routes/paths';
 
+/**
+ * Teacher Login Form Component.
+ * Implements email/password authentication via authApi, validates input, 
+ * handles loading/error states, and persists JWT token to authStore upon success.
+ * Redirects the user to the Workspaces dashboard when login succeeds.
+ */
 export function LoginForm() {
   const [formData, setFormData] = useState({
     email: '',
