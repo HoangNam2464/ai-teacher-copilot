@@ -1,0 +1,214 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 980" width="100%" height="100%" style="background-color: #f8fafc; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;">
+  <defs>
+    <!-- Drop Shadow Filter -->
+    <filter id="shadow" x="-5%" y="-5%" width="115%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.08" />
+    </filter>
+    <filter id="shadow-lg" x="-10%" y="-10%" width="125%" height="125%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#1d4ed8" flood-opacity="0.25" />
+    </filter>
+
+    <!-- Arrow Markers -->
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#2563eb" />
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#059669" />
+    </marker>
+    <marker id="arrow-emerald" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#10b981" />
+    </marker>
+    <marker id="arrow-slate" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#475569" />
+    </marker>
+    <marker id="arrow-orange" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#ea580c" />
+    </marker>
+
+    <!-- Gradients -->
+    <linearGradient id="grad-core" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563eb" />
+      <stop offset="100%" stop-color="#1e40af" />
+    </linearGradient>
+    <linearGradient id="grad-header" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#1e293b" />
+    </linearGradient>
+  </defs>
+
+  <!-- ================= HEADER BANNER ================= -->
+  <g transform="translate(50, 25)">
+    <rect width="1400" height="70" rx="12" fill="url(#grad-header)" filter="url(#shadow)" />
+    <text x="700" y="36" text-anchor="middle" fill="#ffffff" font-size="20" font-weight="bold" letter-spacing="0.5">SƠ ĐỒ NGỮ CẢNH HỆ THỐNG (DATA FLOW DIAGRAM - LEVEL 0)</text>
+    <text x="700" y="56" text-anchor="middle" fill="#94a3b8" font-size="13">DỰ ÁN: AI TEACHER COPILOT FOR K-12 TEACHERS (TRỢ LÝ SOẠN GIÁO ÁN &amp; ĐỀ THI CHUẨN BLOOM)</text>
+  </g>
+
+  <!-- ================= CENTRAL PROCESS (PROCESS 0) ================= -->
+  <g transform="translate(750, 470)" filter="url(#shadow-lg)">
+    <circle r="145" fill="url(#grad-core)" stroke="#60a5fa" stroke-width="3" />
+    <circle r="137" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.4" />
+    
+    <text x="0" y="-70" text-anchor="middle" fill="#93c5fd" font-size="16" font-weight="bold">TIẾN TRÌNH 0</text>
+    <line x1="-80" y1="-55" x2="80" y2="-55" stroke="#93c5fd" stroke-width="1.5" opacity="0.6" />
+    
+    <text x="0" y="-25" text-anchor="middle" fill="#ffffff" font-size="20" font-weight="bold">HỆ THỐNG</text>
+    <text x="0" y="5" text-anchor="middle" fill="#ffffff" font-size="22" font-weight="900" letter-spacing="1">AI TEACHER COPILOT</text>
+    
+    <text x="0" y="40" text-anchor="middle" fill="#bfdbfe" font-size="12" font-weight="500">Curriculum-Grounded</text>
+    <text x="0" y="58" text-anchor="middle" fill="#bfdbfe" font-size="12" font-weight="500">AI Teaching Assistant</text>
+    
+    <rect x="-65" y="80" width="130" height="24" rx="12" fill="#1e3a8a" stroke="#60a5fa" stroke-width="1" />
+    <text x="0" y="96" text-anchor="middle" fill="#ffffff" font-size="11" font-weight="bold">SPRING + FASTAPI</text>
+  </g>
+
+  <!-- ================= EXTERNAL ENTITY 1: TEACHER (TOP-LEFT) ================= -->
+  <g transform="translate(50, 150)" filter="url(#shadow)">
+    <rect width="320" height="210" rx="12" fill="#ffffff" stroke="#3b82f6" stroke-width="2.5" />
+    <path d="M 0 12 Q 0 0 12 0 L 308 0 Q 320 0 320 12 L 320 48 L 0 48 Z" fill="#eff6ff" />
+    <line x1="0" y1="48" x2="320" y2="48" stroke="#3b82f6" stroke-width="1.5" />
+    <text x="160" y="28" text-anchor="middle" fill="#1e40af" font-size="16" font-weight="bold">👤 GIÁO VIÊN K-12</text>
+    <text x="160" y="42" text-anchor="middle" fill="#64748b" font-size="11">(K-12 Teacher - Người dùng chính)</text>
+    
+    <text x="20" y="75" fill="#1e293b" font-size="12" font-weight="bold">• Soạn kế hoạch bài dạy (Giáo án)</text>
+    <text x="20" y="98" fill="#1e293b" font-size="12">• Tạo đề kiểm tra &amp; ma trận Bloom</text>
+    <text x="20" y="121" fill="#1e293b" font-size="12">• Tải lên SGK / Tài liệu (PDF, DOCX)</text>
+    <text x="20" y="144" fill="#1e293b" font-size="12">• Rà soát bản thảo (Human-in-the-loop)</text>
+    <text x="20" y="167" fill="#1e293b" font-size="12">• Xuất bản tệp hoàn chỉnh Word / PDF</text>
+    
+    <rect x="20" y="182" width="280" height="18" rx="4" fill="#dbeafe" />
+    <text x="160" y="195" text-anchor="middle" fill="#1e40af" font-size="10" font-weight="bold">Giao diện Web Client (React 18 + Vite)</text>
+  </g>
+
+  <!-- ================= EXTERNAL ENTITY 2: ADMIN (BOTTOM-LEFT) ================= -->
+  <g transform="translate(50, 680)" filter="url(#shadow)">
+    <rect width="320" height="170" rx="12" fill="#ffffff" stroke="#64748b" stroke-width="2" />
+    <path d="M 0 12 Q 0 0 12 0 L 308 0 Q 320 0 320 12 L 320 45 L 0 45 Z" fill="#f8fafc" />
+    <line x1="0" y1="45" x2="320" y2="45" stroke="#64748b" stroke-width="1.5" />
+    <text x="160" y="26" text-anchor="middle" fill="#334155" font-size="15" font-weight="bold">👨‍💼 QUẢN TRỊ VIÊN</text>
+    <text x="160" y="40" text-anchor="middle" fill="#64748b" font-size="11">(System Administrator)</text>
+    
+    <text x="20" y="72" fill="#334155" font-size="12">• Quản lý tài khoản &amp; phân quyền</text>
+    <text x="20" y="95" fill="#334155" font-size="12">• Cấu hình hệ thống &amp; Model API Keys</text>
+    <text x="20" y="118" fill="#334155" font-size="12">• Giám sát Metrics, RAG Logs &amp; Quota</text>
+    <rect x="20" y="135" width="280" height="20" rx="4" fill="#f1f5f9" />
+    <text x="160" y="149" text-anchor="middle" fill="#475569" font-size="10" font-weight="bold">Admin Portal / Dashboard</text>
+  </g>
+
+  <!-- ================= EXTERNAL ENTITY 3: LLM PROVIDER (TOP-RIGHT) ================= -->
+  <g transform="translate(1130, 150)" filter="url(#shadow)">
+    <rect width="320" height="210" rx="12" fill="#ffffff" stroke="#10b981" stroke-width="2.5" />
+    <path d="M 0 12 Q 0 0 12 0 L 308 0 Q 320 0 320 12 L 320 48 L 0 48 Z" fill="#ecfdf5" />
+    <line x1="0" y1="48" x2="320" y2="48" stroke="#10b981" stroke-width="1.5" />
+    <text x="160" y="28" text-anchor="middle" fill="#065f46" font-size="16" font-weight="bold">🤖 DỊCH VỤ AI / LLM NGOÀI</text>
+    <text x="160" y="42" text-anchor="middle" fill="#047857" font-size="11">(Google Gemini / OpenAI API)</text>
+    
+    <text x="20" y="75" fill="#064e3b" font-size="12" font-weight="bold">• Google Gemini 1.5 / 2.0 Pro / Flash</text>
+    <text x="20" y="98" fill="#064e3b" font-size="12">• OpenAI GPT-4o / Text Embeddings</text>
+    <text x="20" y="121" fill="#064e3b" font-size="12">• Vector Embeddings (768 / 1536 dims)</text>
+    <text x="20" y="144" fill="#064e3b" font-size="12">• Structured JSON Generator (Pydantic)</text>
+    <text x="20" y="167" fill="#064e3b" font-size="12">• Đánh giá &amp; Gắn nhãn Bloom Taxonomy</text>
+    
+    <rect x="20" y="182" width="280" height="18" rx="4" fill="#d1fae5" />
+    <text x="160" y="195" text-anchor="middle" fill="#065f46" font-size="10" font-weight="bold">HTTPS REST API / Model Gateway</text>
+  </g>
+
+  <!-- ================= EXTERNAL ENTITY 4: OBJECT STORAGE (BOTTOM-RIGHT) ================= -->
+  <g transform="translate(1130, 680)" filter="url(#shadow)">
+    <rect width="320" height="170" rx="12" fill="#ffffff" stroke="#ea580c" stroke-width="2" />
+    <path d="M 0 12 Q 0 0 12 0 L 308 0 Q 320 0 320 12 L 320 45 L 0 45 Z" fill="#fff7ed" />
+    <line x1="0" y1="45" x2="320" y2="45" stroke="#ea580c" stroke-width="1.5" />
+    <text x="160" y="26" text-anchor="middle" fill="#9a3412" font-size="15" font-weight="bold">📦 OBJECT STORAGE</text>
+    <text x="160" y="40" text-anchor="middle" fill="#c2410c" font-size="11">(MinIO / Cloud S3 Storage)</text>
+    
+    <text x="20" y="72" fill="#7c2d12" font-size="12">• Lưu trữ tài liệu gốc (PDF, DOCX)</text>
+    <text x="20" y="95" fill="#7c2d12" font-size="12">• Lưu trữ tệp xuất bản (Word, PDF)</text>
+    <text x="20" y="118" fill="#7c2d12" font-size="12">• Cung cấp Pre-signed URL / Stream</text>
+    
+    <rect x="20" y="135" width="280" height="20" rx="4" fill="#ffedd5" />
+    <text x="160" y="149" text-anchor="middle" fill="#9a3412" font-size="10" font-weight="bold">S3 Protocol / AWS SDK Compatible</text>
+  </g>
+
+  <!-- ================= DATA FLOW PATHS & LABELS ================= -->
+
+  <!-- 1. TEACHER -> SYSTEM (INPUT) -->
+  <path d="M 370 210 L 510 210 L 510 420 L 610 420" fill="none" stroke="#2563eb" stroke-width="2.5" marker-end="url(#arrow-blue)" />
+  <g transform="translate(380, 160)">
+    <rect width="210" height="100" rx="6" fill="#ffffff" stroke="#93c5fd" stroke-width="1.2" filter="url(#shadow)" />
+    <text x="10" y="18" fill="#1e40af" font-size="11" font-weight="bold">(1) Luồng Dữ liệu Đầu vào:</text>
+    <text x="10" y="34" fill="#334155" font-size="10">• Thông tin đăng nhập / JWT</text>
+    <text x="10" y="48" fill="#334155" font-size="10">• File tài liệu SGK (PDF, Word)</text>
+    <text x="10" y="62" fill="#334155" font-size="10">• Yêu cầu soạn giáo án / đề thi</text>
+    <text x="10" y="76" fill="#334155" font-size="10">• Ma trận Bloom &amp; tiêu chí bài học</text>
+    <text x="10" y="90" fill="#334155" font-size="10">• Lệnh sửa, duyệt &amp; xuất file</text>
+  </g>
+
+  <!-- 2. SYSTEM -> TEACHER (OUTPUT) -->
+  <path d="M 610 520 L 510 520 L 510 320 L 370 320" fill="none" stroke="#059669" stroke-width="2.5" marker-end="url(#arrow-green)" />
+  <g transform="translate(380, 275)">
+    <rect width="210" height="100" rx="6" fill="#ffffff" stroke="#6ee7b7" stroke-width="1.2" filter="url(#shadow)" />
+    <text x="10" y="18" fill="#065f46" font-size="11" font-weight="bold">(2) Luồng Phản hồi Trả về:</text>
+    <text x="10" y="34" fill="#334155" font-size="10">• Token xác thực &amp; Hồ sơ User</text>
+    <text x="10" y="48" fill="#334155" font-size="10">• Bản thảo Giáo án chuẩn cấu trúc</text>
+    <text x="10" y="62" fill="#334155" font-size="10">• Đề thi trắc nghiệm &amp; tự luận</text>
+    <text x="10" y="76" fill="#334155" font-size="10">• Trích dẫn nguồn (Citations &amp; Trang)</text>
+    <text x="10" y="90" fill="#334155" font-size="10">• Tệp tải về hoàn chỉnh (Word / PDF)</text>
+  </g>
+
+  <!-- 3. ADMIN -> SYSTEM & SYSTEM -> ADMIN -->
+  <path d="M 370 730 L 560 730 L 560 550 L 640 550" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow-slate)" />
+  <path d="M 660 580 L 580 580 L 580 790 L 370 790" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow-slate)" />
+  <g transform="translate(385, 680)">
+    <rect width="180" height="42" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1" />
+    <text x="8" y="16" fill="#334155" font-size="10" font-weight="bold">(3) Cấu hình &amp; Quản trị</text>
+    <text x="8" y="30" fill="#64748b" font-size="9">• Model API Keys, Quota, User Mgmt</text>
+  </g>
+  <g transform="translate(385, 795)">
+    <rect width="180" height="42" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1" />
+    <text x="8" y="16" fill="#334155" font-size="10" font-weight="bold">(4) Báo cáo &amp; Giám sát</text>
+    <text x="8" y="30" fill="#64748b" font-size="9">• Metrics, RAG Quality, Audit Logs</text>
+  </g>
+
+  <!-- 4. SYSTEM -> LLM & LLM -> SYSTEM -->
+  <path d="M 890 420 L 990 420 L 990 210 L 1130 210" fill="none" stroke="#10b981" stroke-width="2.5" marker-end="url(#arrow-emerald)" />
+  <g transform="translate(910, 160)">
+    <rect width="210" height="85" rx="6" fill="#ffffff" stroke="#6ee7b7" stroke-width="1.2" filter="url(#shadow)" />
+    <text x="10" y="18" fill="#065f46" font-size="11" font-weight="bold">(5) Yêu cầu Xử lý AI:</text>
+    <text x="10" y="34" fill="#334155" font-size="10">• Chunks văn bản cần Embedding</text>
+    <text x="10" y="48" fill="#334155" font-size="10">• Prompt + Context &lt;sources&gt;</text>
+    <text x="10" y="62" fill="#334155" font-size="10">• Schema yêu cầu cấu trúc Pydantic</text>
+    <text x="10" y="76" fill="#334155" font-size="10">• Yêu cầu phân loại Bloom Taxonomy</text>
+  </g>
+
+  <path d="M 1130 320 L 990 320 L 990 520 L 890 520" fill="none" stroke="#059669" stroke-width="2.5" marker-end="url(#arrow-green)" />
+  <g transform="translate(910, 260)">
+    <rect width="210" height="85" rx="6" fill="#ffffff" stroke="#6ee7b7" stroke-width="1.2" filter="url(#shadow)" />
+    <text x="10" y="18" fill="#065f46" font-size="11" font-weight="bold">(6) Dữ liệu AI Trả về:</text>
+    <text x="10" y="34" fill="#334155" font-size="10">• Mảng Vector Embedding</text>
+    <text x="10" y="48" fill="#334155" font-size="10">• Nội dung JSON chuẩn Pydantic</text>
+    <text x="10" y="62" fill="#334155" font-size="10">• Ma trận Bloom &amp; Source Chunk IDs</text>
+    <text x="10" y="76" fill="#334155" font-size="10">• Insufficient Evidence (nếu thiếu context)</text>
+  </g>
+
+  <!-- 5. SYSTEM -> MINIO & MINIO -> SYSTEM -->
+  <path d="M 860 550 L 940 550 L 940 730 L 1130 730" fill="none" stroke="#ea580c" stroke-width="2" marker-end="url(#arrow-orange)" />
+  <path d="M 1130 790 L 920 790 L 920 580 L 840 580" fill="none" stroke="#ea580c" stroke-width="2" marker-end="url(#arrow-orange)" />
+  <g transform="translate(935, 680)">
+    <rect width="180" height="42" rx="6" fill="#ffffff" stroke="#fed7aa" stroke-width="1" />
+    <text x="8" y="16" fill="#9a3412" font-size="10" font-weight="bold">(7) Lưu trữ Tệp nhị phân</text>
+    <text x="8" y="30" fill="#7c2d12" font-size="9">• File Upload gốc + File Exported Word/PDF</text>
+  </g>
+  <g transform="translate(935, 795)">
+    <rect width="180" height="42" rx="6" fill="#ffffff" stroke="#fed7aa" stroke-width="1" />
+    <text x="8" y="16" fill="#9a3412" font-size="10" font-weight="bold">(8) Truy xuất Tệp nhị phân</text>
+    <text x="8" y="30" fill="#7c2d12" font-size="9">• Binary Stream cho Parser + Pre-signed URL</text>
+  </g>
+
+  <!-- ================= FOOTER GUARDRAILS CALLOUT ================= -->
+  <g transform="translate(250, 890)">
+    <rect width="1000" height="65" rx="10" fill="#fef2f2" stroke="#ef4444" stroke-width="1.5" filter="url(#shadow)" />
+    <text x="25" y="24" fill="#991b1b" font-size="12" font-weight="bold">🛡️ NGUYÊN TẮC RÀO CHẮN AN TOÀN &amp; KIỂM SOÁT AI (SYSTEM GUARDRAILS):</text>
+    <text x="25" y="42" fill="#7f1d1d" font-size="11">1. Ranh giới &lt;sources&gt;...&lt;/sources&gt; bắt buộc: Dữ liệu tài liệu coi là Untrusted Data, chống triệt để Prompt Injection.</text>
+    <text x="25" y="56" fill="#7f1d1d" font-size="11">2. Cô lập Workspace (Multi-tenant): Ngăn rò rỉ dữ liệu chéo | 3. Human-in-the-Loop: AI chỉ soạn thảo bản nháp, giáo viên là người duyệt cuối cùng.</text>
+  </g>
+
+</svg>
