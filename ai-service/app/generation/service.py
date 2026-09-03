@@ -1,5 +1,5 @@
 from app.retrieval.service import search_similar_chunks
-from app.providers.gemini import generate_structured_output
+from app.providers.factory import get_ai_provider
 from app.generation.schemas import LessonPlan, Quiz
 
 async def generate_lesson_plan_service(workspace_id: str, subject: str, grade_level: str, topic: str, instructions: str):
@@ -10,21 +10,25 @@ async def generate_lesson_plan_service(workspace_id: str, subject: str, grade_le
     context_text = "\n\n".join([f"Source [{i}]: {c.content}" for i, c in enumerate(chunks)])
     
     # 2. Build prompt
-    prompt = f"""
+    system_prompt = "You are a helpful AI assistant for teachers. You must output JSON based on the schema provided."
+    user_prompt = f"""
     Create a lesson plan for:
     Subject: {subject}
     Grade Level: {grade_level}
     Topic: {topic}
     Additional Instructions: {instructions or 'None'}
-    
-    Use the following retrieved knowledge context (RAG) to ground your lesson plan:
-    ---
-    {context_text}
-    ---
     """
     
+    context_chunks = [{"content": f"Source [{i}]: {c.content}"} for i, c in enumerate(chunks)]
+    
     # 3. Call LLM
-    result = await generate_structured_output(prompt, LessonPlan)
+    provider = get_ai_provider()
+    result = await provider.generate_structured_output(
+        system_prompt=system_prompt,
+        user_prompt=user_prompt,
+        response_schema=LessonPlan,
+        context_chunks=context_chunks
+    )
     return result
 
 async def generate_quiz_service(workspace_id: str, subject: str, grade_level: str, topic: str, num_questions: int, instructions: str):
@@ -33,18 +37,22 @@ async def generate_quiz_service(workspace_id: str, subject: str, grade_level: st
     
     context_text = "\n\n".join([f"Source [{i}]: {c.content}" for i, c in enumerate(chunks)])
     
-    prompt = f"""
+    system_prompt = "You are a helpful AI assistant for teachers. You must output JSON based on the schema provided."
+    user_prompt = f"""
     Create a quiz with {num_questions} questions for:
     Subject: {subject}
     Grade Level: {grade_level}
     Topic: {topic}
     Additional Instructions: {instructions or 'None'}
-    
-    Use the following retrieved knowledge context (RAG):
-    ---
-    {context_text}
-    ---
     """
     
-    result = await generate_structured_output(prompt, Quiz)
+    context_chunks = [{"content": f"Source [{i}]: {c.content}"} for i, c in enumerate(chunks)]
+    
+    provider = get_ai_provider()
+    result = await provider.generate_structured_output(
+        system_prompt=system_prompt,
+        user_prompt=user_prompt,
+        response_schema=Quiz,
+        context_chunks=context_chunks
+    )
     return result
