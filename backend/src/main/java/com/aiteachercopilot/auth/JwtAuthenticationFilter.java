@@ -21,6 +21,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Filter that intercepts incoming HTTP requests to validate JWT tokens.
+ * If a valid token is found, it establishes the authentication context for the request.
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
