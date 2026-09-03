@@ -67,26 +67,26 @@ export function WorkspaceListPage() {
   };
 
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+    <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
         <div>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 700 }}>Không Gian Làm Việc</h1>
-          <p style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)', marginTop: '0.25rem' }}>
+          <h1 style={{ fontSize: '1.875rem', fontWeight: 700, color: 'hsl(var(--foreground))' }}>Không Gian Làm Việc</h1>
+          <p style={{ fontSize: '0.875rem', color: 'hsl(var(--muted-foreground))', marginTop: '0.25rem' }}>
             Quản lý và phân nhóm tài liệu giảng dạy theo lớp và môn học
           </p>
         </div>
-        <Button onClick={() => setIsCreating(!isCreating)}>
+        <button className={isCreating ? 'btn btn-outline' : 'btn btn-primary'} onClick={() => setIsCreating(!isCreating)}>
           {isCreating ? 'Hủy bỏ' : '+ Tạo không gian mới'}
-        </Button>
+        </button>
       </div>
 
       {isCreating && (
-        <div style={{ background: 'var(--color-bg-surface)', padding: '1.5rem', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border)', marginBottom: '1.5rem' }}>
-          <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '1rem' }}>Tạo Không Gian Giảng Dạy Mới</h3>
+        <div className="card" style={{ padding: '1.5rem', marginBottom: '2rem' }}>
+          <h3 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1.25rem' }}>Tạo Không Gian Giảng Dạy Mới</h3>
           <form onSubmit={handleCreate}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
               <div className="form-group">
-                <label className="form-label">Tên không gian *</label>
+                <label className="form-label">Tên không gian <span className="form-required">*</span></label>
                 <input
                   type="text"
                   className="form-input"
@@ -127,7 +127,7 @@ export function WorkspaceListPage() {
                 onChange={(e) => setDescription(e.target.value)}
               />
             </div>
-            <Button type="submit" variant="primary">Lưu không gian làm việc</Button>
+            <button type="submit" className="btn btn-primary">Lưu không gian làm việc</button>
           </form>
         </div>
       )}
@@ -135,16 +135,16 @@ export function WorkspaceListPage() {
       {loading && workspaces.length === 0 ? (
         <Spinner message="Đang tải danh sách không gian làm việc..." />
       ) : workspaces.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '3rem', background: 'var(--color-bg-surface)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border)' }}>
-          <span style={{ fontSize: '2.5rem' }}>🏫</span>
-          <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginTop: '0.75rem' }}>Chưa có không gian làm việc nào</h3>
-          <p style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)', marginTop: '0.25rem', marginBottom: '1rem' }}>
+        <div className="card" style={{ textAlign: 'center', padding: '4rem 2rem', background: 'hsl(var(--muted)/0.3)' }}>
+          <span style={{ fontSize: '3rem', marginBottom: '1rem', display: 'block' }}>🏫</span>
+          <h3 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'hsl(var(--foreground))' }}>Chưa có không gian làm việc nào</h3>
+          <p style={{ fontSize: '0.875rem', color: 'hsl(var(--muted-foreground))', marginTop: '0.5rem', marginBottom: '1.5rem' }}>
             Tạo không gian làm việc đầu tiên để bắt đầu tải tài liệu và soạn giáo án
           </p>
-          <Button onClick={() => setIsCreating(true)}>Tạo không gian ngay</Button>
+          <button className="btn btn-primary" onClick={() => setIsCreating(true)}>Tạo không gian ngay</button>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.25rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' }}>
           {workspaces.map((w) => (
             <WorkspaceCard
               key={w.id}

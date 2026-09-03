@@ -5,44 +5,44 @@ import { Button } from '../../../core/components/ui/Button';
 
 export function WorkspaceCard({ workspace, isActive, onSelect, onDelete }) {
   return (
-    <Card hoverable style={{ borderColor: isActive ? 'var(--color-primary)' : 'var(--color-border)' }}>
+    <div className="card" style={{ padding: '1.25rem', borderColor: isActive ? 'hsl(var(--primary))' : 'hsl(var(--border))', transition: 'border-color 0.2s', position: 'relative' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
         <div>
-          <h3 style={{ fontSize: '1.125rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>
+          <h3 style={{ fontSize: '1.125rem', fontWeight: 600, color: 'hsl(var(--foreground))' }}>
             {workspace.name}
           </h3>
           {workspace.description && (
-            <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)', marginTop: '0.25rem' }}>
+            <p style={{ fontSize: '0.8125rem', color: 'hsl(var(--muted-foreground))', marginTop: '0.25rem' }}>
               {workspace.description}
             </p>
           )}
         </div>
-        {isActive && <Badge variant="success">Đang kích hoạt</Badge>}
+        {isActive && <span className="badge badge-success">Đang kích hoạt</span>}
       </div>
 
       <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.25rem' }}>
-        {workspace.subject && <Badge variant="info">Môn: {workspace.subject}</Badge>}
-        {workspace.gradeLevel && <Badge variant="neutral">Khối {workspace.gradeLevel}</Badge>}
+        {workspace.subject && <span className="badge badge-info">Môn: {workspace.subject}</span>}
+        {workspace.gradeLevel && <span className="badge badge-neutral">Khối {workspace.gradeLevel}</span>}
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--color-border)', paddingTop: '0.75rem' }}>
-        <Button
-          variant={isActive ? 'secondary' : 'primary'}
-          size="sm"
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid hsl(var(--border))', paddingTop: '1rem' }}>
+        <button
+          className={isActive ? 'btn btn-secondary btn-sm' : 'btn btn-primary btn-sm'}
           onClick={() => onSelect(workspace)}
           disabled={isActive}
         >
           {isActive ? 'Đang chọn' : 'Chọn không gian này'}
-        </Button>
+        </button>
 
         <button
           type="button"
-          style={{ fontSize: '0.8125rem', color: 'var(--color-danger)', cursor: 'pointer' }}
+          className="btn btn-ghost btn-sm"
+          style={{ color: 'hsl(var(--destructive))' }}
           onClick={() => onDelete(workspace.id)}
         >
           Xóa
         </button>
       </div>
-    </Card>
+    </div>
   );
 }
