@@ -13,6 +13,7 @@ import { DocumentManagementPage } from '../../features/documents/pages/DocumentM
 import { LessonPlannerPage } from '../../features/lesson-planner/pages/LessonPlannerPage';
 import { QuizGeneratorPage } from '../../features/quiz-generator/pages/QuizGeneratorPage';
 import { HistoryListPage } from '../../features/history/pages/HistoryListPage';
+import { HomePage } from '../../features/landing/pages/HomePage';
 
 export function AppRoutes() {
   return (
@@ -23,9 +24,11 @@ export function AppRoutes() {
         <Route path={PATHS.REGISTER} element={<RegisterPage />} />
       </Route>
 
+      {/* Public Landing Page */}
+      <Route path={PATHS.ROOT} element={<HomePage />} />
+
       {/* Protected Application Routes (Dashboard Layout) */}
       <Route
-        path={PATHS.ROOT}
         element={
           <PrivateRoute>
             <DashboardLayout />
