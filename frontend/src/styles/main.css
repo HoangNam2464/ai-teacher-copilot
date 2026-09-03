@@ -4,3 +4,8 @@
 @import './components.css';
 @import './layout.css';
 @import './auth.css';
+
+/* Tailwind CSS */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
