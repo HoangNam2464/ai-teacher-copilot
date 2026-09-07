@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
-import { lessonPlannerApi } from '@/services/lesson-planner/lessonPlannerApi';
+import { useTranslation } from 'react-i18next';
+import { lessonPlannerApi } from '@/services/generation';
 import { useWorkspace } from '@/hooks/useWorkspace';
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { CitationBadge } from '@/components/citation/CitationBadge';
 import { CitationDrawer } from '@/components/citation/CitationDrawer';
 import { ExportDropdown } from '@/components/export/ExportDropdown';
+import { Wand2, Target, Clock, BookOpen, AlertCircle } from 'lucide-react';
 
 export function LessonPlannerPage() {
+  const { t } = useTranslation();
   const { activeWorkspace } = useWorkspace();
   const [topic, setTopic] = useState('');
   const [objectives, setObjectives] = useState('');
@@ -23,7 +26,7 @@ export function LessonPlannerPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!activeWorkspace?.id) {
-      alert('Vui lòng chọn không gian làm việc trước.');
+      alert(t('workspace.selectFirst'));
       return;
     }
 
@@ -46,9 +49,9 @@ export function LessonPlannerPage() {
     } catch (err) {
       console.error('Generation failed:', err);
       if (err.response?.status === 422) {
-        setError('Hệ thống không tìm thấy đủ tài liệu liên quan trong kho tri thức để soạn giáo án này (Insufficient Evidence). Vui lòng nạp thêm tài liệu.');
+        setError(t('lessonPlanner.insufficientEvidence'));
       } else {
-        setError(err.response?.data?.message || 'Sinh giáo án thất bại. Vui lòng thử lại.');
+        setError(err.response?.data?.message || t('lessonPlanner.failed'));
       }
     } finally {
       setLoading(false);
@@ -58,160 +61,198 @@ export function LessonPlannerPage() {
   const plan = result?.contentData || result?.lessonPlan;
 
   return (
-    <div>
-      <div style={{ marginBottom: '1.5rem' }}>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 700 }}>Soạn Giáo Án AI (AI Lesson Planner)</h1>
-        <p style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)', marginTop: '0.25rem' }}>
-          Sinh kế hoạch bài dạy có cấu trúc bám sát tài liệu nguồn được trích xuất từ RAG
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">{t('lessonPlanner.title')}</h1>
+        <p className="text-muted-foreground text-sm mt-1">
+          {t('lessonPlanner.subtitle')}
         </p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: result ? '1fr 1.2fr' : '1fr', gap: '1.5rem' }}>
+      <div className="grid gap-6 lg:grid-cols-[1fr_1.2fr]">
         {/* Input Form */}
-        <Card>
-          <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '1rem' }}>Thiết Lập Yêu Cầu Soạn Bài</h3>
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label className="form-label">Chủ đề / Tên bài dạy *</label>
-              <input
-                type="text"
-                className="form-input"
-                placeholder="Ví dụ: Định lý Cosin và giải tam giác"
-                required
-                value={topic}
-                onChange={(e) => setTopic(e.target.value)}
-              />
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-              <div className="form-group">
-                <label className="form-label">Môn học</label>
+        <Card className="h-fit">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Target className="w-5 h-5 text-emerald-500" />
+              {t('lessonPlanner.formTitle')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">
+                  {t('lessonPlanner.topic')} <span className="text-destructive">*</span>
+                </label>
                 <input
                   type="text"
-                  className="form-input"
-                  disabled
-                  value={activeWorkspace?.subject || 'Toán học'}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  placeholder={t('lessonPlanner.topicPlaceholder')}
+                  required
+                  value={topic}
+                  onChange={(e) => setTopic(e.target.value)}
                 />
               </div>
-              <div className="form-group">
-                <label className="form-label">Thời lượng (phút)</label>
-                <input
-                  type="number"
-                  className="form-input"
-                  min={15}
-                  max={180}
-                  value={durationMinutes}
-                  onChange={(e) => setDurationMinutes(e.target.value)}
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">{t('workspace.subject')}</label>
+                  <div className="relative">
+                    <BookOpen className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <input
+                      type="text"
+                      className="flex h-10 w-full rounded-md border border-input bg-muted pl-9 pr-3 py-2 text-sm text-muted-foreground cursor-not-allowed placeholder:text-muted-foreground/50"
+                      disabled
+                      placeholder="Chọn không gian làm việc phía trên"
+                      value={activeWorkspace?.subject || ''}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">{t('lessonPlanner.duration')}</label>
+                  <div className="relative">
+                    <Clock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <input
+                      type="number"
+                      className="flex h-10 w-full rounded-md border border-input bg-background pl-9 pr-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                      min={15}
+                      max={180}
+                      value={durationMinutes}
+                      onChange={(e) => setDurationMinutes(e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">{t('lessonPlanner.objectives')}</label>
+                <textarea
+                  className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  rows={3}
+                  placeholder={t('lessonPlanner.objectivesPlaceholder')}
+                  value={objectives}
+                  onChange={(e) => setObjectives(e.target.value)}
                 />
               </div>
-            </div>
 
-            <div className="form-group">
-              <label className="form-label">Mục tiêu bài học (Mỗi mục tiêu 1 dòng)</label>
-              <textarea
-                className="form-textarea"
-                rows={3}
-                placeholder="- Nắm vững công thức định lý Cosin&#10;- Áp dụng tính cạnh và góc trong tam giác"
-                value={objectives}
-                onChange={(e) => setObjectives(e.target.value)}
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Chỉ dẫn sư phạm bổ sung</label>
-              <textarea
-                className="form-textarea"
-                rows={2}
-                placeholder="Ví dụ: Tăng cường hoạt động thảo luận nhóm 4 người..."
-                value={instructions}
-                onChange={(e) => setInstructions(e.target.value)}
-              />
-            </div>
-
-            {error && (
-              <div style={{ padding: '0.75rem', marginBottom: '1rem', backgroundColor: 'var(--color-danger-light)', color: 'var(--color-danger-text)', borderRadius: 'var(--radius-md)', fontSize: '0.8125rem' }}>
-                {error}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">{t('lessonPlanner.instructions')}</label>
+                <textarea
+                  className="flex min-h-[60px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  rows={2}
+                  placeholder={t('lessonPlanner.instructionsPlaceholder')}
+                  value={instructions}
+                  onChange={(e) => setInstructions(e.target.value)}
+                />
               </div>
-            )}
 
-            <Button type="submit" variant="primary" loading={loading} style={{ width: '100%' }}>
-              ✨ Bắt đầu sinh giáo án AI
-            </Button>
-          </form>
+              {error && (
+                <div className="p-3 bg-destructive/10 text-destructive rounded-md text-sm flex items-start gap-2">
+                  <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+                  <span>{error}</span>
+                </div>
+              )}
+
+              <Button type="submit" disabled={loading} className="w-full h-11 gap-2 text-base font-medium">
+                <Wand2 className={`w-5 h-5 ${loading ? 'animate-pulse' : ''}`} />
+                {loading ? t('lessonPlanner.generating') : t('lessonPlanner.generate')}
+              </Button>
+            </form>
+          </CardContent>
         </Card>
 
         {/* Output Preview */}
-        {result && plan && (
-          <div>
-            <Card>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.75rem' }}>
-                <div>
-                  <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-primary)' }}>
-                    {plan.title || topic}
-                  </h3>
-                  <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)' }}>
-                    Thời lượng: {plan.duration_minutes || durationMinutes} phút • {activeWorkspace?.gradeLevel}
-                  </p>
-                </div>
-                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                  <CitationBadge
-                    count={plan.source_chunk_ids?.length || 0}
-                    onClick={() => setIsCitationOpen(true)}
-                  />
-                  <ExportDropdown
-                    workspaceId={activeWorkspace?.id}
-                    generationId={result.id}
-                    defaultFileName={`giao-an-${topic}`}
-                  />
-                </div>
-              </div>
-
-              {plan.objectives && plan.objectives.length > 0 && (
-                <div style={{ marginBottom: '1.25rem' }}>
-                  <h4 style={{ fontSize: '0.9375rem', fontWeight: 600, marginBottom: '0.35rem' }}>🎯 Mục tiêu bài dạy</h4>
-                  <ul style={{ paddingLeft: '1.25rem', fontSize: '0.875rem', color: 'var(--color-text-secondary)' }}>
-                    {plan.objectives.map((obj, i) => (
-                      <li key={i}>{obj}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {plan.sections && plan.sections.length > 0 && (
-                <div>
-                  <h4 style={{ fontSize: '0.9375rem', fontWeight: 600, marginBottom: '0.75rem' }}>📖 Tiến trình hoạt động</h4>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                    {plan.sections.map((sec, i) => (
-                      <div
-                        key={i}
-                        style={{
-                          padding: '0.875rem',
-                          background: 'var(--color-bg-subtle)',
-                          borderRadius: 'var(--radius-md)',
-                          border: '1px solid var(--color-border)',
-                        }}
-                      >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
-                          <strong style={{ fontSize: '0.875rem' }}>{sec.title}</strong>
-                          <span style={{ fontSize: '0.75rem', color: 'var(--color-primary)', fontWeight: 600 }}>
-                            {sec.duration_minutes} phút
-                          </span>
-                        </div>
-                        <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)', whiteSpace: 'pre-line' }}>
-                          {sec.content}
-                        </p>
-                      </div>
-                    ))}
+        {result && plan ? (
+          <div className="sticky top-24 h-fit">
+            <Card className="overflow-hidden border-emerald-500/20 shadow-md shadow-emerald-500/5">
+              <CardHeader className="bg-emerald-50/50 dark:bg-emerald-500/5 border-b border-border pb-4">
+                <div className="flex justify-between items-start">
+                  <div className="space-y-1">
+                    <CardTitle className="text-xl text-emerald-700 dark:text-emerald-400">
+                      {plan.title || topic}
+                    </CardTitle>
+                    <p className="text-sm text-muted-foreground flex items-center gap-2">
+                      <Clock className="w-3.5 h-3.5" />
+                      {t('lessonPlanner.durationLabel')}: {plan.duration_minutes || durationMinutes} {t('lessonPlanner.durationUnit')} • {activeWorkspace?.gradeLevel}
+                    </p>
+                  </div>
+                  <div className="flex gap-2 items-center">
+                    <CitationBadge
+                      count={plan.source_chunk_ids?.length || 0}
+                      onClick={() => setIsCitationOpen(true)}
+                    />
+                    <ExportDropdown
+                      workspaceId={activeWorkspace?.id}
+                      generationId={result.id}
+                      defaultFileName={`giao-an-${topic}`}
+                    />
                   </div>
                 </div>
-              )}
+              </CardHeader>
+              
+              <CardContent className="p-6 overflow-y-auto max-h-[calc(100vh-16rem)]">
+                {plan.objectives && plan.objectives.length > 0 && (
+                  <div className="mb-6">
+                    <h4 className="text-base font-semibold mb-3 flex items-center gap-2">
+                      <Target className="w-4 h-4 text-blue-500" />
+                      {t('lessonPlanner.objectivesTitle')}
+                    </h4>
+                    <ul className="space-y-1.5 pl-6 list-disc text-sm text-muted-foreground">
+                      {plan.objectives.map((obj, i) => (
+                        <li key={i}>{obj}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {plan.sections && plan.sections.length > 0 && (
+                  <div>
+                    <h4 className="text-base font-semibold mb-4 flex items-center gap-2">
+                      <BookOpen className="w-4 h-4 text-orange-500" />
+                      {t('lessonPlanner.activitiesTitle')}
+                    </h4>
+                    <div className="space-y-4">
+                      {plan.sections.map((sec, i) => (
+                        <div
+                          key={i}
+                          className="p-4 rounded-xl bg-muted/50 border border-border/50"
+                        >
+                          <div className="flex justify-between items-start mb-2">
+                            <strong className="text-sm font-medium">{sec.title}</strong>
+                            <span className="text-xs font-semibold text-emerald-600 bg-emerald-500/10 px-2 py-1 rounded-md whitespace-nowrap">
+                              {sec.duration_minutes} {t('lessonPlanner.durationUnit')}
+                            </span>
+                          </div>
+                          <p className="text-sm text-muted-foreground whitespace-pre-line leading-relaxed">
+                            {sec.content}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </CardContent>
             </Card>
 
             <CitationDrawer
               isOpen={isCitationOpen}
               onClose={() => setIsCitationOpen(false)}
-              citations={plan.source_chunk_ids?.map((id) => ({ chunkId: id, fileName: 'Tài liệu nguồn trích dẫn', excerpt: 'Nội dung chunk đã trích xuất qua RAG vector search.' }))}
+              citations={plan.source_chunk_ids?.map((id) => ({
+                chunkId: id,
+                fileName: t('citation.sourceDoc'),
+                excerpt: t('lessonPlanner.chunkExcerpt')
+              }))}
             />
+          </div>
+        ) : (
+          <div className="hidden lg:flex flex-col items-center justify-center p-8 text-center bg-muted/20 border-2 border-dashed border-border rounded-2xl h-[calc(100vh-16rem)] sticky top-24">
+            <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center mb-4">
+              <Target className="w-8 h-8 text-emerald-500 opacity-80" />
+            </div>
+            <h3 className="text-lg font-semibold mb-2">{t('lessonPlanner.emptyTitle', 'Chưa có giáo án nào được tạo')}</h3>
+            <p className="text-sm text-muted-foreground max-w-sm">
+              {t('lessonPlanner.emptyDesc', 'Hãy điền thông tin vào form bên trái và bấm "Sinh giáo án" để AI hỗ trợ bạn soạn thảo giáo án chi tiết và chuyên nghiệp.')}
+            </p>
           </div>
         )}
       </div>

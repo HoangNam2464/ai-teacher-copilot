@@ -1,18 +1,7 @@
-import apiClient from '@/services/core/client';
-import { ENDPOINTS } from '@/services/core/endpoints';
+import api from './api';
 import { downloadBlob } from '@/utils/downloadHelper';
 
-/**
- * Shared Export Service — handles downloading generated lesson plans & quizzes
- */
 export const exportService = {
-  /**
-   * Export generated content as PDF or DOCX
-   * @param {string} workspaceId
-   * @param {string} generationId
-   * @param {'PDF' | 'DOCX'} format
-   * @param {string} defaultFileName
-   */
   async exportDocument(workspaceId, generationId, format = 'PDF', defaultFileName = 'document') {
     const mimeTypes = {
       PDF: 'application/pdf',
@@ -22,8 +11,8 @@ export const exportService = {
     const extension = format.toLowerCase();
     const fileName = `${defaultFileName}.${extension}`;
 
-    const response = await apiClient.post(
-      `${ENDPOINTS.EXPORT(workspaceId, generationId)}?format=${format}`,
+    const response = await api.post(
+      `/workspaces/${workspaceId}/generations/${generationId}/export?format=${format}`,
       {},
       { responseType: 'blob' }
     );

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import {
   Mail,
   ArrowRight,
@@ -15,25 +16,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { PATHS } from '@/routes/paths';
 
-const footerLinks = {
-  product: [
-    { name: 'Tính năng', href: '/#features' },
-    { name: 'Cách hoạt động', href: '/#how-it-works' },
-    { name: 'FAQ', href: '/#faq' },
-  ],
-  features: [
-    { name: 'Workspace', href: PATHS.WORKSPACES },
-    { name: 'Soạn Giáo Án', href: PATHS.LESSON_PLANNER },
-    { name: 'Tạo Đề Trắc Nghiệm', href: PATHS.QUIZ_GENERATOR },
-    { name: 'Quản lý Tài Liệu', href: PATHS.DOCUMENTS },
-  ],
-  legal: [
-    { name: 'Điều khoản sử dụng', href: '#' },
-    { name: 'Chính sách bảo mật', href: '#' },
-  ],
-};
-
 export function Footer() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
@@ -53,6 +37,24 @@ export function Footer() {
     }
   };
 
+  const footerLinks = {
+    product: [
+      { name: t('header.nav.features', 'Tính năng'), href: '/#features' },
+      { name: t('header.nav.howItWorks', 'Hướng dẫn'), href: '/#how-it-works' },
+      { name: t('header.nav.faq', 'FAQ'), href: '/#faq' },
+    ],
+    features: [
+      { name: t('workspace.title', 'Workspace'), href: PATHS.WORKSPACES },
+      { name: t('lessonPlanner.title', 'Soạn Giáo Án AI'), href: PATHS.LESSON_PLANNER },
+      { name: t('quizGenerator.title', 'Tạo Đề Thi & Câu Hỏi AI'), href: PATHS.QUIZ_GENERATOR },
+      { name: t('documents.title', 'Tài Liệu'), href: PATHS.DOCUMENTS },
+    ],
+    legal: [
+      { name: t('auth.termsOfService', 'Điều khoản dịch vụ'), href: '#' },
+      { name: t('auth.privacyPolicy', 'Chính sách bảo mật'), href: '#' },
+    ],
+  };
+
   return (
     <footer className="relative overflow-hidden">
       {/* Newsletter Section */}
@@ -66,13 +68,13 @@ export function Footer() {
             >
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 text-sm font-medium mb-4">
                 <Sparkles className="w-4 h-4" />
-                Cập nhật tính năng mới
+                {t('footer.newsletterBadge')}
               </div>
               <h3 className="text-2xl md:text-3xl font-bold mb-3">
-                Nhận thông tin cập nhật sớm nhất
+                {t('footer.newsletterTitle')}
               </h3>
               <p className="text-muted-foreground mb-6 max-w-lg mx-auto">
-                Đăng ký để nhận thông báo về tính năng mới, tips giảng dạy với AI và tài nguyên dành riêng cho giáo viên.
+                {t('footer.newsletterDesc')}
               </p>
 
               <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
@@ -81,7 +83,7 @@ export function Footer() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="email@truong.edu.vn"
+                    placeholder={t('footer.newsletterPlaceholder')}
                     className="w-full h-11 px-4 pr-12 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
                     required
                   />
@@ -95,18 +97,18 @@ export function Footer() {
                   {isSubscribed ? (
                     <>
                       <CheckCircle className="w-4 h-4" />
-                      Đã đăng ký!
+                      {t('footer.subscribed')}
                     </>
                   ) : (
                     <>
-                      Đăng ký
+                      {t('footer.subscribeBtn')}
                       <Send className="w-4 h-4" />
                     </>
                   )}
                 </Button>
               </form>
               <p className="text-xs text-muted-foreground mt-3">
-                Chúng tôi tôn trọng quyền riêng tư của bạn. Hủy đăng ký bất cứ lúc nào.
+                {t('footer.newsletterPrivacy')}
               </p>
             </motion.div>
           </div>
@@ -128,7 +130,7 @@ export function Footer() {
                 </span>
               </Link>
               <p className="text-muted-foreground text-sm mb-6 max-w-sm leading-relaxed">
-                Trợ lý AI đắc lực dành riêng cho giáo viên K-12. Soạn giáo án, tạo đề thi và quản lý tài liệu thông minh với AI.
+                {t('footer.brandTagline')}
               </p>
 
               <div className="flex items-center gap-2">
@@ -153,7 +155,7 @@ export function Footer() {
 
             {/* Product */}
             <div>
-              <h4 className="font-semibold text-sm mb-4 text-foreground">Sản phẩm</h4>
+              <h4 className="font-semibold text-sm mb-4 text-foreground">{t('footer.product')}</h4>
               <ul className="space-y-3">
                 {footerLinks.product.map((link) => (
                   <li key={link.name}>
@@ -171,7 +173,7 @@ export function Footer() {
 
             {/* Features */}
             <div>
-              <h4 className="font-semibold text-sm mb-4 text-foreground">Tính năng</h4>
+              <h4 className="font-semibold text-sm mb-4 text-foreground">{t('footer.features')}</h4>
               <ul className="space-y-3">
                 {footerLinks.features.map((link) => (
                   <li key={link.name}>
@@ -189,7 +191,7 @@ export function Footer() {
 
             {/* Legal */}
             <div>
-              <h4 className="font-semibold text-sm mb-4 text-foreground">Pháp lý</h4>
+              <h4 className="font-semibold text-sm mb-4 text-foreground">{t('footer.legal')}</h4>
               <ul className="space-y-3">
                 {footerLinks.legal.map((link) => (
                   <li key={link.name}>
@@ -212,12 +214,12 @@ export function Footer() {
           <div className="container mx-auto px-6 sm:px-8 lg:px-12 xl:px-16 py-6">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <p className="text-sm text-muted-foreground">
-                © {new Date().getFullYear()} AI Teacher Copilot. Bảo lưu mọi quyền.
+                © {new Date().getFullYear()} {t('footer.rights')}
               </p>
               <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                <span>Tạo ra với</span>
+                <span>{t('footer.madeWith', 'Tạo ra với')}</span>
                 <Heart className="w-4 h-4 text-red-500 fill-red-500" />
-                <span>dành cho giáo viên Việt Nam</span>
+                <span>{t('footer.madeWithHeart')}</span>
               </div>
             </div>
           </div>
@@ -236,7 +238,7 @@ export function Footer() {
             className="fixed bottom-8 right-8 z-50 w-11 h-11 rounded-full bg-emerald-500 text-white shadow-lg shadow-emerald-500/25 flex items-center justify-center hover:bg-emerald-600 transition-colors"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            aria-label="Back to top"
+            aria-label={t('footer.backToTop')}
           >
             <ArrowUp className="w-5 h-5" />
           </motion.button>

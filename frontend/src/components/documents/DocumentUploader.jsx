@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/Button';
+import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui/button';
 
 export function DocumentUploader({ onUploadSuccess, disabled }) {
+  const { t } = useTranslation();
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
@@ -10,7 +12,7 @@ export function DocumentUploader({ onUploadSuccess, disabled }) {
     if (e.target.files && e.target.files[0]) {
       const selected = e.target.files[0];
       if (selected.size > 50 * 1024 * 1024) {
-        setError('Dung lượng file vượt quá giới hạn 50MB');
+        setError(t('documents.fileSizeExceeded'));
         return;
       }
       setError('');
@@ -27,7 +29,7 @@ export function DocumentUploader({ onUploadSuccess, disabled }) {
       setFile(null);
     } catch (err) {
       console.error('Upload failed:', err);
-      setError(err.response?.data?.message || 'Tải lên tài liệu thất bại');
+      setError(err.response?.data?.message || t('documents.uploadFailed'));
     } finally {
       setUploading(false);
     }
@@ -36,10 +38,10 @@ export function DocumentUploader({ onUploadSuccess, disabled }) {
   return (
     <div style={{ background: 'var(--color-bg-surface)', padding: '1.5rem', borderRadius: 'var(--radius-lg)', border: '1px dashed var(--color-border-focus)' }}>
       <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.5rem' }}>
-        Tải Lên Tài Liệu Giảng Dạy Mới
+        {t('documents.uploaderTitle')}
       </h3>
       <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)', marginBottom: '1rem' }}>
-        Hỗ trợ định dạng PDF, DOCX, TXT (tối đa 50MB). Tài liệu sẽ được index để phục vụ RAG AI.
+        {t('documents.uploaderDesc')}
       </p>
 
       {error && (
@@ -60,11 +62,9 @@ export function DocumentUploader({ onUploadSuccess, disabled }) {
         <Button
           onClick={handleUpload}
           disabled={!file || disabled || uploading}
-          loading={uploading}
-          variant="primary"
-          size="sm"
+          className="gap-2"
         >
-          Bắt đầu tải lên & Xử lý AI
+          {uploading ? t('common.processing') : t('documents.startUpload')}
         </Button>
       </div>
     </div>

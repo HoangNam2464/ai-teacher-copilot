@@ -114,4 +114,62 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.error").value("Validation failed"))
                 .andExpect(jsonPath("$.data.email").exists());
     }
+
+    @Test
+    @DisplayName("POST /auth/google - Success returns 200 OK and JWT auth response")
+    void googleLogin_Success() throws Exception {
+        AuthDto.GoogleLoginRequest request = new AuthDto.GoogleLoginRequest();
+        request.setCredential("mock-google-credential");
+
+        AuthDto.AuthResponse authResponse = new AuthDto.AuthResponse(
+                "jwt.google.token",
+                "teacher.google@school.edu.vn",
+                "Thầy Nam (Google Demo)",
+                "TEACHER"
+        );
+
+        when(authService.googleLogin(any(AuthDto.GoogleLoginRequest.class))).thenReturn(authResponse);
+
+        mockMvc.perform(post("/auth/google")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.token").value("jwt.google.token"))
+                .andExpect(jsonPath("$.data.email").value("teacher.google@school.edu.vn"))
+                .andExpect(jsonPath("$.data.fullName").value("Thầy Nam (Google Demo)"));
+    }
+
+    @Test
+    @DisplayName("POST /auth/forgot-password - Success returns 200 OK message")
+    void forgotPassword_Success() throws Exception {
+        AuthDto.ForgotPasswordRequest request = new AuthDto.ForgotPasswordRequest();
+        request.setEmail("teacher@school.edu.vn");
+
+        when(authService.forgotPassword(any(AuthDto.ForgotPasswordRequest.class)))
+                .thenReturn(new AuthDto.MessageResponse("Email hướng dẫn đã được gửi."));
+
+        mockMvc.perform(post("/auth/forgot-password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("Email hướng dẫn đã được gửi."));
+    }
+
+    @Test
+    @DisplayName("POST /auth/verify-email - Success returns 200 OK message")
+    void verifyEmail_Success() throws Exception {
+        AuthDto.VerifyEmailRequest request = new AuthDto.VerifyEmailRequest();
+        request.setToken("valid-verify-token");
+
+        when(authService.verifyEmail(any(AuthDto.VerifyEmailRequest.class)))
+                .thenReturn(new AuthDto.MessageResponse("Tài khoản đã được kích hoạt thành công."));
+
+        mockMvc.perform(post("/auth/verify-email")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true));
+    }
 }

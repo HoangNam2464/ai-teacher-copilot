@@ -47,4 +47,68 @@ public final class AuthDto {
             this.role = role;
         }
     }
+
+    @Data
+    public static class GoogleLoginRequest {
+        @NotBlank(message = "Google credential is required")
+        private String credential;
+    }
+
+    @Data
+    public static class FacebookLoginRequest {
+        @NotBlank(message = "Facebook access token is required")
+        private String accessToken;
+    }
+
+    @Data
+    public static class AppleLoginRequest {
+        @NotBlank(message = "Apple idToken is required")
+        private String idToken;
+        private String fullName;
+    }
+
+    @Data
+    public static class ForgotPasswordRequest {
+        @NotBlank(message = "Email is required")
+        @Email(message = "Invalid email format")
+        private String email;
+    }
+
+    @Data
+    public static class ResetPasswordRequest {
+        @NotBlank(message = "Token is required")
+        private String token;
+
+        @NotBlank(message = "New password is required")
+        @Size(min = 8, message = "Password must be at least 8 characters")
+        private String newPassword;
+    }
+
+    @Data
+    public static class VerifyEmailRequest {
+        @NotBlank(message = "Token is required")
+        private String token;
+    }
+
+    @Data
+    public static class ResendVerificationRequest {
+        @NotBlank(message = "Email is required")
+        @Email(message = "Invalid email format")
+        private String email;
+    }
+
+    @Data
+    public static class MessageResponse {
+        private String message;
+        private String token;
+
+        public MessageResponse(String message) {
+            this.message = message;
+        }
+
+        public MessageResponse(String message, String token) {
+            this.message = message;
+            this.token = token;
+        }
+    }
 }

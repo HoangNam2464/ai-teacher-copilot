@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   ArrowRight,
   Sparkles,
@@ -21,6 +22,7 @@ import { cn } from '@/lib/utils';
 
 // Animated Demo Component
 function AnimatedDemo() {
+  const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(0);
   const [hasStarted, setHasStarted] = useState(false);
   const [analyzedItems, setAnalyzedItems] = useState([]);
@@ -29,17 +31,17 @@ function AnimatedDemo() {
   const [showConfetti, setShowConfetti] = useState(false);
 
   const analyzeItems = [
-    { icon: FileText, label: 'Cấu trúc tài liệu' },
-    { icon: Brain, label: 'Nội dung học thuật' },
-    { icon: BookOpen, label: 'Bloom Taxonomy levels' },
-    { icon: GraduationCap, label: 'Mục tiêu học tập' },
+    { icon: FileText, labelKey: 'hero.demo.analyzeItem1' },
+    { icon: Brain, labelKey: 'hero.demo.analyzeItem2' },
+    { icon: BookOpen, labelKey: 'hero.demo.analyzeItem3' },
+    { icon: GraduationCap, labelKey: 'hero.demo.analyzeItem4' },
   ];
 
   const generateOutputs = [
-    { icon: BookOpen, label: 'Giáo Án Cấu Trúc', color: 'text-amber-500', bg: 'from-amber-500/20 to-orange-500/20' },
-    { icon: FileText, label: 'Đề Trắc Nghiệm', color: 'text-rose-500', bg: 'from-rose-500/20 to-pink-500/20' },
-    { icon: Star, label: 'Câu Hỏi Tự Luận', color: 'text-blue-500', bg: 'from-blue-500/20 to-cyan-500/20' },
-    { icon: GraduationCap, label: 'Rubric Chấm Điểm', color: 'text-violet-500', bg: 'from-violet-500/20 to-purple-500/20' },
+    { icon: BookOpen, labelKey: 'hero.demo.output1', color: 'text-amber-500', bg: 'from-amber-500/20 to-orange-500/20' },
+    { icon: FileText, labelKey: 'hero.demo.output2', color: 'text-rose-500', bg: 'from-rose-500/20 to-pink-500/20' },
+    { icon: Star, labelKey: 'hero.demo.output3', color: 'text-blue-500', bg: 'from-blue-500/20 to-cyan-500/20' },
+    { icon: GraduationCap, labelKey: 'hero.demo.output4', color: 'text-violet-500', bg: 'from-violet-500/20 to-purple-500/20' },
   ];
 
   const stepColors = [
@@ -49,7 +51,12 @@ function AnimatedDemo() {
     { bg: 'from-green-500 to-emerald-500', text: 'text-green-500', dot: 'bg-green-500' },
   ];
 
-  const stepLabels = ['Upload', 'Phân tích', 'Tạo nội dung', 'Hoàn thành'];
+  const stepLabels = [
+    t('hero.demo.stepUpload'),
+    t('hero.demo.stepAnalyze'),
+    t('hero.demo.stepGenerate'),
+    t('hero.demo.stepComplete'),
+  ];
   const stepDots = ['bg-blue-500', 'bg-violet-500', 'bg-amber-500', 'bg-green-500'];
 
   useEffect(() => {
@@ -231,8 +238,8 @@ function AnimatedDemo() {
                     <FileText className="w-5 h-5 text-white" />
                   </motion.div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm truncate">Sách giáo khoa Toán 10.pdf</p>
-                    <p className="text-xs text-muted-foreground">PDF • 12.4MB • 286 trang</p>
+                    <p className="font-semibold text-sm truncate">{t('hero.demo.sampleFile')}</p>
+                    <p className="text-xs text-muted-foreground">{t('hero.demo.sampleFileInfo')}</p>
                   </div>
                   <motion.div animate={{ scale: [1, 1.15, 1] }} transition={{ duration: 1.5, repeat: Infinity }}>
                     <Upload className="w-4 h-4 text-blue-500" />
@@ -243,7 +250,7 @@ function AnimatedDemo() {
                   <div className="flex justify-between text-xs">
                     <span className="text-muted-foreground flex items-center gap-1.5">
                       <Loader2 className="w-3 h-3 text-blue-500 animate-spin" />
-                      Đang tải tài liệu lên...
+                      {t('hero.demo.uploading')}
                     </span>
                     <span className="font-semibold text-blue-500">{uploadProgress}%</span>
                   </div>
@@ -283,7 +290,7 @@ function AnimatedDemo() {
               >
                 <p className="text-xs text-muted-foreground flex items-center gap-2">
                   <Loader2 className="w-3 h-3 text-violet-500 animate-spin" />
-                  AI đang phân tích nội dung tài liệu...
+                  {t('hero.demo.analyzing')}
                 </p>
                 {analyzeItems.map((item, i) => (
                   <AnimatePresence key={i}>
@@ -296,7 +303,7 @@ function AnimatedDemo() {
                         <div className="w-8 h-8 rounded-lg bg-violet-500/10 flex items-center justify-center">
                           <item.icon className="w-4 h-4 text-violet-500" />
                         </div>
-                        <span className="text-sm font-medium flex-1">{item.label}</span>
+                        <span className="text-sm font-medium flex-1">{t(item.labelKey)}</span>
                         <Check className="w-4 h-4 text-emerald-500" />
                       </motion.div>
                     )}
@@ -317,7 +324,7 @@ function AnimatedDemo() {
               >
                 <p className="text-xs text-muted-foreground flex items-center gap-2">
                   <Sparkles className="w-3 h-3 text-amber-500" />
-                  AI đang tạo nội dung giảng dạy...
+                  {t('hero.demo.generating')}
                 </p>
                 <div className="grid grid-cols-2 gap-2">
                   {generateOutputs.map((output, i) => (
@@ -329,7 +336,7 @@ function AnimatedDemo() {
                           className={`p-3 rounded-xl bg-gradient-to-br ${output.bg} border border-border/50`}
                         >
                           <output.icon className={`w-5 h-5 ${output.color} mb-2`} />
-                          <p className="text-xs font-medium">{output.label}</p>
+                          <p className="text-xs font-medium">{t(output.labelKey)}</p>
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -356,11 +363,16 @@ function AnimatedDemo() {
                   <Check className="w-8 h-8 text-white" />
                 </motion.div>
                 <div>
-                  <p className="font-bold text-lg text-emerald-600">Hoàn thành!</p>
-                  <p className="text-sm text-muted-foreground mt-1">4 tài liệu giảng dạy đã sẵn sàng</p>
+                  <p className="font-bold text-lg text-emerald-600">{t('hero.demo.completed')}</p>
+                  <p className="text-sm text-muted-foreground mt-1">{t('hero.demo.readyBanner')}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  {['Giáo Án', 'Đề Thi', 'Tự Luận', 'Rubric'].map((label) => (
+                  {[
+                    t('hero.demo.output1', 'Giáo Án'),
+                    t('hero.demo.output2', 'Đề Thi'),
+                    t('hero.demo.output3', 'Tự Luận'),
+                    t('hero.demo.output4', 'Rubric'),
+                  ].map((label) => (
                     <span
                       key={label}
                       className="px-2 py-0.5 rounded text-[10px] font-medium bg-emerald-500/10 text-emerald-600 border border-emerald-500/20"
@@ -378,15 +390,15 @@ function AnimatedDemo() {
   );
 }
 
-// Statistics
-const stats = [
-  { value: '80%', label: 'Tiết kiệm thời gian soạn bài' },
-  { value: '6 loại', label: 'Bloom Taxonomy được tích hợp' },
-  { value: '100%', label: 'Trích dẫn nguồn chính xác' },
-];
-
 export function HeroSection() {
+  const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
+
+  const stats = [
+    { value: t('hero.stats.stat1Value'), label: t('hero.stats.stat1Label') },
+    { value: t('hero.stats.stat2Value'), label: t('hero.stats.stat2Label') },
+    { value: t('hero.stats.stat3Value'), label: t('hero.stats.stat3Label') },
+  ];
 
   return (
     <section className="relative overflow-hidden pt-24 lg:pt-32 pb-16 lg:pb-24">
@@ -410,7 +422,7 @@ export function HeroSection() {
             >
               <Sparkles className="w-4 h-4 text-emerald-600" />
               <span className="text-sm font-medium text-emerald-700 dark:text-emerald-400">
-                Trợ lý AI dành riêng cho Giáo Viên K-12
+                {t('hero.badge')}
               </span>
             </motion.div>
 
@@ -421,11 +433,11 @@ export function HeroSection() {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight tracking-tight"
             >
-              Soạn Giáo Án &{' '}
+              {t('hero.titlePrefix')}{' '}
               <span className="bg-gradient-to-r from-emerald-600 to-green-500 bg-clip-text text-transparent">
-                Tạo Đề Thi
+                {t('hero.titleHighlight')}
               </span>{' '}
-              với AI
+              {t('hero.titleSuffix')}
             </motion.h1>
 
             {/* Description */}
@@ -435,9 +447,7 @@ export function HeroSection() {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="text-lg text-muted-foreground leading-relaxed"
             >
-              Tải lên tài liệu giảng dạy, AI sẽ phân tích và tự động tạo ra giáo án cấu trúc chuẩn,
-              đề trắc nghiệm theo Bloom Taxonomy, câu hỏi tự luận — tất cả đều có trích dẫn nguồn
-              rõ ràng. Giải phóng <strong>80% thời gian soạn bài</strong>.
+              {t('hero.description')}
             </motion.p>
 
             {/* CTA Buttons */}
@@ -450,7 +460,7 @@ export function HeroSection() {
               {isAuthenticated ? (
                 <Button size="lg" asChild className="shadow-lg shadow-emerald-500/25">
                   <Link to={PATHS.WORKSPACES}>
-                    Vào không gian làm việc
+                    {t('hero.enterWorkspace')}
                     <ArrowRight className="w-5 h-5" />
                   </Link>
                 </Button>
@@ -459,12 +469,12 @@ export function HeroSection() {
                   <Button size="lg" asChild className="shadow-lg shadow-emerald-500/25">
                     <Link to={PATHS.REGISTER}>
                       <Zap className="w-5 h-5" />
-                      Bắt đầu miễn phí
+                      {t('hero.startFree')}
                     </Link>
                   </Button>
                   <Button size="lg" variant="outline" asChild>
                     <Link to={PATHS.LOGIN}>
-                      Đăng nhập
+                      {t('hero.login')}
                       <ArrowRight className="w-4 h-4" />
                     </Link>
                   </Button>

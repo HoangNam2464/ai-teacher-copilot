@@ -1,11 +1,13 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles, Zap } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { PATHS } from '@/routes/paths';
 
 export function CTASection() {
+  const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
 
   return (
@@ -27,18 +29,17 @@ export function CTASection() {
           <div className="relative space-y-6">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/20 text-white text-sm font-medium">
               <Sparkles className="w-4 h-4" />
-              Sẵn sàng thay đổi phương pháp giảng dạy?
+              {t('cta.badge')}
             </div>
 
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">
-              Tiết kiệm 80% thời gian soạn bài
+              {t('cta.title')}
               <br />
-              <span className="text-white/80">ngay hôm nay</span>
+              <span className="text-white/80">{t('cta.titleHighlight')}</span>
             </h2>
 
             <p className="text-white/80 text-lg max-w-2xl mx-auto leading-relaxed">
-              Tham gia cùng hàng nghìn giáo viên Việt Nam đang sử dụng AI để tạo ra
-              giáo án chất lượng cao, đề thi sáng tạo và tài liệu giảng dạy chuyên nghiệp.
+              {t('cta.description')}
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
@@ -49,7 +50,7 @@ export function CTASection() {
                   asChild
                 >
                   <Link to={PATHS.WORKSPACES}>
-                    Vào không gian làm việc
+                    {t('cta.enterWorkspace')}
                     <ArrowRight className="w-5 h-5" />
                   </Link>
                 </Button>
@@ -62,7 +63,7 @@ export function CTASection() {
                   >
                     <Link to={PATHS.REGISTER}>
                       <Zap className="w-5 h-5" />
-                      Đăng ký miễn phí
+                      {t('cta.startFree')}
                     </Link>
                   </Button>
                   <Button
@@ -72,7 +73,7 @@ export function CTASection() {
                     asChild
                   >
                     <Link to={PATHS.LOGIN}>
-                      Đăng nhập
+                      {t('auth.login')}
                       <ArrowRight className="w-4 h-4" />
                     </Link>
                   </Button>
@@ -81,7 +82,7 @@ export function CTASection() {
             </div>
 
             <p className="text-white/60 text-sm">
-              Không cần thẻ tín dụng · Cài đặt trong 5 phút · Bảo mật dữ liệu tuyệt đối
+              {t('cta.subtext')}
             </p>
           </div>
         </motion.div>

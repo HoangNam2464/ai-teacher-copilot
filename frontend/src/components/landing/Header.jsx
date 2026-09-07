@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Menu,
@@ -18,35 +19,36 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { PATHS } from '@/routes/paths';
 import { cn } from '@/lib/utils';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 const features = [
   {
-    name: 'Không gian làm việc',
-    desc: 'Quản lý tài liệu và nội dung giảng dạy',
+    nameKey: 'header.features.workspace',
+    descKey: 'header.features.workspaceDesc',
     icon: BookOpen,
     color: 'text-blue-500',
     bg: 'bg-blue-500/10',
     href: PATHS.WORKSPACES,
   },
   {
-    name: 'Soạn Giáo Án AI',
-    desc: 'Tạo giáo án cấu trúc chuẩn, có trích dẫn nguồn',
+    nameKey: 'header.features.lessonPlanner',
+    descKey: 'header.features.lessonPlannerDesc',
     icon: Brain,
     color: 'text-emerald-500',
     bg: 'bg-emerald-500/10',
     href: PATHS.LESSON_PLANNER,
   },
   {
-    name: 'Tạo Đề Trắc Nghiệm',
-    desc: 'MCQ & tự luận theo Bloom Taxonomy',
+    nameKey: 'header.features.quizGenerator',
+    descKey: 'header.features.quizGeneratorDesc',
     icon: FileText,
     color: 'text-orange-500',
     bg: 'bg-orange-500/10',
     href: PATHS.QUIZ_GENERATOR,
   },
   {
-    name: 'Quản lý Tài Liệu',
-    desc: 'Upload PDF/DOCX, phân tích và lập chỉ mục',
+    nameKey: 'nav.documents',
+    descKey: 'documents.subtitle',
     icon: Lightbulb,
     color: 'text-purple-500',
     bg: 'bg-purple-500/10',
@@ -55,12 +57,13 @@ const features = [
 ];
 
 const navLinks = [
-  { name: 'Tính năng', href: '/#features', hasDropdown: true },
-  { name: 'Hướng dẫn', href: '/#how-it-works' },
-  { name: 'FAQ', href: '/#faq' },
+  { nameKey: 'header.nav.features', href: '/#features', hasDropdown: true },
+  { nameKey: 'header.nav.howItWorks', href: '/#how-it-works' },
+  { nameKey: 'header.nav.faq', href: '/#faq' },
 ];
 
 export function Header() {
+  const { t } = useTranslation();
   const { isAuthenticated, user } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -124,7 +127,7 @@ export function Header() {
                         'hover:bg-muted text-muted-foreground hover:text-foreground'
                       )}
                     >
-                      {link.name}
+                      {t(link.nameKey)}
                       <ChevronDown
                         className={cn(
                           'w-4 h-4 transition-transform duration-200',
@@ -146,7 +149,7 @@ export function Header() {
                             <div className="grid grid-cols-2 gap-2">
                               {features.map((feature) => (
                                 <Link
-                                  key={feature.name}
+                                  key={feature.nameKey}
                                   to={feature.href}
                                   className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/80 transition-colors group/item"
                                 >
@@ -155,10 +158,10 @@ export function Header() {
                                   </div>
                                   <div className="flex-1 min-w-0">
                                     <p className="font-medium text-sm group-hover/item:text-emerald-600 transition-colors">
-                                      {feature.name}
+                                      {t(feature.nameKey)}
                                     </p>
                                     <p className="text-xs text-muted-foreground mt-0.5">
-                                      {feature.desc}
+                                      {t(feature.descKey)}
                                     </p>
                                   </div>
                                 </Link>
@@ -169,7 +172,7 @@ export function Header() {
                                 to={PATHS.WORKSPACES}
                                 className="flex items-center justify-center gap-2 text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors"
                               >
-                                Xem tất cả tính năng
+                                {t('common.viewAll', 'Xem tất cả tính năng')}
                                 <ArrowRight className="w-4 h-4" />
                               </Link>
                             </div>
@@ -183,7 +186,7 @@ export function Header() {
                     href={link.href}
                     className="px-4 py-2 text-sm font-medium rounded-lg transition-all hover:bg-muted text-muted-foreground hover:text-foreground"
                   >
-                    {link.name}
+                    {t(link.nameKey)}
                   </a>
                 )}
               </div>
@@ -192,6 +195,7 @@ export function Header() {
 
           {/* Desktop Auth Buttons */}
           <div className="hidden lg:flex items-center gap-3">
+            <LanguageSwitcher />
             {isAuthenticated ? (
               <Link
                 to={PATHS.WORKSPACES}
@@ -202,18 +206,18 @@ export function Header() {
                     {user?.initials || 'T'}
                   </span>
                 </div>
-                <span className="text-sm font-medium pr-1">Workspace</span>
+                <span className="text-sm font-medium pr-1">{t('header.workspaceBtn', 'Workspace')}</span>
                 <ArrowRight className="w-3.5 h-3.5 text-muted-foreground" />
               </Link>
             ) : (
               <>
                 <Button variant="ghost" asChild>
-                  <Link to={PATHS.LOGIN}>Đăng nhập</Link>
+                  <Link to={PATHS.LOGIN}>{t('auth.login')}</Link>
                 </Button>
                 <Button asChild>
                   <Link to={PATHS.REGISTER}>
-                    <Zap className="w-4 h-4" />
-                    Bắt đầu miễn phí
+                    <Zap className="w-4 h-4 mr-1.5" />
+                    {t('common.startFree')}
                   </Link>
                 </Button>
               </>
@@ -287,7 +291,7 @@ export function Header() {
                         className="flex items-center justify-between px-4 py-3 text-base font-medium rounded-lg transition-colors hover:bg-muted text-foreground"
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
-                        {link.name}
+                        {t(link.nameKey)}
                         <ArrowRight className="w-4 h-4 text-muted-foreground" />
                       </a>
                     </motion.div>
@@ -297,12 +301,12 @@ export function Header() {
                 {/* Features Grid */}
                 <div>
                   <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 mb-3">
-                    Tính năng chính
+                    {t('features.badge', 'Tính năng chính')}
                   </p>
                   <div className="grid grid-cols-2 gap-2">
                     {features.map((feature, index) => (
                       <motion.div
-                        key={feature.name}
+                        key={feature.nameKey}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 + index * 0.03 }}
@@ -315,7 +319,7 @@ export function Header() {
                           <div className={cn('w-10 h-10 rounded-lg flex items-center justify-center', feature.bg)}>
                             <feature.icon className={cn('w-5 h-5', feature.color)} />
                           </div>
-                          <span className="text-xs font-medium">{feature.name}</span>
+                          <span className="text-xs font-medium">{t(feature.nameKey)}</span>
                         </Link>
                       </motion.div>
                     ))}
@@ -329,6 +333,9 @@ export function Header() {
                   transition={{ delay: 0.3 }}
                   className="pt-4 border-t border-border space-y-3"
                 >
+                  <div className="flex justify-end mb-4">
+                    <LanguageSwitcher />
+                  </div>
                   {isAuthenticated ? (
                     <Link
                       to={PATHS.WORKSPACES}
@@ -341,20 +348,20 @@ export function Header() {
                         </span>
                       </div>
                       <div className="flex-1">
-                        <p className="text-sm font-medium">{user?.displayName || 'Giáo viên'}</p>
-                        <p className="text-xs text-muted-foreground">Vào Workspace</p>
+                        <p className="text-sm font-medium">{user?.displayName || t('dashboard.user', 'Giáo viên')}</p>
+                        <p className="text-xs text-muted-foreground">{t('header.enterWorkspace', 'Vào Workspace')}</p>
                       </div>
                       <ArrowRight className="w-4 h-4 text-muted-foreground" />
                     </Link>
                   ) : (
                     <>
                       <Button variant="outline" className="w-full h-12" asChild>
-                        <Link to={PATHS.LOGIN} onClick={() => setIsMobileMenuOpen(false)}>Đăng nhập</Link>
+                        <Link to={PATHS.LOGIN} onClick={() => setIsMobileMenuOpen(false)}>{t('auth.login')}</Link>
                       </Button>
                       <Button className="w-full h-12" asChild>
                         <Link to={PATHS.REGISTER} onClick={() => setIsMobileMenuOpen(false)}>
                           <Zap className="w-4 h-4 mr-2" />
-                          Bắt đầu miễn phí
+                          {t('common.startFree')}
                         </Link>
                       </Button>
                     </>

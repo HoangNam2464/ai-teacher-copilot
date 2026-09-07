@@ -1,5 +1,6 @@
 import React from 'react';
-import { CheckIcon, CheckCircle2Icon } from '@/components/ui/Icons';
+import { useTranslation } from 'react-i18next';
+import { CheckCircle2Icon } from '@/components/ui/Icons';
 
 /**
  * PasswordStrengthMeter — Live password complexity evaluator & visual indicator.
@@ -7,6 +8,8 @@ import { CheckIcon, CheckCircle2Icon } from '@/components/ui/Icons';
  * @param {string} password - Current password string.
  */
 export function PasswordStrengthMeter({ password = '' }) {
+  const { t } = useTranslation();
+
   if (!password) {
     return null;
   }
@@ -18,32 +21,32 @@ export function PasswordStrengthMeter({ password = '' }) {
   const hasSpecial = /[^A-Za-z0-9]/.test(password);
 
   const criteria = [
-    { label: 'Tối thiểu 8 ký tự', passed: hasLength },
-    { label: 'Chữ hoa và chữ thường', passed: hasLower && hasUpper },
-    { label: 'Ít nhất một chữ số (0-9)', passed: hasNumber },
-    { label: 'Ký tự đặc biệt (@, #, $...)', passed: hasSpecial },
+    { label: t('auth.passwordMeter.minChars'), passed: hasLength },
+    { label: t('auth.passwordMeter.upperLower'), passed: hasLower && hasUpper },
+    { label: t('auth.passwordMeter.number'), passed: hasNumber },
+    { label: t('auth.passwordMeter.special'), passed: hasSpecial },
   ];
 
   const passedCount = criteria.filter((c) => c.passed).length;
 
-  let strengthLabel = 'Rất yếu';
+  let strengthLabel = t('auth.passwordMeter.veryWeak');
   let strengthClass = 'weak';
 
   if (passedCount === 2) {
-    strengthLabel = 'Trung bình';
+    strengthLabel = t('auth.passwordMeter.fair');
     strengthClass = 'fair';
   } else if (passedCount === 3) {
-    strengthLabel = 'Khá';
+    strengthLabel = t('auth.passwordMeter.good');
     strengthClass = 'good';
   } else if (passedCount === 4) {
-    strengthLabel = 'Mạnh & An toàn';
+    strengthLabel = t('auth.passwordMeter.strong');
     strengthClass = 'strong';
   }
 
   return (
     <div className="password-meter-box" aria-live="polite">
       <div className="password-meter-header">
-        <span className="password-meter-label">Độ an toàn mật khẩu:</span>
+        <span className="password-meter-label">{t('auth.passwordMeter.title')}</span>
         <span className={`password-meter-status ${strengthClass}`}>{strengthLabel}</span>
       </div>
 
@@ -58,7 +61,7 @@ export function PasswordStrengthMeter({ password = '' }) {
         ))}
       </div>
 
-      <ul className="password-checklist" aria-label="Tiêu chí độ mạnh mật khẩu">
+      <ul className="password-checklist" aria-label={t('auth.passwordMeter.title')}>
         {criteria.map((item, i) => (
           <li
             key={i}

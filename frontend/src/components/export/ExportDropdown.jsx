@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { exportService } from '@/services/core/exportService';
+import { exportService } from '@/services/export';
 import { Button } from '@/components/ui/Button';
 
 export function ExportDropdown({ workspaceId, generationId, defaultFileName = 'tai-lieu' }) {

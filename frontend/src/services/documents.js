@@ -1,9 +1,9 @@
-import apiClient from '@/services/core/client';
-import { ENDPOINTS } from '@/services/core/endpoints';
+import api from './api';
+import { ENDPOINTS } from '@/config/api';
 
-export const documentApi = {
+export const documentService = {
   async getDocuments(workspaceId) {
-    const response = await apiClient.get(ENDPOINTS.DOCUMENTS(workspaceId));
+    const response = await api.get(ENDPOINTS.documents.list(workspaceId));
     return response.data;
   },
 
@@ -14,7 +14,7 @@ export const documentApi = {
     if (gradeLevel) formData.append('gradeLevel', gradeLevel);
     if (topic) formData.append('topic', topic);
 
-    const response = await apiClient.post(ENDPOINTS.DOCUMENT_UPLOAD(workspaceId), formData, {
+    const response = await api.post(ENDPOINTS.documents.upload(workspaceId), formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -22,8 +22,10 @@ export const documentApi = {
     return response.data;
   },
 
-  async deleteDocument(workspaceId, documentId) {
-    const response = await apiClient.delete(ENDPOINTS.DOCUMENT_BY_ID(workspaceId, documentId));
+  async deleteDocument(documentId) {
+    const response = await api.delete(ENDPOINTS.documents.delete(documentId));
     return response.data;
   },
 };
+
+export const documentApi = documentService;

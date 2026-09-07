@@ -1,8 +1,10 @@
 import React from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { PATHS } from '@/routes/paths';
 
 export function FocusLayout() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   return (
@@ -21,12 +23,12 @@ export function FocusLayout() {
         <button
           type="button"
           className="btn btn-secondary btn-sm"
-          onClick={() => navigate(PATHS.DASHBOARD)}
+          onClick={() => navigate(PATHS.WORKSPACES)}
         >
-          ← Quay lại bảng điều khiển
+          {t('common.backToDashboard')}
         </button>
         <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--color-text-secondary)' }}>
-          Chế độ tập trung soạn thảo
+          {t('common.focusMode')}
         </span>
       </header>
 

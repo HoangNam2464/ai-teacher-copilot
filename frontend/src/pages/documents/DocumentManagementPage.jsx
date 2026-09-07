@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { documentApi } from '@/services/documents/documentApi';
+import { useTranslation } from 'react-i18next';
+import { documentApi } from '@/services/documents';
 import { DocumentUploader } from '@/components/documents/DocumentUploader';
 import { useWorkspace } from '@/hooks/useWorkspace';
-import { Badge } from '@/components/ui/Badge';
-import { Spinner } from '@/components/ui/Spinner';
+import { Badge } from '@/components/ui/badge';
+import { Spinner } from '@/components/ui/spinner';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { RefreshCw, File as FileIcon, Trash2, LibraryBig } from 'lucide-react';
 import { formatFileSize, formatDate } from '@/utils/formatters';
 
 export function DocumentManagementPage() {
+  const { t } = useTranslation();
   const { activeWorkspace } = useWorkspace();
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -38,7 +43,7 @@ export function DocumentManagementPage() {
   };
 
   const handleDelete = async (docId) => {
-    if (!window.confirm('Bạn có chắc chắn muốn xóa tài liệu này? Các vector chunks liên quan sẽ bị xóa khỏi RAG.')) {
+    if (!window.confirm(t('documents.deleteConfirm'))) {
       return;
     }
     try {
@@ -46,18 +51,18 @@ export function DocumentManagementPage() {
       await loadDocuments();
     } catch (err) {
       console.error('Delete failed:', err);
-      alert('Xóa tài liệu thất bại.');
+      alert(t('documents.deleteFailed'));
     }
   };
 
   const getStatusBadge = (status) => {
     switch (status) {
       case 'READY':
-        return <Badge variant="success">Sẵn sàng (RAG Active)</Badge>;
+        return <Badge variant="success">{t('documents.statusReady')}</Badge>;
       case 'PROCESSING':
-        return <Badge variant="warning">Đang xử lý vector...</Badge>;
+        return <Badge variant="warning">{t('documents.statusProcessing')}</Badge>;
       case 'FAILED':
-        return <Badge variant="danger">Lỗi xử lý</Badge>;
+        return <Badge variant="danger">{t('documents.statusFailed')}</Badge>;
       default:
         return <Badge variant="neutral">{status || 'PENDING'}</Badge>;
     }
@@ -65,83 +70,104 @@ export function DocumentManagementPage() {
 
   if (!activeWorkspace) {
     return (
-      <div style={{ textAlign: 'center', padding: '3rem' }}>
-        <p style={{ color: 'var(--color-text-secondary)' }}>Vui lòng chọn một Không gian làm việc trước để quản lý tài liệu.</p>
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <LibraryBig className="w-16 h-16 text-muted-foreground/30 mb-4" />
+        <h2 className="text-xl font-semibold mb-2">{t('workspace.noActiveContext')}</h2>
+        <p className="text-muted-foreground text-sm max-w-md">
+          {t('documents.selectWorkspaceFirst')}
+        </p>
       </div>
     );
   }
 
   return (
-    <div>
-      <div style={{ marginBottom: '1.5rem' }}>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 700 }}>Tài Liệu & Kho Tri Thức Học Liệu</h1>
-        <p style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)', marginTop: '0.25rem' }}>
-          Quản lý tài liệu nguồn phục vụ truy xuất RAG cho không gian <strong>{activeWorkspace.name}</strong>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">{t('documents.title')}</h1>
+        <p className="text-muted-foreground text-sm mt-1">
+          {t('documents.subtitle')} <strong className="text-foreground">{activeWorkspace.name}</strong>
         </p>
       </div>
 
-      <div style={{ marginBottom: '1.5rem' }}>
+      <div className="mb-6">
         <DocumentUploader onUploadSuccess={handleUploadSuccess} disabled={!activeWorkspace} />
       </div>
 
-      <div style={{ background: 'var(--color-bg-surface)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border)', overflow: 'hidden' }}>
-        <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h3 style={{ fontSize: '1rem', fontWeight: 600 }}>Danh Sách Tài Liệu Đã Nạp ({documents.length})</h3>
-          <button type="button" className="btn btn-secondary btn-sm" onClick={loadDocuments}>
-            🔄 Làm mới
-          </button>
-        </div>
-
-        {loading ? (
-          <Spinner message="Đang tải danh sách tài liệu..." />
-        ) : documents.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '3rem' }}>
-            <span style={{ fontSize: '2.5rem' }}>📚</span>
-            <p style={{ marginTop: '0.75rem', color: 'var(--color-text-secondary)', fontSize: '0.875rem' }}>
-              Chưa có tài liệu nào trong không gian này. Hãy tải lên file đầu tiên ở trên.
-            </p>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between pb-4">
+          <div className="space-y-1">
+            <CardTitle className="text-lg font-semibold">
+              {t('documents.listTitle')} ({documents.length})
+            </CardTitle>
+            <CardDescription>{t('documents.listSubtitle')}</CardDescription>
           </div>
-        ) : (
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem', textAlign: 'left' }}>
-            <thead>
-              <tr style={{ background: 'var(--color-bg-subtle)', borderBottom: '1px solid var(--color-border)' }}>
-                <th style={{ padding: '0.75rem 1.25rem', fontWeight: 600 }}>Tên file</th>
-                <th style={{ padding: '0.75rem 1.25rem', fontWeight: 600 }}>Dung lượng</th>
-                <th style={{ padding: '0.75rem 1.25rem', fontWeight: 600 }}>Trạng thái RAG</th>
-                <th style={{ padding: '0.75rem 1.25rem', fontWeight: 600 }}>Thời gian tải</th>
-                <th style={{ padding: '0.75rem 1.25rem', fontWeight: 600, textAlign: 'right' }}>Thao tác</th>
-              </tr>
-            </thead>
-            <tbody>
-              {documents.map((doc) => (
-                <tr key={doc.id} style={{ borderBottom: '1px solid var(--color-border)' }}>
-                  <td style={{ padding: '0.75rem 1.25rem', fontWeight: 500, color: 'var(--color-text-primary)' }}>
-                    📄 {doc.fileName}
-                  </td>
-                  <td style={{ padding: '0.75rem 1.25rem', color: 'var(--color-text-secondary)' }}>
-                    {formatFileSize(doc.fileSize)}
-                  </td>
-                  <td style={{ padding: '0.75rem 1.25rem' }}>
-                    {getStatusBadge(doc.status || doc.processingStatus)}
-                  </td>
-                  <td style={{ padding: '0.75rem 1.25rem', color: 'var(--color-text-secondary)' }}>
-                    {formatDate(doc.uploadedAt || doc.createdAt)}
-                  </td>
-                  <td style={{ padding: '0.75rem 1.25rem', textAlign: 'right' }}>
-                    <button
-                      type="button"
-                      style={{ color: 'var(--color-danger)', fontSize: '0.8125rem', cursor: 'pointer' }}
-                      onClick={() => handleDelete(doc.id)}
-                    >
-                      Xóa
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+          <Button variant="outline" size="sm" onClick={loadDocuments} disabled={loading} className="gap-2">
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            {t('common.refresh')}
+          </Button>
+        </CardHeader>
+        
+        <CardContent>
+          {loading ? (
+            <div className="py-12">
+              <Spinner message={t('documents.loadingDocs')} />
+            </div>
+          ) : documents.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-center border-2 border-dashed border-border rounded-xl">
+              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+                <FileIcon className="w-8 h-8 text-muted-foreground" />
+              </div>
+              <h3 className="text-lg font-medium mb-1">{t('documents.empty')}</h3>
+              <p className="text-muted-foreground text-sm max-w-sm">
+                {t('documents.emptyDesc')}
+              </p>
+            </div>
+          ) : (
+            <div className="rounded-md border border-border overflow-hidden">
+              <table className="w-full text-sm text-left">
+                <thead className="bg-muted/50 border-b border-border">
+                  <tr>
+                    <th className="px-4 py-3 font-semibold">{t('documents.table.fileName')}</th>
+                    <th className="px-4 py-3 font-semibold">{t('documents.table.fileSize')}</th>
+                    <th className="px-4 py-3 font-semibold">{t('documents.table.status')}</th>
+                    <th className="px-4 py-3 font-semibold">{t('documents.table.uploadedAt')}</th>
+                    <th className="px-4 py-3 font-semibold text-right">{t('documents.table.actions')}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {documents.map((doc) => (
+                    <tr key={doc.id} className="hover:bg-muted/30 transition-colors">
+                      <td className="px-4 py-3 font-medium text-foreground flex items-center gap-2">
+                        <FileIcon className="w-4 h-4 text-emerald-500" />
+                        <span className="truncate max-w-[250px]" title={doc.fileName}>{doc.fileName}</span>
+                      </td>
+                      <td className="px-4 py-3 text-muted-foreground">
+                        {formatFileSize(doc.fileSize)}
+                      </td>
+                      <td className="px-4 py-3">
+                        {getStatusBadge(doc.status || doc.processingStatus)}
+                      </td>
+                      <td className="px-4 py-3 text-muted-foreground">
+                        {formatDate(doc.uploadedAt || doc.createdAt)}
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                          onClick={() => handleDelete(doc.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

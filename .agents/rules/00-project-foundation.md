@@ -93,6 +93,9 @@ feature/<name>  →  develop  →  main
 - Centralized Axios client with request/response interceptors for JWT
 - State management via Zustand
 - Never store secrets or sensitive API keys in frontend environment variables
+- **Khuôn mẫu thiết kế chuẩn (`frontend1/`)**: Khi xây dựng bất kỳ giao diện chức năng nào, BẮT BUỘC phải đối chiếu và tuân thủ khuôn mẫu tương ứng trong thư mục `frontend1/`.
+- **Tối giản & Tránh "quá AI" (No AI Clutter)**: Tuyệt đối KHÔNG tự ý bịa thêm chi tiết thừa thãi, các đoạn văn bản hướng dẫn dài dòng, hay các khối trang trí rườm rà làm giao diện bị rối mắt, mất tự nhiên và mang cảm giác "quá AI".
+- **Bố cục tinh gọn, súc tích**: Giữ UI đơn giản, sạch sẽ, khoảng trắng hợp lý, đúng trọng tâm chức năng như mẫu tham chiếu.
 
 ---
 
@@ -147,3 +150,4 @@ feature/<name>  →  develop  →  main
 3. **Baseline Before Optimization**: Establish a working baseline, measure with metrics, and optimize only where bottlenecks exist.
 4. **Draft-First AI Output**: AI output is an editable draft proposal. The teacher is the final decision-maker.
 5. **Explicit Insufficient Evidence**: If retrieval does not provide sufficient context, the pipeline returns an explicit `insufficient_evidence` response rather than generating ungrounded or hallucinated content.
+6. **Template-Driven & Anti-Clutter UI**: Giao diện luôn bám sát khuôn mẫu thực tế (`frontend1/`), giữ sự đơn giản, thanh lịch, kiên quyết loại bỏ chi tiết và chữ thừa thãi.

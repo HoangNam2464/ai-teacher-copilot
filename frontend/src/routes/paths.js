@@ -7,6 +7,10 @@ export const PATHS = {
   // Authentication
   LOGIN: '/login',
   REGISTER: '/register',
+  FORGOT_PASSWORD: '/forgot-password',
+  RESET_PASSWORD: '/reset-password',
+  VERIFY_EMAIL: '/verify-email',
+  ONBOARDING: '/onboarding',
 
   // Core App & Dashboards
   ROOT: '/',
@@ -23,4 +27,13 @@ export const PATHS = {
   // Review & Lineage History
   HISTORY: '/history',
   HISTORY_DETAIL: '/history/:id',
+
+  // Settings
+  SETTINGS: {
+    ROOT: '/settings',
+    PROFILE: '/settings/profile',
+    ACCOUNT: '/settings/account',
+    APPEARANCE: '/settings/appearance',
+    NOTIFICATIONS: '/settings/notifications',
+  }
 };
