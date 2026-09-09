@@ -169,13 +169,13 @@ export function DashboardLayout({ children }) {
               <NotificationBell />
 
               {/* Vertical divider */}
-              <div className="h-6 w-px bg-border mx-1" />
+              <div className="h-6 w-px bg-border mx-2" />
 
               {/* User avatar menu */}
               <div className="relative">
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="w-8 h-8 rounded-full bg-purple-600 hover:bg-purple-700 text-white font-bold flex items-center justify-center text-sm transition-transform hover:scale-105 shadow-sm overflow-hidden focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#8B5CF6] hover:bg-[#7c3aed] text-white font-bold flex items-center justify-center text-sm sm:text-base transition-transform hover:scale-105 shadow-sm overflow-hidden focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2"
                   aria-label="User menu"
                 >
                   {user?.avatarUrl ? (

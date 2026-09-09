@@ -14,6 +14,7 @@ import { ForgotPasswordPage } from '@/pages/auth/ForgotPasswordPage';
 import { ResetPasswordPage } from '@/pages/auth/ResetPasswordPage';
 import { VerifyEmailPage } from '@/pages/auth/VerifyEmailPage';
 import { OnboardingPage } from '@/pages/auth/OnboardingPage';
+import { DashboardHomePage } from '@/pages/dashboard/DashboardHomePage';
 import { WorkspaceListPage } from '@/pages/workspace/WorkspaceListPage';
 import { DocumentManagementPage } from '@/pages/documents/DocumentManagementPage';
 import { LessonPlannerPage } from '@/pages/lesson-planner/LessonPlannerPage';
@@ -88,9 +89,9 @@ export function AppRoutes() {
             </PrivateRoute>
           }
         >
-          <Route path="/dashboard" element={<WorkspaceListPage />} />
+          <Route path="/dashboard" element={<DashboardHomePage />} />
           <Route path="/dashboard/workspace" element={<WorkspaceListPage />} />
-          <Route path="/dashboard/workspaces" element={<WorkspaceListPage />} />
+          <Route path="/dashboard/workspaces" element={<Navigate to="/dashboard/workspace" replace />} />
           <Route path="/workspaces" element={<Navigate to="/dashboard/workspace" replace />} />
           <Route path={PATHS.DOCUMENTS} element={<DocumentManagementPage />} />
           <Route path={PATHS.LESSON_PLANNER} element={<LessonPlannerPage />} />
