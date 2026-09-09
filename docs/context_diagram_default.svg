@@ -1,0 +1,157 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1650 960" width="100%" height="100%" style="background-color: #ffffff; font-family: Arial, Helvetica, sans-serif;">
+  <defs>
+    <marker id="arr-black" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#000000" />
+    </marker>
+  </defs>
+
+  <!-- ================= TOP ACTOR: DỊCH VỤ AI / LLM ================= -->
+  <g transform="translate(340, 40)">
+    <rect width="200" height="150" fill="#ffffff" stroke="#000000" stroke-width="1.5" />
+    <text x="100" y="70" text-anchor="middle" font-size="14" font-weight="bold" fill="#000000">Dịch vụ AI / LLM</text>
+    <text x="100" y="90" text-anchor="middle" font-size="12" fill="#000000">(Gemini / OpenAI)</text>
+  </g>
+
+  <!-- TOP ARROWS TO/FROM CENTER CIRCLE -->
+  <!-- 1. Gửi văn bản tạo Vector Embedding (System -> LLM) -->
+  <path d="M 800 353 L 800 70 L 540 70" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arr-black)" />
+  <rect x="560" y="58" width="220" height="20" fill="#ffffff" />
+  <text x="670" y="72" text-anchor="middle" font-size="11" fill="#000000">Gửi văn bản tạo Vector Embedding</text>
+
+  <!-- 2. Nhận kết quả Vector Embedding (LLM -> System) -->
+  <path d="M 540 105 L 835 105 L 835 342" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arr-black)" />
+  <rect x="560" y="94" width="220" height="20" fill="#ffffff" />
+  <text x="670" y="108" text-anchor="middle" font-size="11" fill="#000000">Nhận kết quả Vector Embedding</text>
+
+  <!-- 3. Gửi Prompt có rào chắn <sources> (System -> LLM) -->
+  <path d="M 860 340 L 860 140 L 540 140" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arr-black)" />
+  <rect x="555" y="128" width="230" height="20" fill="#ffffff" />
+  <text x="670" y="142" text-anchor="middle" font-size="11" fill="#000000">Gửi Prompt có rào chắn &lt;sources&gt;</text>
+
+  <!-- 4. Nhận kết quả JSON cấu trúc & nhãn Bloom (LLM -> System) -->
+  <path d="M 540 175 L 890 175 L 890 343" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arr-black)" />
+  <rect x="550" y="164" width="250" height="20" fill="#ffffff" />
+  <text x="675" y="178" text-anchor="middle" font-size="11" fill="#000000">Nhận JSON cấu trúc &amp; nhãn Bloom</text>
+
+
+  <!-- ================= LEFT ACTOR: ADMIN ================= -->
+  <g transform="translate(80, 350)">
+    <rect width="180" height="260" fill="#ffffff" stroke="#000000" stroke-width="1.5" />
+    <text x="90" y="125" text-anchor="middle" font-size="15" font-weight="bold" fill="#000000">Admin</text>
+    <text x="90" y="145" text-anchor="middle" font-size="12" fill="#000000">(Quản trị viên)</text>
+  </g>
+
+  <!-- LEFT ARROWS (Horizontal Parallel Lines to Circle) -->
+  <!-- Left 1: Quản lý người dùng -->
+  <path d="M 260 385 L 757 385" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arr-black)" marker-start="url(#arr-black)" />
+  <rect x="380" y="375" width="220" height="18" fill="#ffffff" />
+  <text x="490" y="388" text-anchor="middle" font-size="11" fill="#000000">Quản lý người dùng (Users)</text>
+
+  <!-- Left 2: Cấu hình API Keys -->
+  <path d="M 260 425 L 731 425" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arr-black)" marker-start="url(#arr-black)" />
+  <rect x="360" y="415" width="260" height="18" fill="#ffffff" />
+  <text x="490" y="428" text-anchor="middle" font-size="11" fill="#000000">Cấu hình API Keys &amp; Quota mô hình AI</text>
+
+  <!-- Left 3: Quản lý kho tài liệu -->
+  <path d="M 260 465 L 721 465" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arr-black)" marker-start="url(#arr-black)" />
+  <rect x="350" y="455" width="280" height="18" fill="#ffffff" />
+  <text x="490" y="468" text-anchor="middle" font-size="11" fill="#000000">Quản lý kho tài liệu chung của hệ thống</text>
+
+  <!-- Left 4: Xem báo cáo thống kê -->
+  <path d="M 722 505 L 260 505" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arr-black)" />
+  <rect x="370" y="495" width="240" height="18" fill="#ffffff" />
+  <text x="490" y="508" text-anchor="middle" font-size="11" fill="#000000">Xem báo cáo thống kê sử dụng</text>
+
+  <!-- Left 5: Giám sát RAG & logs -->
+  <path d="M 736 545 L 260 545" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arr-black)" />
+  <rect x="350" y="535" width="280" height="18" fill="#ffffff" />
+  <text x="490" y="548" text-anchor="middle" font-size="11" fill="#000000">Giám sát chỉ số RAG Retrieval &amp; Logs</text>
+
+  <!-- Left 6: Cấu hình hệ thống -->
+  <path d="M 260 585 L 767 585" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arr-black)" marker-start="url(#arr-black)" />
+  <rect x="360" y="575" width="260" height="18" fill="#ffffff" />
+  <text x="490" y="588" text-anchor="middle" font-size="11" fill="#000000">Cấu hình tham số hệ thống &amp; Storage</text>
+
+
+  <!-- ================= CENTER PROCESS: SYSTEM ================= -->
+  <g transform="translate(720, 340)">
+    <circle cx="140" cy="140" r="140" fill="#fff2cc" stroke="#000000" stroke-width="1.5" />
+    <text x="140" y="145" text-anchor="middle" font-size="16" font-weight="bold" fill="#000000">AI Teacher Copilot</text>
+  </g>
+
+
+  <!-- ================= RIGHT ACTOR: TEACHER ================= -->
+  <g transform="translate(1420, 240)">
+    <rect width="180" height="480" fill="#ffffff" stroke="#000000" stroke-width="1.5" />
+    <text x="90" y="235" text-anchor="middle" font-size="15" font-weight="bold" fill="#000000">Teacher</text>
+    <text x="90" y="255" text-anchor="middle" font-size="12" fill="#000000">(Giáo viên K-12)</text>
+  </g>
+
+  <!-- RIGHT ARROWS (Fully Connected into Circle Edge) -->
+  <!-- Right 1: Login / Register (Turns down into circle top) -->
+  <path d="M 1420 280 L 932 280 L 932 360" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arr-black)" />
+  <rect x="1050" y="270" width="280" height="18" fill="#ffffff" />
+  <text x="1190" y="283" text-anchor="middle" font-size="11" fill="#000000">Đăng ký, Đăng nhập (Xác thực JWT)</text>
+
+  <!-- Right 2: Manage Workspace (Turns down into circle top) -->
+  <path d="M 1420 325 L 963 325 L 963 385" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arr-black)" marker-start="url(#arr-black)" />
+  <rect x="1040" y="315" width="300" height="18" fill="#ffffff" />
+  <text x="1190" y="328" text-anchor="middle" font-size="11" fill="#000000">Quản lý Workspace &amp; Danh mục bài học</text>
+
+  <!-- Right 3: Upload documents (Direct horizontal line to circle) -->
+  <path d="M 1420 370 L 947 370" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arr-black)" />
+  <rect x="1040" y="360" width="300" height="18" fill="#ffffff" />
+  <text x="1190" y="373" text-anchor="middle" font-size="11" fill="#000000">Tải lên tài liệu giáo trình (PDF, DOCX)</text>
+
+  <!-- Right 4: Generate lesson plan (Direct horizontal line to circle) -->
+  <path d="M 1420 415 L 984 415" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arr-black)" />
+  <rect x="1040" y="405" width="300" height="18" fill="#ffffff" />
+  <text x="1190" y="418" text-anchor="middle" font-size="11" fill="#000000">Yêu cầu tạo kế hoạch bài dạy (Giáo án)</text>
+
+  <!-- Right 5: Generate quiz (Direct horizontal line to circle) -->
+  <path d="M 1420 460 L 998 460" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arr-black)" />
+  <rect x="1030" y="450" width="320" height="18" fill="#ffffff" />
+  <text x="1190" y="463" text-anchor="middle" font-size="11" fill="#000000">Yêu cầu tạo đề kiểm tra theo chuẩn Bloom</text>
+
+  <!-- Right 6: Receive draft (Direct horizontal line to teacher) -->
+  <path d="M 998 505 L 1420 505" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arr-black)" />
+  <rect x="1030" y="495" width="320" height="18" fill="#ffffff" />
+  <text x="1190" y="508" text-anchor="middle" font-size="11" fill="#000000">Nhận bản thảo giáo án &amp; đề thi có cấu trúc</text>
+
+  <!-- Right 7: View citations (Direct horizontal line to teacher) -->
+  <path d="M 981 550 L 1420 550" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arr-black)" />
+  <rect x="1040" y="540" width="300" height="18" fill="#ffffff" />
+  <text x="1190" y="553" text-anchor="middle" font-size="11" fill="#000000">Xem trích dẫn nguồn gốc tài liệu (Citations)</text>
+
+  <!-- Right 8: Review & regenerate (Direct horizontal line to circle) -->
+  <path d="M 1420 595 L 940 595" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arr-black)" />
+  <rect x="1020" y="585" width="340" height="18" fill="#ffffff" />
+  <text x="1190" y="598" text-anchor="middle" font-size="11" fill="#000000">Duyệt, chỉnh sửa trực tiếp &amp; tái tạo (Regenerate)</text>
+
+  <!-- Right 9: View history (Turns down from circle bottom) -->
+  <path d="M 932 600 L 932 640 L 1420 640" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arr-black)" />
+  <rect x="1060" y="630" width="260" height="18" fill="#ffffff" />
+  <text x="1190" y="643" text-anchor="middle" font-size="11" fill="#000000">Xem lịch sử phiên bản &amp; thay đổi</text>
+
+  <!-- Right 10: Export (Turns down from circle bottom) -->
+  <path d="M 890 615 L 890 685 L 1420 685" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arr-black)" />
+  <rect x="1040" y="675" width="300" height="18" fill="#ffffff" />
+  <text x="1190" y="688" text-anchor="middle" font-size="11" fill="#000000">Xuất file giáo án &amp; đề thi (Word DOCX / PDF)</text>
+
+
+  <!-- ================= LEGEND (GHI CHÚ DƯỚI) ================= -->
+  <g transform="translate(620, 810)">
+    <!-- Actor Box -->
+    <rect x="0" y="0" width="60" height="55" fill="#ffffff" stroke="#000000" stroke-width="1.5" />
+    <text x="30" y="75" text-anchor="middle" font-size="13" font-weight="bold" fill="#000000">Actor</text>
+
+    <!-- System Circle -->
+    <circle cx="180" cy="27" r="27" fill="#fff2cc" stroke="#000000" stroke-width="1.5" />
+    <text x="180" y="75" text-anchor="middle" font-size="13" font-weight="bold" fill="#000000">System</text>
+
+    <!-- Interaction Arrow -->
+    <line x1="300" y1="45" x2="335" y2="10" stroke="#000000" stroke-width="1.5" marker-end="url(#arr-black)" />
+    <text x="325" y="75" text-anchor="middle" font-size="13" font-weight="bold" fill="#000000">User Interaction</text>
+  </g>
+
+</svg>

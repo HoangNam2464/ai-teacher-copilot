@@ -1,5 +1,15 @@
-/* AI Teacher Copilot — Master Design System Entry Point */
+/* ============================================================
+   AI Teacher Copilot — Global Stylesheet
+   Order: CSS Variables → Tailwind Base → Tailwind Utils → Custom
+   ============================================================ */
+
+/* 0. Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+/* 1. Design Tokens (CSS Custom Properties) */
 @import './variables.css';
-@import './base.css';
-@import './components.css';
-@import './layout.css';
+
+/* 2. Tailwind CSS — must be AFTER @import and BEFORE custom utilities */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

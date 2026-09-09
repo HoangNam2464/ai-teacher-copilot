@@ -6,6 +6,11 @@ from sqlalchemy.orm import declarative_base
 Base = declarative_base()
 
 class DocumentChunk(Base):
+    """
+    SQLAlchemy model representing a parsed text chunk.
+    Stores the 768-dimensional vector embedding in PostgreSQL using pgvector.
+    Includes workspace_id for tenant isolation and metadata for citations.
+    """
     __tablename__ = "document_chunks"
     id = Column(String, primary_key=True, index=True)
     document_id = Column(UUID(as_uuid=True), index=True, nullable=False)

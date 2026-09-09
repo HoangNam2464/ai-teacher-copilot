@@ -1,0 +1,164 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 920" width="100%" height="100%" style="background-color: #ffffff; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;">
+  <defs>
+    <!-- Drop Shadow Filter -->
+    <filter id="c4-shadow" x="-5%" y="-5%" width="115%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.08" />
+    </filter>
+    <filter id="c4-shadow-lg" x="-10%" y="-10%" width="125%" height="125%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#1d4ed8" flood-opacity="0.2" />
+    </filter>
+
+    <!-- Arrow Markers -->
+    <marker id="c4-arrow-blue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#2563eb" />
+    </marker>
+    <marker id="c4-arrow-emerald" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#10b981" />
+    </marker>
+    <marker id="c4-arrow-slate" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#64748b" />
+    </marker>
+    <marker id="c4-arrow-orange" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#ea580c" />
+    </marker>
+  </defs>
+
+  <!-- Header Banner -->
+  <g transform="translate(50, 20)">
+    <rect width="1400" height="65" rx="10" fill="#0f172a" filter="url(#c4-shadow)" />
+    <text x="700" y="34" text-anchor="middle" fill="#ffffff" font-size="20" font-weight="bold">C4 MODEL — LEVEL 1: SYSTEM CONTEXT DIAGRAM</text>
+    <text x="700" y="53" text-anchor="middle" fill="#94a3b8" font-size="13">AI TEACHER COPILOT FOR K-12 TEACHERS (SƠ ĐỒ NGỮ CẢNH C4)</text>
+  </g>
+
+  <!-- System Boundary Box -->
+  <g transform="translate(480, 120)">
+    <rect width="540" height="640" rx="16" fill="#f8fafc" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6,6" />
+    <rect x="20" y="15" width="220" height="26" rx="6" fill="#e2e8f0" />
+    <text x="130" y="32" text-anchor="middle" fill="#334155" font-size="12" font-weight="bold">AI Teacher Copilot Boundary</text>
+  </g>
+
+  <!-- Main System Element -->
+  <g transform="translate(520, 200)" filter="url(#c4-shadow-lg)">
+    <rect width="460" height="480" rx="16" fill="#1d4ed8" stroke="#1e40af" stroke-width="2.5" />
+    <rect x="0" y="0" width="460" height="75" rx="16" fill="#1e40af" />
+    <path d="M 0 60 L 460 60 L 460 75 L 0 75 Z" fill="#1e40af" />
+    <text x="230" y="35" text-anchor="middle" fill="#ffffff" font-size="18" font-weight="bold">AI Teacher Copilot</text>
+    <text x="230" y="55" text-anchor="middle" fill="#93c5fd" font-size="12">[Software System]</text>
+
+    <!-- Inner Architecture Summary -->
+    <g transform="translate(25, 90)">
+      <rect width="410" height="75" rx="8" fill="#2563eb" stroke="#60a5fa" stroke-width="1" />
+      <text x="15" y="24" fill="#ffffff" font-size="13" font-weight="bold">🌐 Frontend Web Client (React 18 + Vite)</text>
+      <text x="15" y="44" fill="#dbeafe" font-size="11">Workspace Manager, Split-view Lesson Editor, Bloom Quiz Viewer</text>
+      <text x="15" y="60" fill="#dbeafe" font-size="11">Citation Inspector &amp; Word/PDF Exporter</text>
+    </g>
+
+    <g transform="translate(25, 180)">
+      <rect width="410" height="90" rx="8" fill="#2563eb" stroke="#60a5fa" stroke-width="1" />
+      <text x="15" y="24" fill="#ffffff" font-size="13" font-weight="bold">⚙️ Spring Boot 3 Core Backend (Java 17)</text>
+      <text x="15" y="44" fill="#dbeafe" font-size="11">• Authentication, JWT &amp; Role-based Access Control</text>
+      <text x="15" y="60" fill="#dbeafe" font-size="11">• Workspace Metadata, Document History &amp; Review States</text>
+      <text x="15" y="76" fill="#dbeafe" font-size="11">• REST API Gateway &amp; Service Orchestration</text>
+    </g>
+
+    <g transform="translate(25, 285)">
+      <rect width="410" height="105" rx="8" fill="#2563eb" stroke="#60a5fa" stroke-width="1" />
+      <text x="15" y="24" fill="#ffffff" font-size="13" font-weight="bold">🧠 FastAPI AI / RAG Service (Python 3.12)</text>
+      <text x="15" y="44" fill="#dbeafe" font-size="11">• Document Parsing (PDF, Word) &amp; Structure-aware Chunking</text>
+      <text x="15" y="60" fill="#dbeafe" font-size="11">• Vector Search &amp; Semantic Retrieval (PostgreSQL pgvector)</text>
+      <text x="15" y="76" fill="#dbeafe" font-size="11">• Prompt Orchestration với &lt;sources&gt; boundary</text>
+      <text x="15" y="92" fill="#dbeafe" font-size="11">• Structured Pydantic Output Validation &amp; Bloom Tagging</text>
+    </g>
+
+    <g transform="translate(25, 405)">
+      <rect width="410" height="50" rx="8" fill="#1e3a8a" stroke="#60a5fa" stroke-width="1" />
+      <text x="205" y="22" text-anchor="middle" fill="#93c5fd" font-size="11" font-weight="bold">POSTGRESQL 16 (PGVECTOR) + MINIO STORAGE</text>
+      <text x="205" y="38" text-anchor="middle" fill="#ffffff" font-size="10">Dữ liệu quan hệ, Lịch sử phiên bản &amp; Vector Embeddings 1536d/768d</text>
+    </g>
+  </g>
+
+  <!-- Person 1: Teacher (Left-Top) -->
+  <g transform="translate(50, 180)" filter="url(#c4-shadow)">
+    <rect width="320" height="180" rx="12" fill="#dbeafe" stroke="#2563eb" stroke-width="2" />
+    <circle cx="160" cy="35" r="20" fill="#2563eb" />
+    <path d="M 145 62 Q 160 55 175 62 Q 185 75 185 80 L 135 80 Q 135 75 145 62 Z" fill="#2563eb" />
+    <text x="160" y="105" text-anchor="middle" fill="#1e3a8a" font-size="16" font-weight="bold">Giáo viên K-12</text>
+    <text x="160" y="122" text-anchor="middle" fill="#2563eb" font-size="11">[Person - Primary User]</text>
+    <text x="160" y="145" text-anchor="middle" fill="#1e293b" font-size="11">Soạn giáo án, tạo câu hỏi thi Bloom,</text>
+    <text x="160" y="162" text-anchor="middle" fill="#1e293b" font-size="11">quản lý tài liệu và xuất tệp Word/PDF.</text>
+  </g>
+
+  <!-- Person 2: Admin (Left-Bottom) -->
+  <g transform="translate(50, 520)" filter="url(#c4-shadow)">
+    <rect width="320" height="160" rx="12" fill="#f1f5f9" stroke="#64748b" stroke-width="2" />
+    <circle cx="160" cy="30" r="18" fill="#64748b" />
+    <path d="M 146 54 Q 160 48 174 54 Q 182 66 182 70 L 138 70 Q 138 66 146 54 Z" fill="#64748b" />
+    <text x="160" y="95" text-anchor="middle" fill="#1e293b" font-size="15" font-weight="bold">Quản trị viên</text>
+    <text x="160" y="112" text-anchor="middle" fill="#64748b" font-size="11">[Person - Administrator]</text>
+    <text x="160" y="135" text-anchor="middle" fill="#334155" font-size="11">Cấu hình API keys, giám sát logs,</text>
+    <text x="160" y="150" text-anchor="middle" fill="#334155" font-size="11">metrics hiệu năng và quản lý tài khoản.</text>
+  </g>
+
+  <!-- External System 1: LLM (Right-Top) -->
+  <g transform="translate(1130, 180)" filter="url(#c4-shadow)">
+    <rect width="320" height="180" rx="12" fill="#d1fae5" stroke="#10b981" stroke-width="2" />
+    <rect x="20" y="15" width="280" height="35" rx="6" fill="#10b981" />
+    <text x="160" y="38" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="bold">🤖 External AI Providers</text>
+    <text x="160" y="70" text-anchor="middle" fill="#065f46" font-size="11">[External Software System]</text>
+    <text x="160" y="95" text-anchor="middle" fill="#064e3b" font-size="12" font-weight="bold">Google Gemini API / OpenAI API</text>
+    <text x="160" y="120" text-anchor="middle" fill="#064e3b" font-size="11">• Cung cấp Text Embedding Model</text>
+    <text x="160" y="140" text-anchor="middle" fill="#064e3b" font-size="11">• Sinh Kế hoạch bài dạy &amp; Bloom Quiz</text>
+    <text x="160" y="160" text-anchor="middle" fill="#064e3b" font-size="11">• Trả về JSON có cấu trúc (Pydantic)</text>
+  </g>
+
+  <!-- External System 2: MinIO (Right-Bottom) -->
+  <g transform="translate(1130, 520)" filter="url(#c4-shadow)">
+    <rect width="320" height="160" rx="12" fill="#ffedd5" stroke="#ea580c" stroke-width="2" />
+    <rect x="20" y="15" width="280" height="35" rx="6" fill="#ea580c" />
+    <text x="160" y="38" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="bold">📦 MinIO Object Storage</text>
+    <text x="160" y="70" text-anchor="middle" fill="#9a3412" font-size="11">[External Storage System]</text>
+    <text x="160" y="95" text-anchor="middle" fill="#7c2d12" font-size="12" font-weight="bold">S3-Compatible Object Store</text>
+    <text x="160" y="120" text-anchor="middle" fill="#7c2d12" font-size="11">• Lưu trữ tài liệu gốc (PDF, DOCX)</text>
+    <text x="160" y="140" text-anchor="middle" fill="#7c2d12" font-size="11">• Lưu trữ tệp xuất bản (Word, PDF)</text>
+  </g>
+
+  <!-- Relationships -->
+  <!-- Teacher -> System -->
+  <path d="M 370 270 L 520 270" fill="none" stroke="#2563eb" stroke-width="2.5" marker-end="url(#c4-arrow-blue)" />
+  <g transform="translate(380, 225)">
+    <rect width="130" height="38" rx="4" fill="#ffffff" stroke="#93c5fd" stroke-width="1" />
+    <text x="65" y="16" text-anchor="middle" fill="#1e40af" font-size="10" font-weight="bold">Soạn bài &amp; Xuất file</text>
+    <text x="65" y="30" text-anchor="middle" fill="#64748b" font-size="9">[HTTPS / REST / JWT]</text>
+  </g>
+
+  <!-- Admin -> System -->
+  <path d="M 370 600 L 520 600" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#c4-arrow-slate)" />
+  <g transform="translate(380, 555)">
+    <rect width="130" height="38" rx="4" fill="#ffffff" stroke="#cbd5e1" stroke-width="1" />
+    <text x="65" y="16" text-anchor="middle" fill="#334155" font-size="10" font-weight="bold">Cấu hình &amp; Giám sát</text>
+    <text x="65" y="30" text-anchor="middle" fill="#64748b" font-size="9">[Admin REST API]</text>
+  </g>
+
+  <!-- System -> LLM -->
+  <path d="M 980 270 L 1130 270" fill="none" stroke="#10b981" stroke-width="2.5" marker-end="url(#c4-arrow-emerald)" />
+  <g transform="translate(990, 225)">
+    <rect width="130" height="38" rx="4" fill="#ffffff" stroke="#6ee7b7" stroke-width="1" />
+    <text x="65" y="16" text-anchor="middle" fill="#065f46" font-size="10" font-weight="bold">Embedding &amp; LLM Call</text>
+    <text x="65" y="30" text-anchor="middle" fill="#64748b" font-size="9">[HTTPS / JSON API]</text>
+  </g>
+
+  <!-- System -> MinIO -->
+  <path d="M 980 600 L 1130 600" fill="none" stroke="#ea580c" stroke-width="2" marker-end="url(#c4-arrow-orange)" />
+  <g transform="translate(990, 555)">
+    <rect width="130" height="38" rx="4" fill="#ffffff" stroke="#fed7aa" stroke-width="1" />
+    <text x="65" y="16" text-anchor="middle" fill="#9a3412" font-size="10" font-weight="bold">Đọc / Ghi tệp Binary</text>
+    <text x="65" y="30" text-anchor="middle" fill="#64748b" font-size="9">[S3 Protocol / SDK]</text>
+  </g>
+
+  <!-- Footer Info -->
+  <g transform="translate(300, 840)">
+    <rect width="900" height="50" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+    <text x="450" y="22" text-anchor="middle" fill="#475569" font-size="11" font-weight="bold">Mô hình kiến trúc 3 tầng: Spring Boot 3 (Java 17) ↔ FastAPI (Python 3.12) ↔ React 18 (Vite)</text>
+    <text x="450" y="38" text-anchor="middle" fill="#64748b" font-size="10">FastAPI là dịch vụ nội bộ (Internal Service), mọi tương tác từ bên ngoài đều đi qua Spring Boot Gateway.</text>
+  </g>
+</svg>

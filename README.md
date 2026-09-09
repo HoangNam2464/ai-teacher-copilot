@@ -169,6 +169,18 @@ JWT_SECRET=your_jwt_secret_key
 
 > ⚠️ **Tuyệt đối không** commit file `.env` chứa credentials thực lên Git.
 
+### Lựa chọn khởi chạy
+
+Bạn có thể chọn 1 trong 2 cách khởi chạy (Xem chi tiết tại [`docs/RUN_GUIDE.md`](./docs/RUN_GUIDE.md)):
+
+* **🌟 Cách 1: Khởi chạy Trọn Gói 1 Lệnh (All-In-One Docker — Khuyên dùng khi Demo / Nộp bài):**
+  ```bash
+  docker compose -f docker-compose.full.yml up --build -d
+  ```
+  Truy cập Web Client tại: `http://localhost:3000`
+
+* **🛠️ Cách 2: Khởi chạy Chế độ Lập trình (Dev Mode — Hot Reload khi đang code):**
+
 ---
 
 ### Bước 1: Khởi chạy Infrastructure (Terminal 1)
@@ -400,6 +412,8 @@ ai-teacher-copilot/
 | Tài liệu | Mô tả |
 | :--- | :--- |
 | [`AI_TEACHER_COPILOT_BLUEPRINT.md`](./docs/AI_TEACHER_COPILOT_BLUEPRINT.md) | Thiết kế kiến trúc hệ thống đầy đủ |
+| [`ENGINEERING_KNOWLEDGE.md`](./docs/ENGINEERING_KNOWLEDGE.md) | Bộ tri thức kỹ thuật RAG, Provider Abstraction & Security |
+| [`UI_UX_KNOWLEDGE.md`](./docs/UI_UX_KNOWLEDGE.md) | Bộ tri thức thiết kế UI/UX, Design System & Interactions |
 | [`API_DOCS.md`](./API_DOCS.md) | REST API documentation |
 | [`CONTRIBUTING.md`](./CONTRIBUTING.md) | Quy chuẩn phát triển & đóng góp |
 | [`CHANGELOG.md`](./CHANGELOG.md) | Lịch sử thay đổi theo phiên bản |

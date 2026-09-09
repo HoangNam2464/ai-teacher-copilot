@@ -56,4 +56,32 @@ public class JwtTokenProvider {
             return false;
         }
     }
+
+    public String generatePurposeToken(String email, String purpose, long customExpirationMs) {
+        Date now = new Date();
+        Date expiry = new Date(now.getTime() + customExpirationMs);
+
+        return Jwts.builder()
+                .subject(email)
+                .claim("purpose", purpose)
+                .issuedAt(now)
+                .expiration(expiry)
+                .signWith(key)
+                .compact();
+    }
+
+    public String validatePurposeToken(String token, String expectedPurpose) {
+        try {
+            Claims claims = Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
+            String purpose = claims.get("purpose", String.class);
+            if (expectedPurpose.equals(purpose)) {
+                return claims.getSubject();
+            }
+            log.warn("Mismatched token purpose: expected {}, got {}", expectedPurpose, purpose);
+            return null;
+        } catch (JwtException | IllegalArgumentException ex) {
+            log.warn("Invalid purpose JWT token: {}", ex.getMessage());
+            return null;
+        }
+    }
 }

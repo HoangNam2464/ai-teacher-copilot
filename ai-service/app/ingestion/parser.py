@@ -10,7 +10,7 @@ class DocumentParser:
         for page in reader.pages:
             extracted = page.extract_text()
             if extracted:
-                text += extracted + "\n"
+                text += extracted + "\n\n"
         return text
 
     @staticmethod
@@ -19,7 +19,7 @@ class DocumentParser:
         text = ""
         for para in doc.paragraphs:
             if para.text.strip():
-                text += para.text + "\n"
+                text += para.text + "\n\n"
         return text
 
     @staticmethod
@@ -30,4 +30,4 @@ class DocumentParser:
         elif extension in ["docx", "doc"]:
             return DocumentParser.parse_docx(file_bytes)
         else:
-            return file_bytes.decode("utf-8", errors="ignore")
+            raise ValueError(f"Unsupported file format: {extension}")
