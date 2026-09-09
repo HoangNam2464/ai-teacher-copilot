@@ -57,6 +57,7 @@
   "header": {
     "nav": {
       "features": "Features",
+      "tour": "Feature Tour",
       "howItWorks": "How it works",
       "faq": "FAQ"
     },
@@ -428,6 +429,7 @@
     },
     "userMenu": {
       "accountSettings": "Account Settings",
+      "tour": "Feature Tour",
       "logout": "Log Out"
     }
   },
@@ -696,6 +698,8 @@
     "notificationsDesc": "Manage notification preferences",
     "appearance": "Appearance",
     "appearanceDesc": "Theme, dark mode",
+    "tour": "Feature Tour",
+    "tourDesc": "Revisit core features and workspace setup tour",
     "subscription": "Subscription",
     "subscriptionDesc": "Plan, usage, invoices",
     "language": "Language",

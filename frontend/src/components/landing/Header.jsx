@@ -14,6 +14,7 @@ import {
   Zap,
   BrainCircuit,
   GraduationCap,
+  Sparkles,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/hooks/useAuth';
@@ -58,6 +59,7 @@ const features = [
 
 const navLinks = [
   { nameKey: 'header.nav.features', href: '/#features', hasDropdown: true },
+  { nameKey: 'header.nav.tour', href: PATHS.WELCOME },
   { nameKey: 'header.nav.howItWorks', href: '/#how-it-works' },
   { nameKey: 'header.nav.faq', href: '/#faq' },
 ];
@@ -167,13 +169,20 @@ export function Header() {
                                 </Link>
                               ))}
                             </div>
-                            <div className="mt-4 pt-4 border-t border-border/50">
+                            <div className="mt-4 pt-4 border-t border-border/50 flex items-center justify-between">
+                              <Link
+                                to={PATHS.WELCOME}
+                                className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
+                              >
+                                <Sparkles className="w-3.5 h-3.5" />
+                                {t('header.nav.tour')}
+                              </Link>
                               <Link
                                 to={PATHS.WORKSPACES}
-                                className="flex items-center justify-center gap-2 text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors"
+                                className="flex items-center justify-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
                               >
                                 {t('common.viewAll')}
-                                <ArrowRight className="w-4 h-4" />
+                                <ArrowRight className="w-3.5 h-3.5" />
                               </Link>
                             </div>
                           </div>
@@ -181,6 +190,13 @@ export function Header() {
                       )}
                     </AnimatePresence>
                   </div>
+                ) : link.href.startsWith('/') && !link.href.includes('#') ? (
+                  <Link
+                    to={link.href}
+                    className="px-4 py-2 text-sm font-medium rounded-lg transition-all hover:bg-muted text-muted-foreground hover:text-foreground"
+                  >
+                    {t(link.nameKey)}
+                  </Link>
                 ) : (
                   <a
                     href={link.href}
@@ -215,7 +231,7 @@ export function Header() {
                   <Link to={PATHS.LOGIN}>{t('auth.login')}</Link>
                 </Button>
                 <Button asChild>
-                  <Link to={PATHS.REGISTER}>
+                  <Link to={PATHS.WELCOME}>
                     <Zap className="w-4 h-4 mr-1.5" />
                     {t('common.startFree')}
                   </Link>
@@ -286,14 +302,25 @@ export function Header() {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.05 }}
                     >
-                      <a
-                        href={link.href}
-                        className="flex items-center justify-between px-4 py-3 text-base font-medium rounded-lg transition-colors hover:bg-muted text-foreground"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        {t(link.nameKey)}
-                        <ArrowRight className="w-4 h-4 text-muted-foreground" />
-                      </a>
+                      {link.href.startsWith('/') && !link.href.includes('#') ? (
+                        <Link
+                          to={link.href}
+                          className="flex items-center justify-between px-4 py-3 text-base font-medium rounded-lg transition-colors hover:bg-muted text-foreground"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          {t(link.nameKey)}
+                          <ArrowRight className="w-4 h-4 text-muted-foreground" />
+                        </Link>
+                      ) : (
+                        <a
+                          href={link.href}
+                          className="flex items-center justify-between px-4 py-3 text-base font-medium rounded-lg transition-colors hover:bg-muted text-foreground"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          {t(link.nameKey)}
+                          <ArrowRight className="w-4 h-4 text-muted-foreground" />
+                        </a>
+                      )}
                     </motion.div>
                   ))}
                 </div>
@@ -359,7 +386,7 @@ export function Header() {
                         <Link to={PATHS.LOGIN} onClick={() => setIsMobileMenuOpen(false)}>{t('auth.login')}</Link>
                       </Button>
                       <Button className="w-full h-12" asChild>
-                        <Link to={PATHS.REGISTER} onClick={() => setIsMobileMenuOpen(false)}>
+                        <Link to={PATHS.WELCOME} onClick={() => setIsMobileMenuOpen(false)}>
                           <Zap className="w-4 h-4 mr-2" />
                           {t('common.startFree')}
                         </Link>

@@ -107,7 +107,8 @@ export function LoginForm() {
           role: authData.role || 'TEACHER',
         });
       }
-      navigate(PATHS.WORKSPACES);
+      const hasCompletedOnboarding = localStorage.getItem('onboarding_completed') === 'true';
+      navigate(hasCompletedOnboarding ? PATHS.WORKSPACES : PATHS.ONBOARDING);
     } catch (err) {
       setError(
         err.response?.data?.message ||
@@ -153,7 +154,8 @@ export function LoginForm() {
           role: authData.role || 'TEACHER',
         });
       }
-      navigate(PATHS.WORKSPACES);
+      const hasCompletedOnboarding = localStorage.getItem('onboarding_completed') === 'true';
+      navigate(hasCompletedOnboarding ? PATHS.WORKSPACES : PATHS.ONBOARDING);
     } catch (err) {
       if (err?.error !== 'popup_closed_by_user') {
         setError(err?.message || t('auth.appleFailed'));
@@ -192,7 +194,8 @@ export function LoginForm() {
           role: authData.role || 'TEACHER',
         });
       }
-      navigate(PATHS.WORKSPACES);
+      const hasCompletedOnboarding = localStorage.getItem('onboarding_completed') === 'true';
+      navigate(hasCompletedOnboarding ? PATHS.WORKSPACES : PATHS.ONBOARDING);
     } catch (err) {
       console.error('Login error:', err);
       setError(

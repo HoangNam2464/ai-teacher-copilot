@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { User, Shield, Bell, Palette, ChevronRight, LogOut } from 'lucide-react';
+import { User, Shield, Bell, Palette, ChevronRight, LogOut, Sparkles } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { PATHS } from '@/routes/paths';
 
@@ -34,6 +34,13 @@ const settingsSections = [
     icon: Palette,
     href: PATHS.SETTINGS.APPEARANCE,
     color: 'purple',
+  },
+  {
+    labelKey: 'settings.tour',
+    descKey: 'settings.tourDesc',
+    icon: Sparkles,
+    href: PATHS.WELCOME,
+    color: 'emerald',
   },
 ];
 

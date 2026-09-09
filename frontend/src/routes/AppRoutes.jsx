@@ -76,15 +76,9 @@ export function AppRoutes() {
           <Route path={PATHS.VERIFY_EMAIL} element={<VerifyEmailPage />} />
         </Route>
 
-        {/* Protected Onboarding (No Layout) */}
-        <Route
-          path={PATHS.ONBOARDING}
-          element={
-            <PrivateRoute>
-              <OnboardingPage />
-            </PrivateRoute>
-          }
-        />
+        {/* Welcome Tour & Onboarding (Accessible to all) */}
+        <Route path={PATHS.WELCOME} element={<OnboardingPage />} />
+        <Route path={PATHS.ONBOARDING} element={<OnboardingPage />} />
 
         {/* Protected Application Routes (Dashboard Layout) */}
         <Route

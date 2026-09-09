@@ -17,6 +17,7 @@ import {
   History,
   BrainCircuit,
   FolderOpen,
+  Sparkles,
 } from 'lucide-react';
 
 export function DashboardLayout() {
@@ -182,6 +183,14 @@ export function DashboardLayout() {
                       >
                         <Settings className="w-4 h-4" />
                         {t('dashboard.userMenu.accountSettings')}
+                      </Link>
+                      <Link
+                        to={PATHS.WELCOME}
+                        onClick={() => setUserMenuOpen(false)}
+                        className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-muted transition-colors"
+                      >
+                        <Sparkles className="w-4 h-4 text-emerald-500" />
+                        {t('dashboard.userMenu.tour')}
                       </Link>
                       <div className="border-t border-border my-1" />
                       <button

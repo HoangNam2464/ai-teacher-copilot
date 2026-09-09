@@ -467,7 +467,7 @@ export function HeroSection() {
               ) : (
                 <>
                   <Button size="lg" asChild className="shadow-lg shadow-emerald-500/25">
-                    <Link to={PATHS.REGISTER}>
+                    <Link to={PATHS.WELCOME}>
                       <Zap className="w-5 h-5" />
                       {t('hero.startFree')}
                     </Link>
