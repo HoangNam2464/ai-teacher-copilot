@@ -15,8 +15,8 @@ export const PATHS = {
 
   // Core App & Dashboards
   ROOT: '/',
-  DASHBOARD: '/',
-  WORKSPACES: '/workspaces',
+  DASHBOARD: '/dashboard',
+  WORKSPACES: '/dashboard/workspace',
   DOCUMENTS: '/documents',
 
   // AI Content Generation

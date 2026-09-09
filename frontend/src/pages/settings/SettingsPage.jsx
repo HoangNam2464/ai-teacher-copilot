@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { User, Shield, Bell, Palette, ChevronRight, LogOut, Sparkles } from 'lucide-react';
+import { User, Shield, Bell, Palette, ChevronRight, LogOut, CreditCard } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { PATHS } from '@/routes/paths';
 
@@ -36,11 +36,12 @@ const settingsSections = [
     color: 'purple',
   },
   {
-    labelKey: 'settings.tour',
-    descKey: 'settings.tourDesc',
-    icon: Sparkles,
-    href: PATHS.WELCOME,
+    labelKey: 'settings.subscription',
+    descKey: 'settings.subscriptionDesc',
+    icon: CreditCard,
+    href: PATHS.SETTINGS.ACCOUNT,
     color: 'emerald',
+    badge: 'Free',
   },
 ];
 
@@ -113,7 +114,14 @@ export function SettingsPage() {
                 <section.icon className={`w-5 h-5 text-${section.color}-500`} />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium">{t(section.labelKey)}</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-medium">{t(section.labelKey)}</p>
+                  {section.badge && (
+                    <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                      {section.badge}
+                    </span>
+                  )}
+                </div>
                 <p className="text-xs text-muted-foreground">{t(section.descKey)}</p>
               </div>
               <ChevronRight className="w-4 h-4 text-muted-foreground" />

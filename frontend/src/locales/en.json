@@ -47,12 +47,13 @@
     "viewAll": "View all features"
   },
   "nav": {
-    "workspaces": "Workspaces",
+    "dashboard": "Dashboard",
+    "workspaces": "Workspace",
     "documents": "Documents",
     "lessonPlanner": "Lesson Planner",
     "quizGenerator": "Quiz Generator",
     "history": "History",
-    "settings": "Account Settings"
+    "settings": "Settings"
   },
   "header": {
     "nav": {
@@ -422,6 +423,12 @@
     "welcome": "Welcome back",
     "user": "Teacher",
     "upgradeButton": "Upgrade",
+    "upgradeBanner": {
+      "title": "Upgrade to Pro",
+      "description": "Unlock unlimited study sets and AI features",
+      "unlockDescription": "Unlock unlimited study sets and AI features",
+      "upgrade": "Upgrade"
+    },
     "greeting": {
       "morning": "Good morning",
       "afternoon": "Good afternoon",

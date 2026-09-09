@@ -47,12 +47,13 @@
     "viewAll": "Xem tất cả tính năng"
   },
   "nav": {
-    "workspaces": "Không gian làm việc",
+    "dashboard": "Dashboard",
+    "workspaces": "Workspace",
     "documents": "Tài liệu",
     "lessonPlanner": "Soạn giáo án",
     "quizGenerator": "Tạo đề thi",
     "history": "Lịch sử",
-    "settings": "Cài đặt tài khoản"
+    "settings": "Cài đặt"
   },
   "header": {
     "nav": {
@@ -422,6 +423,12 @@
     "welcome": "Chào mừng trở lại",
     "user": "Giáo viên",
     "upgradeButton": "Nâng cấp",
+    "upgradeBanner": {
+      "title": "Nâng cấp lên Pro",
+      "description": "Mở khóa không giới hạn tài liệu và tính năng AI",
+      "unlockDescription": "Mở khóa không giới hạn tài liệu và tính năng AI",
+      "upgrade": "Nâng cấp"
+    },
     "greeting": {
       "morning": "Chào buổi sáng",
       "afternoon": "Chào buổi chiều",

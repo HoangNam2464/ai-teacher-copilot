@@ -5,19 +5,20 @@ import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 import { PATHS } from '@/routes/paths';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { Button } from '@/components/ui/Button';
 import {
   LayoutDashboard,
   Settings,
   LogOut,
   Menu,
   X,
-  ChevronDown,
   FileText,
   Brain,
   History,
   BrainCircuit,
   FolderOpen,
   Sparkles,
+  Bell,
 } from 'lucide-react';
 
 export function DashboardLayout() {
@@ -29,8 +30,9 @@ export function DashboardLayout() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   const sidebarItems = [
-    { labelKey: 'nav.workspaces', icon: LayoutDashboard, href: PATHS.WORKSPACES },
-    { labelKey: 'nav.documents', icon: FolderOpen, href: PATHS.DOCUMENTS },
+    { labelKey: 'nav.dashboard', icon: LayoutDashboard, href: PATHS.DASHBOARD },
+    { labelKey: 'nav.workspaces', icon: FolderOpen, href: PATHS.WORKSPACES },
+    { labelKey: 'nav.documents', icon: FileText, href: PATHS.DOCUMENTS },
     { labelKey: 'nav.lessonPlanner', icon: Brain, href: PATHS.LESSON_PLANNER },
     { labelKey: 'nav.quizGenerator', icon: FileText, href: PATHS.QUIZ_GENERATOR },
     { labelKey: 'nav.history', icon: History, href: PATHS.HISTORY },
@@ -82,8 +84,9 @@ export function DashboardLayout() {
           <nav className="flex-1 p-4 space-y-1">
             {sidebarItems.map((item) => {
               const isActive =
-                location.pathname === item.href ||
-                location.pathname.startsWith(item.href + '/');
+                item.href === PATHS.DASHBOARD
+                  ? location.pathname === PATHS.DASHBOARD
+                  : location.pathname === item.href || location.pathname.startsWith(item.href + '/');
               return (
                 <Link
                   key={item.href}
@@ -104,9 +107,33 @@ export function DashboardLayout() {
           </nav>
 
           {/* Bottom section */}
-          <div className="flex-shrink-0 p-4 pt-0 space-y-1">
+          <div className="flex-shrink-0 p-4 pt-0 space-y-3">
+            {/* Upgrade to Pro Card */}
+            <div className="p-4 rounded-2xl bg-emerald-50/80 dark:bg-emerald-950/20 border border-emerald-500/20 mb-2">
+              <div className="flex items-center gap-2 mb-1.5">
+                <Sparkles className="w-5 h-5 text-emerald-500 shrink-0" />
+                <span className="text-sm font-semibold text-foreground">
+                  {t('dashboard.upgradeBanner.title', 'Upgrade to Pro')}
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground leading-relaxed mb-3">
+                {t('dashboard.upgradeBanner.unlockDescription', 'Unlock unlimited study sets and AI features')}
+              </p>
+              <Button
+                size="sm"
+                className="w-full bg-[#22c55e] hover:bg-[#16a34a] text-white font-medium rounded-xl text-sm py-2 shadow-sm transition-colors"
+                asChild
+              >
+                <Link to={PATHS.SETTINGS.ROOT} onClick={() => setSidebarOpen(false)}>
+                  {t('dashboard.upgradeBanner.upgrade', 'Upgrade')}
+                </Link>
+              </Button>
+            </div>
+
+            {/* Settings link */}
             <Link
               to={PATHS.SETTINGS.ROOT}
+              onClick={() => setSidebarOpen(false)}
               className={cn(
                 'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
                 location.pathname.startsWith(PATHS.SETTINGS.ROOT)
@@ -136,16 +163,30 @@ export function DashboardLayout() {
 
             <div className="flex-1" />
 
-            {/* Language switcher */}
-            <LanguageSwitcher />
+            {/* Right actions: Globe + Bell + Divider + Purple Avatar */}
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              {/* Language switcher */}
+              <LanguageSwitcher />
 
-            {/* User menu */}
-            <div className="relative ml-2">
+              {/* Notification bell */}
               <button
-                onClick={() => setUserMenuOpen(!userMenuOpen)}
-                className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted transition-colors"
+                onClick={() => navigate(PATHS.SETTINGS.NOTIFICATIONS)}
+                className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                aria-label="Notifications"
               >
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <Bell className="w-5 h-5" />
+              </button>
+
+              {/* Vertical divider */}
+              <div className="h-6 w-px bg-border mx-1" />
+
+              {/* User avatar menu */}
+              <div className="relative">
+                <button
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className="w-8 h-8 rounded-full bg-purple-600 hover:bg-purple-700 text-white font-bold flex items-center justify-center text-sm transition-transform hover:scale-105 shadow-sm overflow-hidden focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                  aria-label="User menu"
+                >
                   {user?.avatarUrl ? (
                     <img
                       src={user.avatarUrl}
@@ -153,29 +194,22 @@ export function DashboardLayout() {
                       className="w-8 h-8 rounded-full object-cover"
                     />
                   ) : (
-                    <span className="text-sm font-semibold text-primary">
-                      {initials}
-                    </span>
+                    <span>{initials || user?.displayName?.charAt(0)?.toUpperCase() || 'N'}</span>
                   )}
-                </div>
-                <div className="hidden sm:block text-left">
-                  <p className="text-sm font-medium leading-none">{displayName}</p>
-                  <p className="text-xs text-muted-foreground capitalize mt-0.5">
-                    {user?.role?.toLowerCase() || t('dashboard.user')}
-                  </p>
-                </div>
-                <ChevronDown className="w-4 h-4 text-muted-foreground" />
-              </button>
+                </button>
 
-              {/* Dropdown */}
-              {userMenuOpen && (
-                <>
-                  <div
-                    className="fixed inset-0 z-40"
-                    onClick={() => setUserMenuOpen(false)}
-                  />
-                  <div className="absolute right-0 top-full mt-2 w-52 bg-card border border-border rounded-lg shadow-lg z-50 animate-fade-in">
-                    <div className="p-2">
+                {/* Dropdown */}
+                {userMenuOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-40"
+                      onClick={() => setUserMenuOpen(false)}
+                    />
+                    <div className="absolute right-0 top-full mt-2 w-56 bg-card border border-border rounded-xl shadow-xl z-50 animate-fade-in p-2">
+                      <div className="px-3 py-2 border-b border-border mb-1">
+                        <p className="text-sm font-semibold text-foreground truncate">{displayName}</p>
+                        <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+                      </div>
                       <Link
                         to={PATHS.SETTINGS.ROOT}
                         onClick={() => setUserMenuOpen(false)}
@@ -201,9 +235,9 @@ export function DashboardLayout() {
                         {t('dashboard.userMenu.logout')}
                       </button>
                     </div>
-                  </div>
-                </>
-              )}
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </header>

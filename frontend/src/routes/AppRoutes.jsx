@@ -88,7 +88,10 @@ export function AppRoutes() {
             </PrivateRoute>
           }
         >
-          <Route path={PATHS.WORKSPACES} element={<WorkspaceListPage />} />
+          <Route path="/dashboard" element={<WorkspaceListPage />} />
+          <Route path="/dashboard/workspace" element={<WorkspaceListPage />} />
+          <Route path="/dashboard/workspaces" element={<WorkspaceListPage />} />
+          <Route path="/workspaces" element={<Navigate to="/dashboard/workspace" replace />} />
           <Route path={PATHS.DOCUMENTS} element={<DocumentManagementPage />} />
           <Route path={PATHS.LESSON_PLANNER} element={<LessonPlannerPage />} />
           <Route path={PATHS.QUIZ_GENERATOR} element={<QuizGeneratorPage />} />
