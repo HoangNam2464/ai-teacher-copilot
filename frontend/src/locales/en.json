@@ -44,7 +44,11 @@
     "errorTryAgain": "Please try again or contact support.",
     "defaultSubject": "Mathematics",
     "defaultGrade": "Grade 10",
-    "viewAll": "View all features"
+    "viewAll": "View all features",
+    "upgradeToPro": "Upgrade to Pro",
+    "upgrade": "Upgrade",
+    "subscription": "Subscription",
+    "plan": "Plan"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -840,5 +844,22 @@
     "arts": "Fine Arts",
     "music": "Music",
     "physicalEducation": "Physical Education"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "allCaughtUp": "You're all caught up!",
+    "unreadCount": "{{count}} unread notifications",
+    "noNotifications": "No notifications yet",
+    "noUnread": "No unread notifications",
+    "wellNotify": "We'll notify you when something important happens.",
+    "markAllAsRead": "Mark all as read",
+    "clearAll": "Clear all",
+    "viewAll": "View all notifications",
+    "clickToView": "Click to view",
+    "justNow": "just now",
+    "minutesAgo": "{{count}} minutes ago",
+    "hoursAgo": "{{count}} hours ago",
+    "daysAgo": "{{count}} days ago"
   }
 }
+

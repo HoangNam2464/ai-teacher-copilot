@@ -29,12 +29,13 @@ export const PATHS = {
   HISTORY: '/history',
   HISTORY_DETAIL: '/history/:id',
 
-  // Settings
+  // Settings & Subscription
   SETTINGS: {
-    ROOT: '/settings',
-    PROFILE: '/settings/profile',
-    ACCOUNT: '/settings/account',
-    APPEARANCE: '/settings/appearance',
-    NOTIFICATIONS: '/settings/notifications',
+    ROOT: '/dashboard/settings',
+    PROFILE: '/dashboard/settings/profile',
+    ACCOUNT: '/dashboard/settings/account',
+    APPEARANCE: '/dashboard/settings/appearance',
+    NOTIFICATIONS: '/dashboard/settings/notifications',
+    SUBSCRIPTION: '/dashboard/subscription',
   }
 };

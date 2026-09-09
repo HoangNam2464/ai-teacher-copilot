@@ -2,26 +2,27 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
+import { Button } from '@/components/ui/Button';
+import { NotificationBell } from '@/components/NotificationBell';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { cn } from '@/lib/utils';
 import { PATHS } from '@/routes/paths';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-import { Button } from '@/components/ui/Button';
 import {
   LayoutDashboard,
   Settings,
   LogOut,
   Menu,
   X,
+  CreditCard,
+  Sparkles,
   FileText,
   Brain,
   History,
   BrainCircuit,
   FolderOpen,
-  Sparkles,
-  Bell,
 } from 'lucide-react';
 
-export function DashboardLayout() {
+export function DashboardLayout({ children }) {
   const { t } = useTranslation();
   const { user, logout, displayName, initials } = useAuth();
   const location = useLocation();
@@ -40,7 +41,7 @@ export function DashboardLayout() {
 
   const handleLogout = async () => {
     await logout();
-    navigate('/');
+    navigate(PATHS.LOGIN);
   };
 
   return (
@@ -78,7 +79,7 @@ export function DashboardLayout() {
           </button>
         </div>
 
-        {/* Scrollable area */}
+        {/* Scrollable area: nav + bottom items */}
         <div className="flex-1 flex flex-col overflow-y-auto">
           {/* Navigation */}
           <nav className="flex-1 p-4 space-y-1">
@@ -95,7 +96,7 @@ export function DashboardLayout() {
                   className={cn(
                     'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
                     isActive
-                      ? 'bg-primary/10 text-primary'
+                      ? 'bg-green-500/10 text-green-600 dark:text-green-400 font-medium'
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                   )}
                 >
@@ -108,27 +109,23 @@ export function DashboardLayout() {
 
           {/* Bottom section */}
           <div className="flex-shrink-0 p-4 pt-0 space-y-3">
-            {/* Upgrade to Pro Card */}
-            <div className="p-4 rounded-2xl bg-emerald-50/80 dark:bg-emerald-950/20 border border-emerald-500/20 mb-2">
-              <div className="flex items-center gap-2 mb-1.5">
-                <Sparkles className="w-5 h-5 text-emerald-500 shrink-0" />
-                <span className="text-sm font-semibold text-foreground">
-                  {t('dashboard.upgradeBanner.title', 'Upgrade to Pro')}
-                </span>
+            {/* Pro upgrade banner */}
+            {(!user?.plan || user?.plan === 'free') && (
+              <div className="p-4 rounded-xl bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20">
+                <div className="flex items-center gap-2 mb-2">
+                  <Sparkles className="w-4 h-4 text-green-500" />
+                  <span className="text-sm font-medium">{t('common.upgradeToPro')}</span>
+                </div>
+                <p className="text-xs text-muted-foreground mb-3">
+                  {t('dashboard.upgradeBanner.unlockDescription')}
+                </p>
+                <Button size="sm" className="w-full bg-green-500 hover:bg-green-600 text-white font-medium" asChild>
+                  <Link to={PATHS.SETTINGS.SUBSCRIPTION} onClick={() => setSidebarOpen(false)}>
+                    {t('common.upgrade')}
+                  </Link>
+                </Button>
               </div>
-              <p className="text-xs text-muted-foreground leading-relaxed mb-3">
-                {t('dashboard.upgradeBanner.unlockDescription', 'Unlock unlimited study sets and AI features')}
-              </p>
-              <Button
-                size="sm"
-                className="w-full bg-[#22c55e] hover:bg-[#16a34a] text-white font-medium rounded-xl text-sm py-2 shadow-sm transition-colors"
-                asChild
-              >
-                <Link to={PATHS.SETTINGS.ROOT} onClick={() => setSidebarOpen(false)}>
-                  {t('dashboard.upgradeBanner.upgrade', 'Upgrade')}
-                </Link>
-              </Button>
-            </div>
+            )}
 
             {/* Settings link */}
             <Link
@@ -137,12 +134,12 @@ export function DashboardLayout() {
               className={cn(
                 'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
                 location.pathname.startsWith(PATHS.SETTINGS.ROOT)
-                  ? 'bg-primary/10 text-primary'
+                  ? 'bg-green-500/10 text-green-600 dark:text-green-400 font-medium'
                   : 'text-muted-foreground hover:bg-muted hover:text-foreground'
               )}
             >
               <Settings className="w-5 h-5" />
-              {t('nav.settings')}
+              {t('common.settings')}
             </Link>
           </div>
         </div>
@@ -163,19 +160,13 @@ export function DashboardLayout() {
 
             <div className="flex-1" />
 
-            {/* Right actions: Globe + Bell + Divider + Purple Avatar */}
+            {/* Header Right Side: Language switcher + Notification bell + Divider + User menu */}
             <div className="flex items-center gap-1.5 sm:gap-2">
               {/* Language switcher */}
               <LanguageSwitcher />
 
               {/* Notification bell */}
-              <button
-                onClick={() => navigate(PATHS.SETTINGS.NOTIFICATIONS)}
-                className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                aria-label="Notifications"
-              >
-                <Bell className="w-5 h-5" />
-              </button>
+              <NotificationBell />
 
               {/* Vertical divider */}
               <div className="h-6 w-px bg-border mx-1" />
@@ -194,46 +185,51 @@ export function DashboardLayout() {
                       className="w-8 h-8 rounded-full object-cover"
                     />
                   ) : (
-                    <span>{initials || user?.displayName?.charAt(0)?.toUpperCase() || 'N'}</span>
+                    <span>{initials || (displayName ? displayName.charAt(0).toUpperCase() : 'N')}</span>
                   )}
                 </button>
 
-                {/* Dropdown */}
+                {/* Dropdown menu */}
                 {userMenuOpen && (
                   <>
                     <div
                       className="fixed inset-0 z-40"
                       onClick={() => setUserMenuOpen(false)}
                     />
-                    <div className="absolute right-0 top-full mt-2 w-56 bg-card border border-border rounded-xl shadow-xl z-50 animate-fade-in p-2">
-                      <div className="px-3 py-2 border-b border-border mb-1">
-                        <p className="text-sm font-semibold text-foreground truncate">{displayName}</p>
-                        <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+                    <div className="absolute right-0 top-full mt-2 w-52 bg-card border border-border rounded-lg shadow-lg z-50 animate-fade-in">
+                      <div className="p-2">
+                        <div className="px-3 py-2 border-b border-border mb-1">
+                          <p className="text-sm font-semibold text-foreground truncate">{displayName}</p>
+                          <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+                        </div>
+                        <Link
+                          to={PATHS.SETTINGS.SUBSCRIPTION}
+                          onClick={() => setUserMenuOpen(false)}
+                          className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-muted transition-colors"
+                        >
+                          <CreditCard className="w-4 h-4" />
+                          {t('common.subscription')}
+                          <span className="ml-auto px-1.5 py-0.5 bg-green-500/10 text-green-500 rounded text-[10px] font-medium capitalize">
+                            {user?.plan || 'Free'}
+                          </span>
+                        </Link>
+                        <Link
+                          to={PATHS.SETTINGS.ROOT}
+                          onClick={() => setUserMenuOpen(false)}
+                          className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-muted transition-colors"
+                        >
+                          <Settings className="w-4 h-4" />
+                          {t('common.settings')}
+                        </Link>
+                        <div className="border-t border-border my-1" />
+                        <button
+                          onClick={handleLogout}
+                          className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-muted transition-colors text-red-500"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          {t('common.logout')}
+                        </button>
                       </div>
-                      <Link
-                        to={PATHS.SETTINGS.ROOT}
-                        onClick={() => setUserMenuOpen(false)}
-                        className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-muted transition-colors"
-                      >
-                        <Settings className="w-4 h-4" />
-                        {t('dashboard.userMenu.accountSettings')}
-                      </Link>
-                      <Link
-                        to={PATHS.WELCOME}
-                        onClick={() => setUserMenuOpen(false)}
-                        className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-muted transition-colors"
-                      >
-                        <Sparkles className="w-4 h-4 text-emerald-500" />
-                        {t('dashboard.userMenu.tour')}
-                      </Link>
-                      <div className="border-t border-border my-1" />
-                      <button
-                        onClick={handleLogout}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-muted transition-colors text-destructive"
-                      >
-                        <LogOut className="w-4 h-4" />
-                        {t('dashboard.userMenu.logout')}
-                      </button>
                     </div>
                   </>
                 )}
@@ -244,7 +240,7 @@ export function DashboardLayout() {
 
         {/* Page content */}
         <main className="p-4 lg:p-6">
-          <Outlet />
+          {children || <Outlet />}
         </main>
       </div>
     </div>

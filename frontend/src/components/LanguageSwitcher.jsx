@@ -29,14 +29,11 @@ export function LanguageSwitcher() {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen(!open)}
-        className="p-2 hover:bg-muted rounded-lg transition-colors flex items-center gap-1.5 text-muted-foreground hover:text-foreground"
+        className="p-2 hover:bg-muted rounded-lg transition-colors"
         aria-label={t('common.changeLanguage', 'Language')}
         title={languageNames[currentLang] || 'Language'}
       >
-        <Globe className="w-4 h-4" />
-        <span className="text-xs font-medium uppercase tracking-wider hidden sm:inline-block">
-          {currentLang}
-        </span>
+        <Globe className="w-5 h-5 text-muted-foreground hover:text-foreground transition-colors" />
       </button>
 
       {open && (

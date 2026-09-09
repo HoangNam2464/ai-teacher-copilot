@@ -44,7 +44,11 @@
     "errorTryAgain": "Vui lòng thử lại hoặc liên hệ bộ phận hỗ trợ.",
     "defaultSubject": "Toán học",
     "defaultGrade": "Lớp 10",
-    "viewAll": "Xem tất cả tính năng"
+    "viewAll": "Xem tất cả tính năng",
+    "upgradeToPro": "Nâng cấp lên Pro",
+    "upgrade": "Nâng cấp",
+    "subscription": "Gói đăng ký",
+    "plan": "Gói"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -840,5 +844,22 @@
     "arts": "Mỹ Thuật",
     "music": "Âm Nhạc",
     "physicalEducation": "Thể Dục"
+  },
+  "notifications": {
+    "title": "Thông báo",
+    "allCaughtUp": "Bạn đã xem tất cả!",
+    "unreadCount": "{{count}} thông báo chưa đọc",
+    "noNotifications": "Chưa có thông báo nào",
+    "noUnread": "Không có thông báo chưa đọc",
+    "wellNotify": "Chúng tôi sẽ thông báo cho bạn khi có điều gì quan trọng xảy ra.",
+    "markAllAsRead": "Đánh dấu tất cả là đã đọc",
+    "clearAll": "Xóa tất cả",
+    "viewAll": "Xem tất cả thông báo",
+    "clickToView": "Nhấp để xem",
+    "justNow": "vừa mới",
+    "minutesAgo": "{{count}} phút trước",
+    "hoursAgo": "{{count}} giờ trước",
+    "daysAgo": "{{count}} ngày trước"
   }
 }
+

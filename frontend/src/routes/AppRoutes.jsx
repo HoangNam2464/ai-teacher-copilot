@@ -97,12 +97,20 @@ export function AppRoutes() {
           <Route path={PATHS.QUIZ_GENERATOR} element={<QuizGeneratorPage />} />
           <Route path={PATHS.HISTORY} element={<HistoryListPage />} />
           
-          {/* Settings */}
+          {/* Settings & Subscription */}
           <Route path={PATHS.SETTINGS.ROOT} element={<SettingsPage />} />
           <Route path={PATHS.SETTINGS.PROFILE} element={<ProfileSettingsPage />} />
           <Route path={PATHS.SETTINGS.ACCOUNT} element={<AccountSettingsPage />} />
           <Route path={PATHS.SETTINGS.APPEARANCE} element={<AppearanceSettingsPage />} />
           <Route path={PATHS.SETTINGS.NOTIFICATIONS} element={<NotificationSettingsPage />} />
+          <Route path={PATHS.SETTINGS.SUBSCRIPTION} element={<AccountSettingsPage />} />
+
+          {/* Backward compatibility redirects */}
+          <Route path="/settings" element={<Navigate to={PATHS.SETTINGS.ROOT} replace />} />
+          <Route path="/settings/profile" element={<Navigate to={PATHS.SETTINGS.PROFILE} replace />} />
+          <Route path="/settings/account" element={<Navigate to={PATHS.SETTINGS.ACCOUNT} replace />} />
+          <Route path="/settings/appearance" element={<Navigate to={PATHS.SETTINGS.APPEARANCE} replace />} />
+          <Route path="/settings/notifications" element={<Navigate to={PATHS.SETTINGS.NOTIFICATIONS} replace />} />
         </Route>
 
         {/* 404 */}
