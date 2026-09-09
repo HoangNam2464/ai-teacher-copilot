@@ -18,30 +18,31 @@ import {
 } from 'lucide-react';
 
 const subjects = [
-  { nameKey: 'Toán', icon: Calculator, gradient: 'from-blue-500 to-indigo-500' },
-  { nameKey: 'Ngữ Văn', icon: BookOpen, gradient: 'from-rose-500 to-pink-500' },
-  { nameKey: 'Vật Lý', icon: Atom, gradient: 'from-violet-500 to-purple-500' },
-  { nameKey: 'Hóa Học', icon: FlaskConical, gradient: 'from-emerald-500 to-teal-500' },
-  { nameKey: 'Sinh Học', icon: Microscope, gradient: 'from-green-500 to-lime-500' },
-  { nameKey: 'Lịch Sử', icon: Globe, gradient: 'from-amber-500 to-yellow-500' },
-  { nameKey: 'Địa Lý', icon: Scale, gradient: 'from-cyan-500 to-blue-500' },
-  { nameKey: 'Tiếng Anh', icon: Languages, gradient: 'from-indigo-500 to-blue-600' },
-  { nameKey: 'Tin Học', icon: Code, gradient: 'from-orange-500 to-red-500' },
-  { nameKey: 'Công Nghệ', icon: Cpu, gradient: 'from-slate-500 to-gray-600' },
-  { nameKey: 'GDCD', icon: PenTool, gradient: 'from-pink-500 to-fuchsia-500' },
-  { nameKey: 'Mỹ Thuật', icon: Palette, gradient: 'from-fuchsia-500 to-purple-500' },
-  { nameKey: 'Âm Nhạc', icon: Music, gradient: 'from-teal-500 to-cyan-500' },
-  { nameKey: 'Thể Dục', icon: Dumbbell, gradient: 'from-red-500 to-rose-500' },
+  { nameKey: 'math', icon: Calculator, gradient: 'from-blue-500 to-indigo-500' },
+  { nameKey: 'literature', icon: BookOpen, gradient: 'from-rose-500 to-pink-500' },
+  { nameKey: 'physics', icon: Atom, gradient: 'from-violet-500 to-purple-500' },
+  { nameKey: 'chemistry', icon: FlaskConical, gradient: 'from-emerald-500 to-teal-500' },
+  { nameKey: 'biology', icon: Microscope, gradient: 'from-green-500 to-lime-500' },
+  { nameKey: 'history', icon: Globe, gradient: 'from-amber-500 to-yellow-500' },
+  { nameKey: 'geography', icon: Scale, gradient: 'from-cyan-500 to-blue-500' },
+  { nameKey: 'english', icon: Languages, gradient: 'from-indigo-500 to-blue-600' },
+  { nameKey: 'informatics', icon: Code, gradient: 'from-orange-500 to-red-500' },
+  { nameKey: 'technology', icon: Cpu, gradient: 'from-slate-500 to-gray-600' },
+  { nameKey: 'civicEducation', icon: PenTool, gradient: 'from-pink-500 to-fuchsia-500' },
+  { nameKey: 'arts', icon: Palette, gradient: 'from-fuchsia-500 to-purple-500' },
+  { nameKey: 'music', icon: Music, gradient: 'from-teal-500 to-cyan-500' },
+  { nameKey: 'physicalEducation', icon: Dumbbell, gradient: 'from-red-500 to-rose-500' },
 ];
 
 function SubjectPill({ nameKey, icon: Icon, gradient }) {
+  const { t } = useTranslation();
   return (
     <div className="group relative flex items-center gap-3 px-5 py-3 rounded-2xl bg-card/80 dark:bg-card/40 border border-border/40 whitespace-nowrap select-none backdrop-blur-sm hover:border-emerald-500/30 transition-all duration-300 hover:shadow-md hover:shadow-emerald-500/5">
       <div className={`w-8 h-8 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300`}>
         <Icon className="w-4 h-4 text-white" />
       </div>
       <span className="text-sm font-semibold text-foreground/80 group-hover:text-foreground transition-colors duration-300">
-        {nameKey}
+        {t(`subjects.${nameKey}`, { defaultValue: nameKey })}
       </span>
     </div>
   );

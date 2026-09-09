@@ -40,8 +40,8 @@ export function QuizGeneratorPage() {
       setResult(null);
 
       const payload = {
-        subject: activeWorkspace.subject || 'Toán học',
-        gradeLevel: activeWorkspace.gradeLevel || 'Lớp 10',
+        subject: activeWorkspace.subject || t('common.defaultSubject'),
+        gradeLevel: activeWorkspace.gradeLevel || t('common.defaultGrade'),
         topic,
         questionCount: Number(questionCount),
         difficulty,
@@ -120,7 +120,9 @@ export function QuizGeneratorPage() {
                     onChange={(e) => setDifficulty(e.target.value)}
                   >
                     {APP_CONFIG.DIFFICULTY_LEVELS.map((d) => (
-                      <option key={d.value} value={d.value}>{d.label}</option>
+                      <option key={d.value} value={d.value}>
+                        {d.value === 'EASY' ? t('quizGenerator.difficultyEasy') : d.value === 'MEDIUM' ? t('quizGenerator.difficultyMedium') : t('quizGenerator.difficultyHard')}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -134,7 +136,9 @@ export function QuizGeneratorPage() {
                   onChange={(e) => setTargetBloomLevel(e.target.value)}
                 >
                   {APP_CONFIG.BLOOM_LEVELS.map((b) => (
-                    <option key={b.value} value={b.value}>{b.label}</option>
+                    <option key={b.value} value={b.value}>
+                      {t(`bloom.${b.value.toLowerCase()}`)} ({b.value})
+                    </option>
                   ))}
                 </select>
               </div>
@@ -251,9 +255,9 @@ export function QuizGeneratorPage() {
             <div className="w-16 h-16 rounded-2xl bg-orange-500/10 flex items-center justify-center mb-4">
               <FileQuestion className="w-8 h-8 text-orange-500 opacity-80" />
             </div>
-            <h3 className="text-lg font-semibold mb-2">{t('quizGenerator.emptyTitle', 'Chưa có đề thi nào được tạo')}</h3>
+            <h3 className="text-lg font-semibold mb-2">{t('quizGenerator.emptyTitle')}</h3>
             <p className="text-sm text-muted-foreground max-w-sm">
-              {t('quizGenerator.emptyDesc', 'Hãy điền thông tin vào form bên trái và bấm "Sinh đề thi" để hệ thống AI bắt đầu tự động tạo câu hỏi dựa trên ngữ cảnh của không gian làm việc.')}
+              {t('quizGenerator.emptyDesc')}
             </p>
           </div>
         )}

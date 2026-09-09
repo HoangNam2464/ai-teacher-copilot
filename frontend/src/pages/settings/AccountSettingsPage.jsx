@@ -41,11 +41,11 @@ export function AccountSettingsPage() {
     setPasswordError('');
 
     if (newPassword.length < 8) {
-      setPasswordError(t('accountSettingsPage.passwordMinLength', 'Mật khẩu phải dài ít nhất 8 ký tự.'));
+      setPasswordError(t('accountSettingsPage.passwordMinLength'));
       return;
     }
     if (newPassword !== confirmPassword) {
-      setPasswordError(t('accountSettingsPage.passwordsDoNotMatch', 'Mật khẩu mới không khớp.'));
+      setPasswordError(t('accountSettingsPage.passwordsDoNotMatch'));
       return;
     }
 
@@ -59,7 +59,7 @@ export function AccountSettingsPage() {
       setConfirmPassword('');
       setTimeout(() => setPasswordChanged(false), 3000);
     } catch {
-      setPasswordError(t('accountSettingsPage.incorrectPassword', 'Mật khẩu hiện tại không chính xác.'));
+      setPasswordError(t('accountSettingsPage.incorrectPassword'));
     }
     setChangingPassword(false);
   };
@@ -88,9 +88,9 @@ export function AccountSettingsPage() {
         >
           <Button variant="ghost" size="sm" onClick={() => navigate(PATHS.SETTINGS.ROOT)}>
             <ArrowLeft className="w-4 h-4 mr-1" />
-            {t('accountSettingsPage.back', 'Quay lại')}
+            {t('accountSettingsPage.back')}
           </Button>
-          <h1 className="text-2xl font-bold">{t('accountSettingsPage.title', 'Cài đặt Tài khoản')}</h1>
+          <h1 className="text-2xl font-bold">{t('accountSettingsPage.title')}</h1>
         </motion.div>
 
         {/* Change Password */}
@@ -105,8 +105,8 @@ export function AccountSettingsPage() {
               <Lock className="w-5 h-5 text-blue-500" />
             </div>
             <div>
-              <p className="text-sm font-semibold">{t('accountSettingsPage.changePassword', 'Đổi mật khẩu')}</p>
-              <p className="text-xs text-muted-foreground">{t('accountSettingsPage.changePasswordDesc', 'Đảm bảo tài khoản của bạn sử dụng mật khẩu mạnh.')}</p>
+              <p className="text-sm font-semibold">{t('accountSettingsPage.changePassword')}</p>
+              <p className="text-xs text-muted-foreground">{t('accountSettingsPage.changePasswordDesc')}</p>
             </div>
           </div>
 
@@ -117,7 +117,7 @@ export function AccountSettingsPage() {
                 type={showOld ? 'text' : 'password'}
                 value={oldPassword}
                 onChange={(e) => setOldPassword(e.target.value)}
-                placeholder={t('accountSettingsPage.currentPassword', 'Mật khẩu hiện tại')}
+                placeholder={t('accountSettingsPage.currentPassword')}
                 className="w-full px-4 py-3 pr-10 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               />
               <button
@@ -135,7 +135,7 @@ export function AccountSettingsPage() {
                 type={showNew ? 'text' : 'password'}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                placeholder={t('accountSettingsPage.newPassword', 'Mật khẩu mới')}
+                placeholder={t('accountSettingsPage.newPassword')}
                 className="w-full px-4 py-3 pr-10 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               />
               <button
@@ -152,7 +152,7 @@ export function AccountSettingsPage() {
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder={t('accountSettingsPage.confirmNewPassword', 'Xác nhận mật khẩu mới')}
+              placeholder={t('accountSettingsPage.confirmNewPassword')}
               className="w-full px-4 py-3 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
             />
 
@@ -162,7 +162,7 @@ export function AccountSettingsPage() {
 
             {passwordChanged && (
               <p className="text-xs text-green-500 flex items-center gap-1">
-                <Check className="w-3 h-3" /> {t('accountSettingsPage.passwordChangedSuccess', 'Mật khẩu đã được thay đổi.')}
+                <Check className="w-3 h-3" /> {t('accountSettingsPage.passwordChangedSuccess')}
               </p>
             )}
 
@@ -172,7 +172,7 @@ export function AccountSettingsPage() {
               className="bg-blue-500 hover:bg-blue-600 h-11 w-full"
             >
               {changingPassword ? <Spinner className="mr-2 h-4 w-4" /> : null}
-              {changingPassword ? t('accountSettingsPage.changing', 'Đang đổi...') : t('accountSettingsPage.changePasswordBtn', 'Đổi Mật Khẩu')}
+              {changingPassword ? t('accountSettingsPage.changing') : t('accountSettingsPage.changePasswordBtn')}
             </Button>
           </div>
         </motion.div>
@@ -184,19 +184,19 @@ export function AccountSettingsPage() {
           transition={{ delay: 0.1 }}
           className="bg-card rounded-2xl border border-border p-6 mb-6"
         >
-          <p className="text-sm font-semibold mb-3">{t('accountSettingsPage.accountInfo', 'Thông tin tài khoản')}</p>
+          <p className="text-sm font-semibold mb-3">{t('accountSettingsPage.accountInfo')}</p>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between py-2 border-b border-border">
-              <span className="text-muted-foreground">{t('accountSettingsPage.emailLabel', 'Email đăng nhập')}</span>
+              <span className="text-muted-foreground">{t('accountSettingsPage.emailLabel')}</span>
               <span>{user?.email || 'user@example.com'}</span>
             </div>
             <div className="flex justify-between py-2 border-b border-border">
-              <span className="text-muted-foreground">{t('accountSettingsPage.planLabel', 'Loại tài khoản')}</span>
-              <span className="capitalize text-primary font-medium">Giáo viên</span>
+              <span className="text-muted-foreground">{t('accountSettingsPage.planLabel')}</span>
+              <span className="capitalize text-primary font-medium">{t('dashboard.user')}</span>
             </div>
             <div className="flex justify-between py-2 border-b border-border">
-              <span className="text-muted-foreground">{t('accountSettingsPage.emailVerified', 'Trạng thái xác minh')}</span>
-              <span className="text-green-500">{t('accountSettingsPage.yes', 'Đã xác minh')}</span>
+              <span className="text-muted-foreground">{t('accountSettingsPage.emailVerified')}</span>
+              <span className="text-green-500">{t('accountSettingsPage.yes')}</span>
             </div>
           </div>
         </motion.div>
@@ -213,8 +213,8 @@ export function AccountSettingsPage() {
               <Trash2 className="w-5 h-5 text-destructive" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-destructive">{t('accountSettingsPage.deleteAccount', 'Xóa tài khoản')}</p>
-              <p className="text-xs text-muted-foreground">{t('accountSettingsPage.deleteAccountDesc', 'Xóa vĩnh viễn tài khoản và dữ liệu.')}</p>
+              <p className="text-sm font-semibold text-destructive">{t('accountSettingsPage.deleteAccount')}</p>
+              <p className="text-xs text-muted-foreground">{t('accountSettingsPage.deleteAccountDesc')}</p>
             </div>
           </div>
 
@@ -224,21 +224,21 @@ export function AccountSettingsPage() {
               onClick={() => setShowDeleteConfirm(true)}
               className="text-destructive border-destructive/30 hover:bg-destructive/5"
             >
-              {t('accountSettingsPage.deleteMyAccount', 'Xóa tài khoản của tôi')}
+              {t('accountSettingsPage.deleteMyAccount')}
             </Button>
           ) : (
             <div className="space-y-3 p-4 bg-destructive/5 rounded-xl border border-destructive/20 mt-4">
               <div className="flex items-start gap-2">
                 <AlertTriangle className="w-5 h-5 text-destructive shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium text-destructive">{t('accountSettingsPage.cannotBeUndone', 'Hành động này không thể hoàn tác!')}</p>
+                  <p className="text-sm font-medium text-destructive">{t('accountSettingsPage.cannotBeUndone')}</p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {t('accountSettingsPage.deleteWarning', 'Tất cả dữ liệu, không gian làm việc và bài giảng sẽ bị xóa vĩnh viễn.')}
+                    {t('accountSettingsPage.deleteWarning')}
                   </p>
                 </div>
               </div>
               <div className="mt-2">
-                <label className="text-xs text-muted-foreground mb-2 block" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(t('accountSettingsPage.typeDeleteToConfirm', 'Gõ chữ <b>DELETE</b> để xác nhận')) }} />
+                <label className="text-xs text-muted-foreground mb-2 block" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(t('accountSettingsPage.typeDeleteToConfirm')) }} />
                 <input
                   value={deleteConfirmText}
                   onChange={(e) => setDeleteConfirmText(e.target.value)}
@@ -253,10 +253,10 @@ export function AccountSettingsPage() {
                   className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
                 >
                   {deleting ? <Spinner className="mr-2 h-4 w-4" /> : null}
-                  {deleting ? t('accountSettingsPage.deleting', 'Đang xóa...') : t('accountSettingsPage.deleteForever', 'Xóa vĩnh viễn')}
+                  {deleting ? t('accountSettingsPage.deleting') : t('accountSettingsPage.deleteForever')}
                 </Button>
                 <Button variant="outline" onClick={() => { setShowDeleteConfirm(false); setDeleteConfirmText(''); }}>
-                  {t('accountSettingsPage.cancel', 'Hủy')}
+                  {t('accountSettingsPage.cancel')}
                 </Button>
               </div>
             </div>

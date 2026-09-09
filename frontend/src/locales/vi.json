@@ -40,7 +40,11 @@
     "unexpectedError": "Đã xảy ra lỗi không mong muốn",
     "changeLanguage": "Thay đổi ngôn ngữ",
     "notifications": "Thông báo",
-    "closeNotice": "Đóng thông báo"
+    "closeNotice": "Đóng thông báo",
+    "errorTryAgain": "Vui lòng thử lại hoặc liên hệ bộ phận hỗ trợ.",
+    "defaultSubject": "Toán học",
+    "defaultGrade": "Lớp 10",
+    "viewAll": "Xem tất cả tính năng"
   },
   "nav": {
     "workspaces": "Không gian làm việc",
@@ -128,6 +132,37 @@
       "f5Desc": "Mọi nội dung AI tạo ra đều gắn liền với trang và đoạn văn bản nguồn trong tài liệu của bạn, đảm bảo tính minh bạch.",
       "f6Title": "Xem Lại, Sửa & Xuất Word/PDF",
       "f6Desc": "Giáo viên giữ quyền kiểm soát hoàn toàn: chỉnh sửa inline, yêu cầu AI viết lại theo hướng dẫn và xuất DOCX, PDF chuyên nghiệp."
+    },
+    "demo": {
+      "analyzing": "Đang phân tích...",
+      "extracting": "AI đang trích xuất...",
+      "vectorIndexReady": "Vector Index sẵn sàng!",
+      "extractedConcepts": "4 khái niệm đã trích xuất",
+      "uploadPdfDocx": "Upload PDF / DOCX",
+      "lessonPlanner": "AI Lesson Planner",
+      "planItems": {
+        "objectives": "Mục tiêu bài dạy",
+        "warmup": "Hoạt động khởi động",
+        "mainContent": "Nội dung chính",
+        "assessment": "Đánh giá cuối bài"
+      },
+      "citations": "3 nguồn trích dẫn",
+      "bloomQuiz": "Bloom Taxonomy Quiz",
+      "autoTagged": "Tự động gắn thẻ 6 cấp độ",
+      "remember": "Nhận biết",
+      "understand": "Thông hiểu",
+      "apply": "Vận dụng",
+      "analyze": "Vận dụng cao",
+      "evaluate": "Đánh giá",
+      "create": "Sáng tạo",
+      "sourceChunkId": "Source Chunk ID",
+      "pageNumber": "Số trang",
+      "documentName": "Tên tài liệu",
+      "excerptPreview": "Trích đoạn xem trước",
+      "inlineEditing": "Chỉnh sửa trực tiếp",
+      "aiRegeneration": "Tái tạo bằng AI",
+      "exportWord": "Xuất file Word",
+      "exportPdf": "Xuất file PDF"
     }
   },
   "howItWorks": {
@@ -506,7 +541,10 @@
     "totalQuestions": "Tổng số câu",
     "questionNum": "Câu",
     "correctAnswer": "Đáp án đúng",
-    "explanation": "Giải thích"
+    "explanation": "Giải thích",
+    "difficultyEasy": "Dễ (Cơ bản)",
+    "difficultyMedium": "Trung bình",
+    "difficultyHard": "Nâng cao"
   },
   "history": {
     "title": "Lịch Sử Soạn Thảo & Bản Nháp",
@@ -602,7 +640,8 @@
       "descSubjects": "Chọn tối đa 3 môn học để AI tùy chỉnh ví dụ và học liệu.",
       "titleGoal": "Mục tiêu chính của bạn là gì?",
       "descGoal": "Chúng tôi sẽ tập trung vào tính năng quan trọng nhất với bạn.",
-      "saving": "Đang thiết lập Copilot..."
+      "saving": "Đang thiết lập Copilot...",
+      "savingDesc": "AI Teacher Copilot đang tối ưu hóa không gian làm việc dựa trên lựa chọn của bạn..."
     },
     "education": {
       "elementary": "Tiểu học",
@@ -663,7 +702,8 @@
     "theme": "Chủ đề",
     "dark": "Tối",
     "light": "Sáng",
-    "system": "Hệ thống"
+    "system": "Hệ thống",
+    "workspaceBadge": "Teacher Workspace"
   },
   "profileEditPage": {
     "title": "Chỉnh sửa Hồ sơ",
@@ -768,6 +808,26 @@
     "productUpdatesDesc": "Tin tức về các tính năng và cải tiến mới",
     "saving": "Đang lưu...",
     "saved": "Đã lưu!",
-    "savePreferences": "Lưu Tùy Chọn"
+    "savePreferences": "Lưu Tùy Chọn",
+    "documentProcessing": "Xử lý tài liệu",
+    "documentProcessingDesc": "Thông báo khi tài liệu của bạn đã được AI xử lý xong",
+    "securityAlerts": "Cảnh báo bảo mật",
+    "securityAlertsDesc": "Cảnh báo về các đăng nhập bất thường hoặc thay đổi tài khoản"
+  },
+  "subjects": {
+    "math": "Toán",
+    "literature": "Ngữ Văn",
+    "physics": "Vật Lý",
+    "chemistry": "Hóa Học",
+    "biology": "Sinh Học",
+    "history": "Lịch Sử",
+    "geography": "Địa Lý",
+    "english": "Tiếng Anh",
+    "informatics": "Tin Học",
+    "technology": "Công Nghệ",
+    "civicEducation": "GDCD",
+    "arts": "Mỹ Thuật",
+    "music": "Âm Nhạc",
+    "physicalEducation": "Thể Dục"
   }
 }

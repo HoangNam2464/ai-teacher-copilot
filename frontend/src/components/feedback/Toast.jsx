@@ -1,4 +1,5 @@
 import React, { useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Toast — Ephemeral notification component.
@@ -10,6 +11,7 @@ import React, { useEffect, useCallback } from 'react';
  * @param {function} onClose    - Callback invoked when the toast should be dismissed.
  */
 export function Toast({ id, message, variant = 'info', duration = 4000, onClose }) {
+  const { t } = useTranslation();
   const handleClose = useCallback(() => {
     onClose?.(id);
   }, [id, onClose]);
@@ -41,7 +43,7 @@ export function Toast({ id, message, variant = 'info', duration = 4000, onClose 
         type="button"
         className="toast__close"
         onClick={handleClose}
-        aria-label="Đóng thông báo"
+        aria-label={t('common.closeNotice')}
       >
         ✕
       </button>
@@ -63,9 +65,10 @@ export function Toast({ id, message, variant = 'info', duration = 4000, onClose 
  *     setToasts(p => p.filter(t => t.id !== id));
  */
 export function ToastContainer({ toasts = [], onClose }) {
+  const { t } = useTranslation();
   if (toasts.length === 0) return null;
   return (
-    <div className="toast-container" aria-label="Thông báo" role="region">
+    <div className="toast-container" aria-label={t('common.notifications')} role="region">
       {toasts.map((toast) => (
         <Toast key={toast.id} {...toast} onClose={onClose} />
       ))}

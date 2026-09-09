@@ -18,23 +18,17 @@ const NOTIFICATION_TYPES = [
   {
     key: 'documentProcessing',
     labelKey: 'notificationSettingsPage.documentProcessing',
-    defaultLabel: 'Xử lý tài liệu',
     descKey: 'notificationSettingsPage.documentProcessingDesc',
-    defaultDesc: 'Thông báo khi tài liệu của bạn đã được AI xử lý xong',
   },
   {
     key: 'securityAlerts',
     labelKey: 'notificationSettingsPage.securityAlerts',
-    defaultLabel: 'Cảnh báo bảo mật',
     descKey: 'notificationSettingsPage.securityAlertsDesc',
-    defaultDesc: 'Cảnh báo về các đăng nhập bất thường hoặc thay đổi tài khoản',
   },
   {
     key: 'productUpdates',
     labelKey: 'notificationSettingsPage.productUpdates',
-    defaultLabel: 'Cập nhật sản phẩm',
     descKey: 'notificationSettingsPage.productUpdatesDesc',
-    defaultDesc: 'Tin tức về các tính năng và cải tiến mới',
   },
 ];
 
@@ -115,9 +109,9 @@ export function NotificationSettingsPage() {
         >
           <Button variant="ghost" size="sm" onClick={() => navigate(PATHS.SETTINGS.ROOT)}>
             <ArrowLeft className="w-4 h-4 mr-1" />
-            {t('notificationSettingsPage.back', 'Quay lại')}
+            {t('notificationSettingsPage.back')}
           </Button>
-          <h1 className="text-2xl font-bold">{t('notificationSettingsPage.title', 'Tùy Chọn Thông Báo')}</h1>
+          <h1 className="text-2xl font-bold">{t('notificationSettingsPage.title')}</h1>
         </motion.div>
 
         {/* Master Toggle */}
@@ -133,8 +127,8 @@ export function NotificationSettingsPage() {
                 <Bell className="w-5 h-5 text-amber-500" />
               </div>
               <div>
-                <p className="text-sm font-semibold">{t('notificationSettingsPage.allNotifications', 'Tất cả Thông Báo')}</p>
-                <p className="text-xs text-muted-foreground">{t('notificationSettingsPage.masterToggle', 'Bật hoặc tắt tất cả thông báo')}</p>
+                <p className="text-sm font-semibold">{t('notificationSettingsPage.allNotifications')}</p>
+                <p className="text-xs text-muted-foreground">{t('notificationSettingsPage.masterToggle')}</p>
               </div>
             </div>
             <Toggle checked={prefs.enabled} onChange={(val) => updatePref('enabled', val)} />
@@ -151,8 +145,8 @@ export function NotificationSettingsPage() {
           {NOTIFICATION_TYPES.map((type) => (
             <div key={type.key} className="flex items-center justify-between p-5">
               <div className="flex-1 min-w-0 mr-4">
-                <p className="text-sm font-medium">{t(type.labelKey, type.defaultLabel)}</p>
-                <p className="text-xs text-muted-foreground">{t(type.descKey, type.defaultDesc)}</p>
+                <p className="text-sm font-medium">{t(type.labelKey)}</p>
+                <p className="text-xs text-muted-foreground">{t(type.descKey)}</p>
               </div>
               <Toggle
                 checked={prefs[type.key]}
@@ -180,7 +174,7 @@ export function NotificationSettingsPage() {
             ) : saved ? (
               <Check className="w-5 h-5 mr-2" />
             ) : null}
-            {saving ? t('notificationSettingsPage.saving', 'Đang lưu...') : saved ? t('notificationSettingsPage.saved', 'Đã lưu!') : t('notificationSettingsPage.savePreferences', 'Lưu Tùy Chọn')}
+            {saving ? t('notificationSettingsPage.saving') : saved ? t('notificationSettingsPage.saved') : t('notificationSettingsPage.savePreferences')}
           </Button>
         </motion.div>
       </div>

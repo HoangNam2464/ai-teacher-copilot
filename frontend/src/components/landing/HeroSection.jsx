@@ -368,10 +368,10 @@ function AnimatedDemo() {
                 </div>
                 <div className="flex items-center gap-2">
                   {[
-                    t('hero.demo.output1', 'Giáo Án'),
-                    t('hero.demo.output2', 'Đề Thi'),
-                    t('hero.demo.output3', 'Tự Luận'),
-                    t('hero.demo.output4', 'Rubric'),
+                    t('hero.demo.output1'),
+                    t('hero.demo.output2'),
+                    t('hero.demo.output3'),
+                    t('hero.demo.output4'),
                   ].map((label) => (
                     <span
                       key={label}

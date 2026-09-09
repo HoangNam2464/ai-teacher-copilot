@@ -40,7 +40,11 @@
     "unexpectedError": "An unexpected error occurred",
     "changeLanguage": "Change language",
     "notifications": "Notifications",
-    "closeNotice": "Close notice"
+    "closeNotice": "Close notice",
+    "errorTryAgain": "Please try again or contact support.",
+    "defaultSubject": "Mathematics",
+    "defaultGrade": "Grade 10",
+    "viewAll": "View all features"
   },
   "nav": {
     "workspaces": "Workspaces",
@@ -128,6 +132,37 @@
       "f5Desc": "Every AI draft links directly to exact source chunks and page numbers in your uploaded documents.",
       "f6Title": "Review, Edit & Export",
       "f6Desc": "Teachers retain full authority: edit inline, instruct AI to regenerate sections, and export to DOCX or PDF."
+    },
+    "demo": {
+      "analyzing": "Analyzing...",
+      "extracting": "AI is extracting...",
+      "vectorIndexReady": "Vector Index Ready!",
+      "extractedConcepts": "4 concepts extracted",
+      "uploadPdfDocx": "Upload PDF / DOCX",
+      "lessonPlanner": "AI Lesson Planner",
+      "planItems": {
+        "objectives": "Learning Objectives",
+        "warmup": "Warm-up Activity",
+        "mainContent": "Core Content",
+        "assessment": "Lesson Assessment"
+      },
+      "citations": "3 citations",
+      "bloomQuiz": "Bloom Taxonomy Quiz",
+      "autoTagged": "Auto-tagged across 6 levels",
+      "remember": "Remember",
+      "understand": "Understand",
+      "apply": "Apply",
+      "analyze": "Analyze",
+      "evaluate": "Evaluate",
+      "create": "Create",
+      "sourceChunkId": "Source Chunk ID",
+      "pageNumber": "Page Number",
+      "documentName": "Document Name",
+      "excerptPreview": "Excerpt Preview",
+      "inlineEditing": "Inline Editing",
+      "aiRegeneration": "AI Regeneration",
+      "exportWord": "Export Word",
+      "exportPdf": "Export PDF"
     }
   },
   "howItWorks": {
@@ -506,7 +541,10 @@
     "totalQuestions": "Total questions",
     "questionNum": "Question",
     "correctAnswer": "Correct answer",
-    "explanation": "Explanation"
+    "explanation": "Explanation",
+    "difficultyEasy": "Easy (Basic)",
+    "difficultyMedium": "Medium",
+    "difficultyHard": "Advanced"
   },
   "history": {
     "title": "Draft & Generation History",
@@ -602,7 +640,8 @@
       "descSubjects": "Select up to 3 subjects for tailored examples and materials.",
       "titleGoal": "What is your primary goal?",
       "descGoal": "We'll focus on the most important feature for you.",
-      "saving": "Setting up Copilot..."
+      "saving": "Setting up Copilot...",
+      "savingDesc": "AI Teacher Copilot is optimizing your workspace based on your preferences..."
     },
     "education": {
       "elementary": "Elementary",
@@ -663,7 +702,8 @@
     "theme": "Theme",
     "dark": "Dark",
     "light": "Light",
-    "system": "System"
+    "system": "System",
+    "workspaceBadge": "Teacher Workspace"
   },
   "profileEditPage": {
     "title": "Edit Profile",
@@ -768,6 +808,26 @@
     "productUpdatesDesc": "News about new features and improvements",
     "saving": "Saving...",
     "saved": "Saved!",
-    "savePreferences": "Save Preferences"
+    "savePreferences": "Save Preferences",
+    "documentProcessing": "Document Processing",
+    "documentProcessingDesc": "Notify when your document has been processed by AI",
+    "securityAlerts": "Security Alerts",
+    "securityAlertsDesc": "Alerts about unusual logins or account changes"
+  },
+  "subjects": {
+    "math": "Mathematics",
+    "literature": "Literature",
+    "physics": "Physics",
+    "chemistry": "Chemistry",
+    "biology": "Biology",
+    "history": "History",
+    "geography": "Geography",
+    "english": "English",
+    "informatics": "Informatics",
+    "technology": "Technology",
+    "civicEducation": "Civics",
+    "arts": "Fine Arts",
+    "music": "Music",
+    "physicalEducation": "Physical Education"
   }
 }

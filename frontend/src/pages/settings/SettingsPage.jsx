@@ -78,11 +78,11 @@ export function SettingsPage() {
             </div>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-semibold">{user?.displayName || t('userMenu.user', 'Giáo viên')}</p>
+            <p className="font-semibold">{user?.displayName || t('dashboard.user')}</p>
             <p className="text-sm text-muted-foreground">{user?.email}</p>
             <div className="flex items-center gap-2 mt-1">
               <span className="inline-block px-2 py-0.5 bg-primary/10 text-primary rounded-full text-xs font-medium capitalize">
-                Teacher Workspace
+                {t('settings.workspaceBadge')}
               </span>
             </div>
           </div>
@@ -128,7 +128,7 @@ export function SettingsPage() {
             <div className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center shrink-0">
               <LogOut className="w-5 h-5 text-destructive" />
             </div>
-            <p className="text-sm font-medium text-destructive">{t('common.logout', 'Đăng xuất')}</p>
+            <p className="text-sm font-medium text-destructive">{t('common.logout')}</p>
           </button>
         </motion.div>
 

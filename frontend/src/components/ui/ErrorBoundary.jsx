@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import i18n from '@/lib/i18n';
 
 export class ErrorBoundary extends Component {
   constructor(props) {
@@ -21,16 +22,16 @@ export class ErrorBoundary extends Component {
           <div className="min-h-[50vh] flex items-center justify-center">
             <div className="text-center max-w-md px-4">
               <h2 className="text-lg font-semibold text-foreground mb-2">
-                Đã xảy ra lỗi
+                {i18n.t('common.unexpectedError')}
               </h2>
               <p className="text-sm text-muted-foreground mb-4">
-                {this.state.error?.message || 'Vui lòng tải lại trang.'}
+                {this.state.error?.message || i18n.t('common.errorTryAgain')}
               </p>
               <button
                 onClick={() => window.location.reload()}
                 className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
               >
-                Tải lại trang
+                {i18n.t('common.reloadPage')}
               </button>
             </div>
           </div>

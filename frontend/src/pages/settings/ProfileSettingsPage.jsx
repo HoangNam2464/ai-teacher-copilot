@@ -22,17 +22,17 @@ export function ProfileSettingsPage() {
   const { t } = useTranslation();
   
   const EDUCATION_LABELS = {
-    high_school: t('profileEditPage.educationLevels.0', 'Trung học phổ thông'),
-    undergraduate: t('profileEditPage.educationLevels.1', 'Đại học'),
-    graduate: t('profileEditPage.educationLevels.2', 'Sau đại học'),
-    post_graduate: t('profileEditPage.educationLevels.3', 'Nghiên cứu sinh'),
-    self_learner: t('profileEditPage.educationLevels.4', 'Tự học'),
-    professional: t('profileEditPage.educationLevels.5', 'Chuyên gia'),
+    high_school: t('profileEditPage.educationLevels.0'),
+    undergraduate: t('profileEditPage.educationLevels.1'),
+    graduate: t('profileEditPage.educationLevels.2'),
+    post_graduate: t('profileEditPage.educationLevels.3'),
+    self_learner: t('profileEditPage.educationLevels.4'),
+    professional: t('profileEditPage.educationLevels.5'),
   };
   
   // Safe fallback if translation doesn't return an array
   const commonSubjectsT = t('profileEditPage.commonSubjects', { returnObjects: true });
-  const COMMON_SUBJECTS = Array.isArray(commonSubjectsT) ? commonSubjectsT : ['Toán học', 'Vật lý', 'Hóa học', 'Sinh học', 'Văn học', 'Lịch sử', 'Tiếng Anh'];
+  const COMMON_SUBJECTS = Array.isArray(commonSubjectsT) ? commonSubjectsT : [t('subjects.math'), t('subjects.physics'), t('subjects.chemistry'), t('subjects.biology'), t('subjects.literature'), t('subjects.history'), t('subjects.english')];
   
   const { user } = useAuthStore();
   
@@ -53,13 +53,12 @@ export function ProfileSettingsPage() {
     const loadProfile = async () => {
       setName(user?.displayName || '');
       setAvatarUrl(user?.avatarUrl || '');
-      // Mock some data for the demo since backend is not fully integrated for this
       setEducationLevel('professional');
-      setSubjects(['Toán học', 'Vật lý']);
+      setSubjects([t('subjects.math'), t('subjects.physics')]);
       setLoading(false);
     };
     loadProfile();
-  }, [user]);
+  }, [user, t]);
 
   const handleAvatarUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -129,9 +128,9 @@ export function ProfileSettingsPage() {
         >
           <Button variant="ghost" size="sm" onClick={() => navigate(PATHS.SETTINGS.ROOT)}>
             <ArrowLeft className="w-4 h-4 mr-1" />
-            {t('profileEditPage.back', 'Quay lại')}
+            {t('profileEditPage.back')}
           </Button>
-          <h1 className="text-2xl font-bold">{t('profileEditPage.title', 'Chỉnh sửa hồ sơ')}</h1>
+          <h1 className="text-2xl font-bold">{t('profileEditPage.title')}</h1>
         </motion.div>
 
         {/* Avatar */}
@@ -187,11 +186,11 @@ export function ProfileSettingsPage() {
           transition={{ delay: 0.1 }}
           className="bg-card rounded-2xl border border-border p-6 mb-6"
         >
-          <label className="block text-sm font-medium mb-2">{t('profileEditPage.displayName', 'Tên hiển thị')}</label>
+          <label className="block text-sm font-medium mb-2">{t('profileEditPage.displayName')}</label>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder={t('profileEditPage.namePlaceholder', 'Tên của bạn')}
+            placeholder={t('profileEditPage.namePlaceholder')}
             className="w-full px-4 py-3 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
           />
         </motion.div>
@@ -203,13 +202,13 @@ export function ProfileSettingsPage() {
           transition={{ delay: 0.12 }}
           className="bg-card rounded-2xl border border-border p-6 mb-6"
         >
-          <label className="block text-sm font-medium mb-2">{t('profileEditPage.email', 'Email')}</label>
+          <label className="block text-sm font-medium mb-2">{t('profileEditPage.email')}</label>
           <input
             value={user?.email || 'user@example.com'}
             readOnly
             className="w-full px-4 py-3 bg-muted/30 border border-border rounded-xl text-sm text-muted-foreground cursor-not-allowed"
           />
-          <p className="text-xs text-muted-foreground mt-2">{t('profileEditPage.emailCannotBeChanged', 'Không thể thay đổi email.')}</p>
+          <p className="text-xs text-muted-foreground mt-2">{t('profileEditPage.emailCannotBeChanged')}</p>
         </motion.div>
 
         {/* Education Level */}
@@ -219,7 +218,7 @@ export function ProfileSettingsPage() {
           transition={{ delay: 0.15 }}
           className="bg-card rounded-2xl border border-border p-6 mb-6"
         >
-          <label className="block text-sm font-medium mb-3">{t('profileEditPage.educationLevel', 'Cấp độ giảng dạy')}</label>
+          <label className="block text-sm font-medium mb-3">{t('profileEditPage.educationLevel')}</label>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {EDUCATION_LEVEL_IDS.map((id) => (
               <button
@@ -244,7 +243,7 @@ export function ProfileSettingsPage() {
           transition={{ delay: 0.2 }}
           className="bg-card rounded-2xl border border-border p-6 mb-6"
         >
-          <label className="block text-sm font-medium mb-3">{t('profileEditPage.subjectsOfInterest', 'Môn học giảng dạy')}</label>
+          <label className="block text-sm font-medium mb-3">{t('profileEditPage.subjectsOfInterest')}</label>
           <div className="flex flex-wrap gap-2 mb-4">
             {COMMON_SUBJECTS.map((subject) => {
               const selected = subjects.includes(subject);
@@ -289,11 +288,11 @@ export function ProfileSettingsPage() {
               value={customSubject}
               onChange={(e) => setCustomSubject(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && addCustomSubject()}
-              placeholder={t('profileEditPage.addCustomSubject', 'Thêm môn học khác')}
+              placeholder={t('profileEditPage.addCustomSubject')}
               className="flex-1 px-3 py-2 bg-muted/50 border border-border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
             <Button size="sm" variant="outline" onClick={addCustomSubject} disabled={!customSubject.trim()}>
-              {t('profileEditPage.add', 'Thêm')}
+              {t('profileEditPage.add')}
             </Button>
           </div>
         </motion.div>
@@ -314,7 +313,7 @@ export function ProfileSettingsPage() {
             ) : saved ? (
               <Check className="w-5 h-5 mr-2" />
             ) : null}
-            {saving ? t('profileEditPage.saving', 'Đang lưu...') : saved ? t('profileEditPage.saved', 'Đã lưu!') : t('profileEditPage.saveChanges', 'Lưu thay đổi')}
+            {saving ? t('profileEditPage.saving') : saved ? t('profileEditPage.saved') : t('profileEditPage.saveChanges')}
           </Button>
         </motion.div>
       </div>

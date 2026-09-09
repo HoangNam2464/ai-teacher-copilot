@@ -673,7 +673,7 @@ function SetupWizard() {
               </div>
               <h2 className="text-2xl font-bold mb-2">{t('onboarding.wizard.saving')}</h2>
               <p className="text-muted-foreground max-w-sm">
-                AI Teacher Copilot đang tối ưu hóa không gian làm việc dựa trên lựa chọn của bạn...
+                {t('onboarding.wizard.savingDesc')}
               </p>
             </motion.div>
           )}

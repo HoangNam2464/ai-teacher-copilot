@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const BLOOM_CLASS_MAP = {
   remember: 'bloom-badge--remember',
@@ -7,15 +8,6 @@ const BLOOM_CLASS_MAP = {
   analyze: 'bloom-badge--analyze',
   evaluate: 'bloom-badge--evaluate',
   create: 'bloom-badge--create',
-};
-
-const BLOOM_LABEL_MAP = {
-  remember: 'Nhận biết',
-  understand: 'Thông hiểu',
-  apply: 'Vận dụng',
-  analyze: 'Vận dụng cao',
-  evaluate: 'Đánh giá',
-  create: 'Sáng tạo',
 };
 
 /**
@@ -28,19 +20,20 @@ export function BloomTaxonomyTag({
   className = '',
   ...props
 }) {
+  const { t, i18n } = useTranslation();
   if (!level) return null;
 
   const key = String(level).toLowerCase().trim();
   const badgeClass = BLOOM_CLASS_MAP[key] || 'badge-neutral';
-  const viLabel = BLOOM_LABEL_MAP[key];
+  const translated = t(`bloom.${key}`, { defaultValue: level });
 
   return (
     <span
       className={`bloom-badge ${badgeClass} ${className}`}
-      title={`Cấp độ Bloom: ${viLabel || level}`}
+      title={`${t('bloom.title')}: ${translated}`}
       {...props}
     >
-      {showVietnamese && viLabel ? `${viLabel} (${level})` : level}
+      {showVietnamese && i18n.language.startsWith('vi') ? `${translated} (${level})` : translated}
     </span>
   );
 }

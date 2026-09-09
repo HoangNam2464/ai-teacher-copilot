@@ -39,19 +39,19 @@ export function Footer() {
 
   const footerLinks = {
     product: [
-      { name: t('header.nav.features', 'Tính năng'), href: '/#features' },
-      { name: t('header.nav.howItWorks', 'Hướng dẫn'), href: '/#how-it-works' },
-      { name: t('header.nav.faq', 'FAQ'), href: '/#faq' },
+      { name: t('header.nav.features'), href: '/#features' },
+      { name: t('header.nav.howItWorks'), href: '/#how-it-works' },
+      { name: t('header.nav.faq'), href: '/#faq' },
     ],
     features: [
-      { name: t('workspace.title', 'Workspace'), href: PATHS.WORKSPACES },
-      { name: t('lessonPlanner.title', 'Soạn Giáo Án AI'), href: PATHS.LESSON_PLANNER },
-      { name: t('quizGenerator.title', 'Tạo Đề Thi & Câu Hỏi AI'), href: PATHS.QUIZ_GENERATOR },
-      { name: t('documents.title', 'Tài Liệu'), href: PATHS.DOCUMENTS },
+      { name: t('workspace.title'), href: PATHS.WORKSPACES },
+      { name: t('lessonPlanner.title'), href: PATHS.LESSON_PLANNER },
+      { name: t('quizGenerator.title'), href: PATHS.QUIZ_GENERATOR },
+      { name: t('documents.title'), href: PATHS.DOCUMENTS },
     ],
     legal: [
-      { name: t('auth.termsOfService', 'Điều khoản dịch vụ'), href: '#' },
-      { name: t('auth.privacyPolicy', 'Chính sách bảo mật'), href: '#' },
+      { name: t('auth.termsOfService'), href: '#' },
+      { name: t('auth.privacyPolicy'), href: '#' },
     ],
   };
 
@@ -217,7 +217,7 @@ export function Footer() {
                 © {new Date().getFullYear()} {t('footer.rights')}
               </p>
               <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                <span>{t('footer.madeWith', 'Tạo ra với')}</span>
+                <span>{t('footer.madeWith')}</span>
                 <Heart className="w-4 h-4 text-red-500 fill-red-500" />
                 <span>{t('footer.madeWithHeart')}</span>
               </div>

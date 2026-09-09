@@ -76,9 +76,9 @@ export function AppearanceSettingsPage() {
         >
           <Button variant="ghost" size="sm" onClick={() => navigate(PATHS.SETTINGS.ROOT)}>
             <ArrowLeft className="w-4 h-4 mr-1" />
-            {t('appearanceSettingsPage.back', 'Quay lại')}
+            {t('appearanceSettingsPage.back')}
           </Button>
-          <h1 className="text-2xl font-bold">{t('appearanceSettingsPage.title', 'Giao diện')}</h1>
+          <h1 className="text-2xl font-bold">{t('appearanceSettingsPage.title')}</h1>
         </motion.div>
 
         {/* Theme Selection */}
@@ -88,7 +88,7 @@ export function AppearanceSettingsPage() {
           transition={{ delay: 0.05 }}
           className="bg-card rounded-2xl border border-border p-6"
         >
-          <label className="block text-sm font-semibold mb-4">{t('appearanceSettingsPage.theme', 'Chủ đề')}</label>
+          <label className="block text-sm font-semibold mb-4">{t('appearanceSettingsPage.theme')}</label>
           <div className="grid grid-cols-3 gap-4">
             {THEME_OPTIONS.map((opt) => {
               const active = theme === opt.value;
@@ -113,8 +113,8 @@ export function AppearanceSettingsPage() {
 
                   <opt.icon className={`w-5 h-5 ${active ? 'text-primary' : 'text-muted-foreground'}`} />
                   <div className="text-center">
-                    <p className={`text-sm font-medium ${active ? 'text-primary' : ''}`}>{t(opt.labelKey, opt.value === 'light' ? 'Sáng' : opt.value === 'dark' ? 'Tối' : 'Hệ thống')}</p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">{t(opt.descKey, '')}</p>
+                    <p className={`text-sm font-medium ${active ? 'text-primary' : ''}`}>{t(opt.labelKey)}</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">{t(opt.descKey)}</p>
                   </div>
                 </button>
               );
@@ -129,7 +129,7 @@ export function AppearanceSettingsPage() {
           transition={{ delay: 0.1 }}
           className="text-xs text-muted-foreground text-center mt-6"
         >
-          {t('appearanceSettingsPage.themeInfo', 'Chủ đề được lưu trữ trên trình duyệt này.')}
+          {t('appearanceSettingsPage.themeInfo')}
         </motion.p>
       </div>
   );

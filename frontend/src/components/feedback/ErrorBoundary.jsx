@@ -1,4 +1,5 @@
 import React from 'react';
+import i18n from '@/lib/i18n';
 
 /**
  * ErrorBoundary — React class component that catches render-time errors
@@ -62,16 +63,16 @@ export class ErrorBoundary extends React.Component {
     return (
       <div className="error-boundary" role="alert">
         <span className="error-boundary__icon" aria-hidden="true">⚠️</span>
-        <h3 className="error-boundary__title">Đã xảy ra lỗi không mong muốn</h3>
+        <h3 className="error-boundary__title">{i18n.t('common.unexpectedError')}</h3>
         <p className="error-boundary__message">
-          {error?.message || 'Vui lòng thử lại hoặc liên hệ bộ phận hỗ trợ.'}
+          {error?.message || i18n.t('common.errorTryAgain')}
         </p>
         <button
           type="button"
           className="btn btn-secondary"
           onClick={this.reset}
         >
-          Thử lại
+          {i18n.t('common.tryAgain')}
         </button>
       </div>
     );

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { exportService } from '@/services/export';
 import { Button } from '@/components/ui/Button';
 
 export function ExportDropdown({ workspaceId, generationId, defaultFileName = 'tai-lieu' }) {
+  const { t } = useTranslation();
   const [isExporting, setIsExporting] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -13,7 +15,7 @@ export function ExportDropdown({ workspaceId, generationId, defaultFileName = 't
       await exportService.exportDocument(workspaceId, generationId, format, defaultFileName);
     } catch (err) {
       console.error('Export failed:', err);
-      alert('Xuất tài liệu thất bại. Vui lòng thử lại.');
+      alert(t('export.failed'));
     } finally {
       setIsExporting(false);
       setIsOpen(false);
@@ -29,7 +31,7 @@ export function ExportDropdown({ workspaceId, generationId, defaultFileName = 't
         loading={isExporting}
       >
         <span>📥</span>
-        <span>Xuất tài liệu</span>
+        <span>{t('export.button')}</span>
         <span style={{ fontSize: '0.625rem' }}>▼</span>
       </Button>
 
@@ -62,7 +64,7 @@ export function ExportDropdown({ workspaceId, generationId, defaultFileName = 't
             }}
             onClick={() => handleExport('DOCX')}
           >
-            <span>📝</span> Xuất file Word (.docx)
+            <span>📝</span> {t('export.word')}
           </button>
           <button
             type="button"
@@ -79,7 +81,7 @@ export function ExportDropdown({ workspaceId, generationId, defaultFileName = 't
             }}
             onClick={() => handleExport('PDF')}
           >
-            <span>📄</span> Xuất file PDF (.pdf)
+            <span>📄</span> {t('export.pdf')}
           </button>
         </div>
       )}

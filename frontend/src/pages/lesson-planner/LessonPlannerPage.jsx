@@ -36,8 +36,8 @@ export function LessonPlannerPage() {
       setResult(null);
 
       const payload = {
-        subject: activeWorkspace.subject || 'Toán học',
-        gradeLevel: activeWorkspace.gradeLevel || 'Lớp 10',
+        subject: activeWorkspace.subject || t('common.defaultSubject'),
+        gradeLevel: activeWorkspace.gradeLevel || t('common.defaultGrade'),
         topic,
         objectives: objectives ? objectives.split('\n').filter((s) => s.trim()) : [],
         durationMinutes: Number(durationMinutes),
@@ -103,7 +103,7 @@ export function LessonPlannerPage() {
                       type="text"
                       className="flex h-10 w-full rounded-md border border-input bg-muted pl-9 pr-3 py-2 text-sm text-muted-foreground cursor-not-allowed placeholder:text-muted-foreground/50"
                       disabled
-                      placeholder="Chọn không gian làm việc phía trên"
+                      placeholder={t('lessonPlanner.selectWorkspaceFirst')}
                       value={activeWorkspace?.subject || ''}
                     />
                   </div>
@@ -249,9 +249,9 @@ export function LessonPlannerPage() {
             <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center mb-4">
               <Target className="w-8 h-8 text-emerald-500 opacity-80" />
             </div>
-            <h3 className="text-lg font-semibold mb-2">{t('lessonPlanner.emptyTitle', 'Chưa có giáo án nào được tạo')}</h3>
+            <h3 className="text-lg font-semibold mb-2">{t('lessonPlanner.emptyTitle')}</h3>
             <p className="text-sm text-muted-foreground max-w-sm">
-              {t('lessonPlanner.emptyDesc', 'Hãy điền thông tin vào form bên trái và bấm "Sinh giáo án" để AI hỗ trợ bạn soạn thảo giáo án chi tiết và chuyên nghiệp.')}
+              {t('lessonPlanner.emptyDesc')}
             </p>
           </div>
         )}

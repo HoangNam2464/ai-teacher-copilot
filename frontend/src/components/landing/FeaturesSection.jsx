@@ -55,7 +55,7 @@ function UploadKnowledgeDemo() {
             <motion.div className="w-12 h-12 rounded-lg border-2 border-dashed border-blue-500/50 flex items-center justify-center mx-auto mb-2" animate={{ borderColor: ['rgba(59,130,246,0.3)', 'rgba(59,130,246,0.8)', 'rgba(59,130,246,0.3)'] }} transition={{ duration: 2, repeat: Infinity }}>
               <Upload className="w-5 h-5 text-blue-500" />
             </motion.div>
-            <p className="text-[10px] text-muted-foreground">Upload PDF / DOCX</p>
+            <p className="text-[10px] text-muted-foreground">{t('features.demo.uploadPdfDocx')}</p>
           </motion.div>
         )}
         {step === 1 && (
@@ -63,7 +63,7 @@ function UploadKnowledgeDemo() {
             <motion.div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mx-auto mb-2" animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}>
               <FileText className="w-5 h-5 text-white" />
             </motion.div>
-            <p className="text-[10px] font-medium">Đang phân tích...</p>
+            <p className="text-[10px] font-medium">{t('features.demo.analyzing')}</p>
             <div className="w-20 h-0.5 bg-muted rounded-full mt-1.5 mx-auto overflow-hidden">
               <motion.div className="h-full bg-blue-500 rounded-full" initial={{ width: 0 }} animate={{ width: '100%' }} transition={{ duration: 0.8 }} />
             </div>
@@ -73,7 +73,7 @@ function UploadKnowledgeDemo() {
           <motion.div key="extracting" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="w-full">
             <div className="flex items-center gap-1.5 mb-2">
               <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}><Brain className="w-3.5 h-3.5 text-blue-500" /></motion.div>
-              <span className="text-[10px] font-medium">AI đang trích xuất...</span>
+              <span className="text-[10px] font-medium">{t('features.demo.extracting')}</span>
             </div>
             <div className="space-y-1">
               {extractedItems.map((item, i) => (
@@ -90,8 +90,8 @@ function UploadKnowledgeDemo() {
             <motion.div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mx-auto mb-2" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', bounce: 0.5 }}>
               <Check className="w-6 h-6 text-white" />
             </motion.div>
-            <p className="font-medium text-xs">Vector Index sẵn sàng!</p>
-            <p className="text-[10px] text-muted-foreground">4 concepts extracted</p>
+            <p className="font-medium text-xs">{t('features.demo.vectorIndexReady')}</p>
+            <p className="text-[10px] text-muted-foreground">{t('features.demo.extractedConcepts')}</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -100,8 +100,14 @@ function UploadKnowledgeDemo() {
 }
 
 function LessonPlanDemo() {
+  const { t } = useTranslation();
   const [generatedItems, setGeneratedItems] = useState([]);
-  const planItems = ['Mục tiêu bài dạy', 'Hoạt động khởi động', 'Nội dung chính', 'Đánh giá cuối bài'];
+  const planItems = [
+    t('features.demo.planItems.objectives'),
+    t('features.demo.planItems.warmup'),
+    t('features.demo.planItems.mainContent'),
+    t('features.demo.planItems.assessment'),
+  ];
 
   useEffect(() => {
     const run = async () => {
@@ -123,7 +129,7 @@ function LessonPlanDemo() {
         <div className="w-5 h-5 rounded bg-gradient-to-br from-emerald-500 to-green-500 flex items-center justify-center">
           <Sparkles className="w-3 h-3 text-white" />
         </div>
-        <span className="text-[10px] font-semibold">AI Lesson Planner</span>
+        <span className="text-[10px] font-semibold">{t('features.demo.lessonPlanner')}</span>
       </div>
       <div className="space-y-1.5 flex-1">
         {planItems.map((item, i) => {
@@ -148,7 +154,7 @@ function LessonPlanDemo() {
               <span className={isGenerated ? 'font-medium' : 'text-muted-foreground'}>{item}</span>
               {isGenerated && (
                 <span className="ml-auto text-[8px] text-emerald-500 flex items-center gap-0.5">
-                  <Quote className="w-2 h-2" /> 3 citations
+                  <Quote className="w-2 h-2" /> {t('features.demo.citations')}
                 </span>
               )}
             </motion.div>
@@ -160,14 +166,15 @@ function LessonPlanDemo() {
 }
 
 function QuizDemo() {
+  const { t } = useTranslation();
   const [activeLevel, setActiveLevel] = useState(0);
   const bloomLevels = [
-    { name: 'Remember', color: 'bg-blue-500', pct: 20 },
-    { name: 'Understand', color: 'bg-emerald-500', pct: 25 },
-    { name: 'Apply', color: 'bg-amber-500', pct: 20 },
-    { name: 'Analyze', color: 'bg-orange-500', pct: 15 },
-    { name: 'Evaluate', color: 'bg-rose-500', pct: 10 },
-    { name: 'Create', color: 'bg-purple-500', pct: 10 },
+    { name: t('bloom.remember'), color: 'bg-blue-500', pct: 20 },
+    { name: t('bloom.understand'), color: 'bg-emerald-500', pct: 25 },
+    { name: t('bloom.apply'), color: 'bg-amber-500', pct: 20 },
+    { name: t('bloom.analyze'), color: 'bg-orange-500', pct: 15 },
+    { name: t('bloom.evaluate'), color: 'bg-rose-500', pct: 10 },
+    { name: t('bloom.create'), color: 'bg-purple-500', pct: 10 },
   ];
 
   useEffect(() => {
@@ -183,7 +190,7 @@ function QuizDemo() {
         <div className="w-5 h-5 rounded bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center">
           <Target className="w-3 h-3 text-white" />
         </div>
-        <span className="text-[10px] font-semibold">Bloom Taxonomy Quiz</span>
+        <span className="text-[10px] font-semibold">{t('features.demo.bloomQuiz')}</span>
       </div>
       <div className="space-y-1 flex-1">
         {bloomLevels.map((level, i) => (
@@ -209,7 +216,7 @@ function QuizDemo() {
       </div>
       <div className="mt-2 flex items-center justify-center gap-1 text-[9px] text-muted-foreground">
         <Tag className="w-3 h-3 text-amber-500" />
-        <span>Auto-tagged across 6 levels</span>
+        <span>{t('features.demo.autoTagged')}</span>
       </div>
     </div>
   );
@@ -372,7 +379,7 @@ export function FeaturesSection() {
       description: t('features.items.f4Desc'),
       icon: Tag,
       gradient: 'from-purple-500 to-violet-500',
-      demo: <GenericFeatureDemo icon={Tag} gradient="from-purple-500 to-violet-500" title={t('features.items.f4Title')} items={['Remember', 'Understand', 'Apply', 'Analyze', 'Evaluate', 'Create']} />,
+      demo: <GenericFeatureDemo icon={Tag} gradient="from-purple-500 to-violet-500" title={t('features.items.f4Title')} items={[t('bloom.remember'), t('bloom.understand'), t('bloom.apply'), t('bloom.analyze'), t('bloom.evaluate'), t('bloom.create')]} />,
     },
     {
       key: 'citation',
@@ -380,7 +387,7 @@ export function FeaturesSection() {
       description: t('features.items.f5Desc'),
       icon: Quote,
       gradient: 'from-teal-500 to-cyan-500',
-      demo: <GenericFeatureDemo icon={BookOpen} gradient="from-teal-500 to-cyan-500" title={t('features.items.f5Title')} items={['Source Chunk ID', 'Page Number', 'Document Name', 'Excerpt Preview']} />,
+      demo: <GenericFeatureDemo icon={BookOpen} gradient="from-teal-500 to-cyan-500" title={t('features.items.f5Title')} items={[t('features.demo.sourceChunkId'), t('features.demo.pageNumber'), t('features.demo.documentName'), t('features.demo.excerptPreview')]} />,
     },
     {
       key: 'export',
@@ -388,7 +395,7 @@ export function FeaturesSection() {
       description: t('features.items.f6Desc'),
       icon: Download,
       gradient: 'from-rose-500 to-pink-500',
-      demo: <GenericFeatureDemo icon={Download} gradient="from-rose-500 to-pink-500" title={t('features.items.f6Title')} items={['Inline Editing', 'AI Regeneration', 'Export Word', 'Export PDF']} />,
+      demo: <GenericFeatureDemo icon={Download} gradient="from-rose-500 to-pink-500" title={t('features.items.f6Title')} items={[t('features.demo.inlineEditing'), t('features.demo.aiRegeneration'), t('features.demo.exportWord'), t('features.demo.exportPdf')]} />,
     },
   ], [t]);
 

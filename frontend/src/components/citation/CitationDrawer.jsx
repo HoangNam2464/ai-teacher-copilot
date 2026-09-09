@@ -1,6 +1,8 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export function CitationDrawer({ isOpen, onClose, citations = [] }) {
+  const { t } = useTranslation();
   if (!isOpen) return null;
 
   return (
@@ -32,7 +34,7 @@ export function CitationDrawer({ isOpen, onClose, citations = [] }) {
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.75rem' }}>
           <h3 style={{ fontSize: '1.125rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>
-            Nguồn Trích Dẫn Học Liệu
+            {t('citation.drawerTitle')}
           </h3>
           <button
             type="button"
@@ -44,7 +46,7 @@ export function CitationDrawer({ isOpen, onClose, citations = [] }) {
         </div>
 
         {citations.length === 0 ? (
-          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>Không có nguồn trích dẫn nào.</p>
+          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>{t('citation.empty')}</p>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {citations.map((c, index) => (
@@ -59,11 +61,11 @@ export function CitationDrawer({ isOpen, onClose, citations = [] }) {
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                   <span style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--color-primary)' }}>
-                    📄 {c.fileName || 'Tài liệu nguồn'}
+                    📄 {c.fileName || t('citation.sourceDoc')}
                   </span>
                   {c.sourcePage && (
                     <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-                      Trang {c.sourcePage}
+                      {t('citation.page')} {c.sourcePage}
                     </span>
                   )}
                 </div>

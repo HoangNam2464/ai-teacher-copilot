@@ -172,7 +172,7 @@ export function Header() {
                                 to={PATHS.WORKSPACES}
                                 className="flex items-center justify-center gap-2 text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors"
                               >
-                                {t('common.viewAll', 'Xem tất cả tính năng')}
+                                {t('common.viewAll')}
                                 <ArrowRight className="w-4 h-4" />
                               </Link>
                             </div>
@@ -301,7 +301,7 @@ export function Header() {
                 {/* Features Grid */}
                 <div>
                   <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 mb-3">
-                    {t('features.badge', 'Tính năng chính')}
+                    {t('features.badge')}
                   </p>
                   <div className="grid grid-cols-2 gap-2">
                     {features.map((feature, index) => (
@@ -348,8 +348,8 @@ export function Header() {
                         </span>
                       </div>
                       <div className="flex-1">
-                        <p className="text-sm font-medium">{user?.displayName || t('dashboard.user', 'Giáo viên')}</p>
-                        <p className="text-xs text-muted-foreground">{t('header.enterWorkspace', 'Vào Workspace')}</p>
+                        <p className="text-sm font-medium">{user?.displayName || t('dashboard.user')}</p>
+                        <p className="text-xs text-muted-foreground">{t('header.enterWorkspace')}</p>
                       </div>
                       <ArrowRight className="w-4 h-4 text-muted-foreground" />
                     </Link>

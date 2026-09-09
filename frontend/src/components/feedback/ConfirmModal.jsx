@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 /**
  * ConfirmModal — Accessible confirmation dialog.
@@ -6,8 +7,8 @@ import React, { useEffect, useRef } from 'react';
  * @param {boolean}  isOpen       - Controls visibility of the modal.
  * @param {string}   title        - Modal heading text.
  * @param {string}   message      - Body text describing the action to confirm.
- * @param {string}   confirmLabel - Label for the confirm button. Default: 'Xác nhận'.
- * @param {string}   cancelLabel  - Label for the cancel button. Default: 'Hủy'.
+ * @param {string}   confirmLabel - Label for the confirm button.
+ * @param {string}   cancelLabel  - Label for the cancel button.
  * @param {string}   variant      - Confirm button style: 'danger' | 'primary'. Default: 'danger'.
  * @param {boolean}  loading      - Shows loading state on confirm button. Default: false.
  * @param {function} onConfirm    - Callback invoked when user confirms.
@@ -17,14 +18,18 @@ export function ConfirmModal({
   isOpen,
   title,
   message,
-  confirmLabel = 'Xác nhận',
-  cancelLabel = 'Hủy',
+  confirmLabel,
+  cancelLabel,
   variant = 'danger',
   loading = false,
   onConfirm,
   onCancel,
 }) {
+  const { t } = useTranslation();
   const cancelRef = useRef(null);
+
+  const resolvedConfirmLabel = confirmLabel ?? t('common.confirm');
+  const resolvedCancelLabel = cancelLabel ?? t('common.cancel');
 
   // Focus the cancel button when modal opens for safer UX
   useEffect(() => {
@@ -65,7 +70,7 @@ export function ConfirmModal({
             onClick={onCancel}
             disabled={loading}
           >
-            {cancelLabel}
+            {resolvedCancelLabel}
           </button>
           <button
             type="button"
@@ -74,7 +79,7 @@ export function ConfirmModal({
             disabled={loading}
             aria-busy={loading}
           >
-            {loading ? 'Đang xử lý...' : confirmLabel}
+            {loading ? t('common.processing') : resolvedConfirmLabel}
           </button>
         </div>
       </div>

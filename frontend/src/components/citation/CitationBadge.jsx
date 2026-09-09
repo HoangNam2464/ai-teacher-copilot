@@ -1,7 +1,9 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { BookOpenIcon } from '@/components/ui/Icons';
 
 export function CitationBadge({ count = 0, onClick }) {
+  const { t } = useTranslation();
   if (!count || count === 0) return null;
 
   return (
@@ -9,10 +11,10 @@ export function CitationBadge({ count = 0, onClick }) {
       type="button"
       className="citation-badge"
       onClick={onClick}
-      title="Xem nguồn trích dẫn học liệu"
+      title={t('citation.badgeTitle')}
     >
       <BookOpenIcon size={12} />
-      <span>{count} nguồn</span>
+      <span>{t('citation.sourcesCount', { count })}</span>
     </button>
   );
 }
