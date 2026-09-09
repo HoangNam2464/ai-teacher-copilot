@@ -61,7 +61,7 @@ export function CTASection() {
                     className="bg-white text-emerald-700 hover:bg-white/90 shadow-xl shadow-black/10"
                     asChild
                   >
-                    <Link to={PATHS.REGISTER}>
+                    <Link to={PATHS.WELCOME}>
                       <Zap className="w-5 h-5" />
                       {t('cta.startFree')}
                     </Link>

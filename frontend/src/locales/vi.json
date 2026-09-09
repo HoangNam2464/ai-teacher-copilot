@@ -57,6 +57,7 @@
   "header": {
     "nav": {
       "features": "Tính năng",
+      "tour": "Tour tính năng",
       "howItWorks": "Hướng dẫn",
       "faq": "FAQ"
     },
@@ -428,6 +429,7 @@
     },
     "userMenu": {
       "accountSettings": "Cài đặt tài khoản",
+      "tour": "Giới thiệu tính năng (Tour)",
       "logout": "Đăng xuất"
     }
   },
@@ -696,6 +698,8 @@
     "notificationsDesc": "Quản lý sở thích thông báo",
     "appearance": "Giao diện",
     "appearanceDesc": "Chủ đề, chế độ tối",
+    "tour": "Xem lại giới thiệu tính năng",
+    "tourDesc": "Khám phá lại tính năng và hướng dẫn thiết lập không gian làm việc",
     "subscription": "Gói đăng ký",
     "subscriptionDesc": "Kế hoạch, sử dụng, hóa đơn",
     "language": "Ngôn ngữ",
