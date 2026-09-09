@@ -3,7 +3,7 @@ import { Link, useSearchParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Mail, CheckCircle, AlertCircle, Loader2, ArrowLeft, BrainCircuit } from 'lucide-react';
 import { authService as authApi } from '@/services/auth';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Alert } from '@/components/ui/Alert';
 import { PATHS } from '@/routes/paths';

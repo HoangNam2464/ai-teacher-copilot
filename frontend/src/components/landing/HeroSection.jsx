@@ -15,7 +15,7 @@ import {
   Star,
   Zap,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/hooks/useAuth';
 import { PATHS } from '@/routes/paths';
 import { cn } from '@/lib/utils';

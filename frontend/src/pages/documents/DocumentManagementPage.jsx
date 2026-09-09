@@ -3,10 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { documentApi } from '@/services/documents';
 import { DocumentUploader } from '@/components/documents/DocumentUploader';
 import { useWorkspace } from '@/hooks/useWorkspace';
-import { Badge } from '@/components/ui/badge';
-import { Spinner } from '@/components/ui/spinner';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/Badge';
+import { Spinner } from '@/components/ui/Spinner';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
 import { RefreshCw, File as FileIcon, Trash2, LibraryBig } from 'lucide-react';
 import { formatFileSize, formatDate } from '@/utils/formatters';
 
