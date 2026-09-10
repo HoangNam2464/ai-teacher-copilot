@@ -534,7 +534,10 @@
     "insufficientEvidence": "Not enough relevant context found in knowledge base (Insufficient Evidence). Please upload more documents.",
     "failed": "Failed to generate lesson plan. Please try again.",
     "citationsTitle": "Source Citations",
-    "chunkExcerpt": "Chunk content retrieved via RAG vector search."
+    "chunkExcerpt": "Chunk content retrieved via RAG vector search.",
+    "emptyTitle": "No lesson plan generated yet",
+    "emptyDesc": "Fill in the topic and learning objectives on the left, then click 'Generate AI Lesson Plan' to create a comprehensive plan.",
+    "selectWorkspaceFirst": "Please select a workspace first"
   },
   "quizGenerator": {
     "title": "AI Quiz & Question Generator",
@@ -557,7 +560,10 @@
     "explanation": "Explanation",
     "difficultyEasy": "Easy (Basic)",
     "difficultyMedium": "Medium",
-    "difficultyHard": "Advanced"
+    "difficultyHard": "Advanced",
+    "emptyTitle": "No quiz generated yet",
+    "emptyDesc": "Configure the topic, question count and Bloom's level on the left, then click 'Generate AI Quiz' to begin.",
+    "selectWorkspaceFirst": "Please select a workspace first"
   },
   "history": {
     "title": "Draft & Generation History",

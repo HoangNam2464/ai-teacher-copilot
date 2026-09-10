@@ -534,7 +534,10 @@
     "insufficientEvidence": "Hệ thống không tìm thấy đủ tài liệu liên quan trong kho tri thức để soạn giáo án này (Insufficient Evidence). Vui lòng nạp thêm tài liệu.",
     "failed": "Sinh giáo án thất bại. Vui lòng thử lại.",
     "citationsTitle": "Tài liệu nguồn trích dẫn",
-    "chunkExcerpt": "Nội dung chunk đã trích xuất qua RAG vector search."
+    "chunkExcerpt": "Nội dung chunk đã trích xuất qua RAG vector search.",
+    "emptyTitle": "Chưa có giáo án nào được tạo",
+    "emptyDesc": "Điền thông tin chủ đề và mục tiêu bài dạy ở biểu mẫu bên trái, sau đó nhấn 'Bắt đầu sinh giáo án AI' để tạo kế hoạch bài dạy chi tiết.",
+    "selectWorkspaceFirst": "Vui lòng chọn Không gian làm việc trước"
   },
   "quizGenerator": {
     "title": "Tạo Đề Thi & Câu Hỏi AI",
@@ -557,7 +560,10 @@
     "explanation": "Giải thích",
     "difficultyEasy": "Dễ (Cơ bản)",
     "difficultyMedium": "Trung bình",
-    "difficultyHard": "Nâng cao"
+    "difficultyHard": "Nâng cao",
+    "emptyTitle": "Chưa có đề kiểm tra nào được tạo",
+    "emptyDesc": "Thiết lập chủ đề kiểm tra, số lượng câu hỏi và cấp độ Bloom ở biểu mẫu bên trái, sau đó nhấn 'Sinh đề thi & câu hỏi AI'.",
+    "selectWorkspaceFirst": "Vui lòng chọn Không gian làm việc trước"
   },
   "history": {
     "title": "Lịch Sử Soạn Thảo & Bản Nháp",

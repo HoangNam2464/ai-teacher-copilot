@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
+import { useWorkspaceStore } from '@/stores/workspaceStore';
 import { Button } from '@/components/ui/Button';
 import { NotificationBell } from '@/components/NotificationBell';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
@@ -20,15 +21,24 @@ import {
   History,
   BrainCircuit,
   FolderOpen,
+  ChevronDown,
+  Check,
+  Plus,
 } from 'lucide-react';
 
 export function DashboardLayout({ children }) {
   const { t } = useTranslation();
   const { user, logout, displayName, initials } = useAuth();
+  const { workspaces, activeWorkspace, setActiveWorkspace, fetchWorkspaces } = useWorkspaceStore();
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [workspaceDropdownOpen, setWorkspaceDropdownOpen] = useState(false);
+
+  useEffect(() => {
+    fetchWorkspaces();
+  }, [fetchWorkspaces]);
 
   const sidebarItems = [
     { labelKey: 'nav.dashboard', icon: LayoutDashboard, href: PATHS.DASHBOARD },
@@ -149,14 +159,96 @@ export function DashboardLayout({ children }) {
       <div className="lg:ml-64">
         {/* Header */}
         <header className="h-16 bg-card border-b border-border sticky top-0 z-30">
-          <div className="h-full px-4 flex items-center justify-between">
+          <div className="h-full px-4 flex items-center justify-between gap-3">
             {/* Mobile menu button */}
             <button
               onClick={() => setSidebarOpen(true)}
-              className="lg:hidden p-2 hover:bg-muted rounded-lg transition-colors"
+              className="lg:hidden p-2 hover:bg-muted rounded-lg transition-colors flex-shrink-0"
             >
               <Menu className="w-5 h-5" />
             </button>
+
+            {/* Workspace Quick Switcher */}
+            <div className="relative">
+              {activeWorkspace ? (
+                <button
+                  onClick={() => setWorkspaceDropdownOpen(!workspaceDropdownOpen)}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border bg-card hover:bg-muted text-foreground text-sm font-medium transition-colors shadow-xs"
+                  title={t('workspace.title', 'Không gian làm việc')}
+                >
+                  <div className="w-5 h-5 rounded bg-green-500/10 flex items-center justify-center text-green-600 flex-shrink-0">
+                    <FolderOpen className="w-3.5 h-3.5" />
+                  </div>
+                  <span className="truncate max-w-[130px] sm:max-w-[200px] font-semibold text-xs sm:text-sm">
+                    {activeWorkspace.name}
+                  </span>
+                  <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
+                </button>
+              ) : (
+                <Link
+                  to={PATHS.WORKSPACES}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-dashed border-green-500/50 text-green-600 bg-green-500/5 hover:bg-green-500/10 text-xs sm:text-sm font-medium transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>{t('workspace.createFirst', 'Chọn Không gian')}</span>
+                </Link>
+              )}
+
+              {/* Workspace Dropdown */}
+              {workspaceDropdownOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setWorkspaceDropdownOpen(false)}
+                  />
+                  <div className="absolute left-0 top-full mt-2 w-64 bg-card border border-border rounded-xl shadow-lg z-50 p-2 animate-fade-in">
+                    <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                      {t('workspace.title', 'Không gian làm việc')}
+                    </div>
+                    <div className="max-h-60 overflow-y-auto space-y-1">
+                      {workspaces.map((w) => {
+                        const isSelected = activeWorkspace?.id === w.id;
+                        return (
+                          <button
+                            key={w.id}
+                            onClick={() => {
+                              setActiveWorkspace(w);
+                              setWorkspaceDropdownOpen(false);
+                            }}
+                            className={cn(
+                              'w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs sm:text-sm transition-colors text-left',
+                              isSelected
+                                ? 'bg-green-500/10 text-green-600 font-semibold'
+                                : 'hover:bg-muted text-foreground'
+                            )}
+                          >
+                            <div className="truncate min-w-0 pr-2">
+                              <p className="truncate">{w.name}</p>
+                              {w.subject && (
+                                <p className="text-[11px] text-muted-foreground font-normal truncate">
+                                  {w.subject} {w.gradeLevel ? `• ${w.gradeLevel}` : ''}
+                                </p>
+                              )}
+                            </div>
+                            {isSelected && <Check className="w-4 h-4 text-green-600 shrink-0" />}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <div className="border-t border-border mt-2 pt-2">
+                      <Link
+                        to={PATHS.WORKSPACES}
+                        onClick={() => setWorkspaceDropdownOpen(false)}
+                        className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-green-600 hover:bg-green-500/10 transition-colors"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        {t('workspace.create', 'Quản lý / Tạo không gian mới')}
+                      </Link>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
 
             <div className="flex-1" />
 
