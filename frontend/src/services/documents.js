@@ -7,7 +7,7 @@ export const documentService = {
     return response.data;
   },
 
-  async uploadDocument(workspaceId, file, { subject, gradeLevel, topic } = {}) {
+  async uploadDocument(workspaceId, file, { subject, gradeLevel, topic } = {}, onProgress) {
     const formData = new FormData();
     formData.append('file', file);
     if (subject) formData.append('subject', subject);
@@ -18,12 +18,22 @@ export const documentService = {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
+      onUploadProgress: (progressEvent) => {
+        if (progressEvent.total && onProgress) {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          onProgress(percentCompleted);
+        }
+      },
     });
     return response.data;
   },
 
-  async deleteDocument(documentId) {
-    const response = await api.delete(ENDPOINTS.documents.delete(documentId));
+  async deleteDocument(workspaceId, documentId) {
+    if (!documentId && workspaceId) {
+      const response = await api.delete(ENDPOINTS.documents.delete(workspaceId));
+      return response.data;
+    }
+    const response = await api.delete(`/workspaces/${workspaceId}/documents/${documentId}`);
     return response.data;
   },
 };

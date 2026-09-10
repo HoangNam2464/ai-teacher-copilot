@@ -55,14 +55,19 @@ export function DocumentManagementPage() {
     }
   }, [activeWorkspace?.id]);
 
-  const handleUploadSuccess = async (file) => {
+  const handleUploadSuccess = async (file, onProgress) => {
     if (!activeWorkspace?.id) return;
     try {
-      await documentApi.uploadDocument(activeWorkspace.id, file, {
-        subject: activeWorkspace.subject,
-        gradeLevel: activeWorkspace.gradeLevel,
-      });
-      toast.success(t('common.success', 'Tải lên tài liệu thành công! AI đang xử lý vector.'));
+      await documentApi.uploadDocument(
+        activeWorkspace.id,
+        file,
+        {
+          subject: activeWorkspace.subject,
+          gradeLevel: activeWorkspace.gradeLevel,
+        },
+        onProgress
+      );
+      toast.success(t('documents.uploadSuccess', 'Tải lên tài liệu thành công! AI đang xử lý vector.'));
       await loadDocuments();
     } catch (err) {
       toast.error(err?.response?.data?.message || t('documents.uploadFailed', 'Tải lên thất bại'));
@@ -79,7 +84,7 @@ export function DocumentManagementPage() {
     if (!docToDelete?.id) return;
     try {
       setIsDeleting(true);
-      await documentApi.deleteDocument(docToDelete.id);
+      await documentApi.deleteDocument(activeWorkspace.id, docToDelete.id);
       toast.success(t('common.success', 'Đã xóa tài liệu khỏi kho tri thức'));
       setDeleteModalOpen(false);
       setDocToDelete(null);
