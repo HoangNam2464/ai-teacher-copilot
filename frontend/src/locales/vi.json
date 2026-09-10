@@ -44,15 +44,20 @@
     "errorTryAgain": "Vui lòng thử lại hoặc liên hệ bộ phận hỗ trợ.",
     "defaultSubject": "Toán học",
     "defaultGrade": "Lớp 10",
-    "viewAll": "Xem tất cả tính năng"
+    "viewAll": "Xem tất cả tính năng",
+    "upgradeToPro": "Nâng cấp lên Pro",
+    "upgrade": "Nâng cấp",
+    "subscription": "Gói đăng ký",
+    "plan": "Gói"
   },
   "nav": {
-    "workspaces": "Không gian làm việc",
+    "dashboard": "Dashboard",
+    "workspaces": "Workspace",
     "documents": "Tài liệu",
     "lessonPlanner": "Soạn giáo án",
     "quizGenerator": "Tạo đề thi",
     "history": "Lịch sử",
-    "settings": "Cài đặt tài khoản"
+    "settings": "Cài đặt"
   },
   "header": {
     "nav": {
@@ -422,6 +427,12 @@
     "welcome": "Chào mừng trở lại",
     "user": "Giáo viên",
     "upgradeButton": "Nâng cấp",
+    "upgradeBanner": {
+      "title": "Nâng cấp lên Pro",
+      "description": "Mở khóa không giới hạn tài liệu và tính năng AI",
+      "unlockDescription": "Mở khóa không giới hạn tài liệu và tính năng AI",
+      "upgrade": "Nâng cấp"
+    },
     "greeting": {
       "morning": "Chào buổi sáng",
       "afternoon": "Chào buổi chiều",
@@ -523,7 +534,10 @@
     "insufficientEvidence": "Hệ thống không tìm thấy đủ tài liệu liên quan trong kho tri thức để soạn giáo án này (Insufficient Evidence). Vui lòng nạp thêm tài liệu.",
     "failed": "Sinh giáo án thất bại. Vui lòng thử lại.",
     "citationsTitle": "Tài liệu nguồn trích dẫn",
-    "chunkExcerpt": "Nội dung chunk đã trích xuất qua RAG vector search."
+    "chunkExcerpt": "Nội dung chunk đã trích xuất qua RAG vector search.",
+    "emptyTitle": "Chưa có giáo án nào được tạo",
+    "emptyDesc": "Điền thông tin chủ đề và mục tiêu bài dạy ở biểu mẫu bên trái, sau đó nhấn 'Bắt đầu sinh giáo án AI' để tạo kế hoạch bài dạy chi tiết.",
+    "selectWorkspaceFirst": "Vui lòng chọn Không gian làm việc trước"
   },
   "quizGenerator": {
     "title": "Tạo Đề Thi & Câu Hỏi AI",
@@ -546,7 +560,10 @@
     "explanation": "Giải thích",
     "difficultyEasy": "Dễ (Cơ bản)",
     "difficultyMedium": "Trung bình",
-    "difficultyHard": "Nâng cao"
+    "difficultyHard": "Nâng cao",
+    "emptyTitle": "Chưa có đề kiểm tra nào được tạo",
+    "emptyDesc": "Thiết lập chủ đề kiểm tra, số lượng câu hỏi và cấp độ Bloom ở biểu mẫu bên trái, sau đó nhấn 'Sinh đề thi & câu hỏi AI'.",
+    "selectWorkspaceFirst": "Vui lòng chọn Không gian làm việc trước"
   },
   "history": {
     "title": "Lịch Sử Soạn Thảo & Bản Nháp",
@@ -833,5 +850,22 @@
     "arts": "Mỹ Thuật",
     "music": "Âm Nhạc",
     "physicalEducation": "Thể Dục"
+  },
+  "notifications": {
+    "title": "Thông báo",
+    "allCaughtUp": "Bạn đã xem tất cả!",
+    "unreadCount": "{{count}} thông báo chưa đọc",
+    "noNotifications": "Chưa có thông báo nào",
+    "noUnread": "Không có thông báo chưa đọc",
+    "wellNotify": "Chúng tôi sẽ thông báo cho bạn khi có điều gì quan trọng xảy ra.",
+    "markAllAsRead": "Đánh dấu tất cả là đã đọc",
+    "clearAll": "Xóa tất cả",
+    "viewAll": "Xem tất cả thông báo",
+    "clickToView": "Nhấp để xem",
+    "justNow": "vừa mới",
+    "minutesAgo": "{{count}} phút trước",
+    "hoursAgo": "{{count}} giờ trước",
+    "daysAgo": "{{count}} ngày trước"
   }
 }
+

@@ -44,15 +44,20 @@
     "errorTryAgain": "Please try again or contact support.",
     "defaultSubject": "Mathematics",
     "defaultGrade": "Grade 10",
-    "viewAll": "View all features"
+    "viewAll": "View all features",
+    "upgradeToPro": "Upgrade to Pro",
+    "upgrade": "Upgrade",
+    "subscription": "Subscription",
+    "plan": "Plan"
   },
   "nav": {
-    "workspaces": "Workspaces",
+    "dashboard": "Dashboard",
+    "workspaces": "Workspace",
     "documents": "Documents",
     "lessonPlanner": "Lesson Planner",
     "quizGenerator": "Quiz Generator",
     "history": "History",
-    "settings": "Account Settings"
+    "settings": "Settings"
   },
   "header": {
     "nav": {
@@ -422,6 +427,12 @@
     "welcome": "Welcome back",
     "user": "Teacher",
     "upgradeButton": "Upgrade",
+    "upgradeBanner": {
+      "title": "Upgrade to Pro",
+      "description": "Unlock unlimited study sets and AI features",
+      "unlockDescription": "Unlock unlimited study sets and AI features",
+      "upgrade": "Upgrade"
+    },
     "greeting": {
       "morning": "Good morning",
       "afternoon": "Good afternoon",
@@ -523,7 +534,10 @@
     "insufficientEvidence": "Not enough relevant context found in knowledge base (Insufficient Evidence). Please upload more documents.",
     "failed": "Failed to generate lesson plan. Please try again.",
     "citationsTitle": "Source Citations",
-    "chunkExcerpt": "Chunk content retrieved via RAG vector search."
+    "chunkExcerpt": "Chunk content retrieved via RAG vector search.",
+    "emptyTitle": "No lesson plan generated yet",
+    "emptyDesc": "Fill in the topic and learning objectives on the left, then click 'Generate AI Lesson Plan' to create a comprehensive plan.",
+    "selectWorkspaceFirst": "Please select a workspace first"
   },
   "quizGenerator": {
     "title": "AI Quiz & Question Generator",
@@ -546,7 +560,10 @@
     "explanation": "Explanation",
     "difficultyEasy": "Easy (Basic)",
     "difficultyMedium": "Medium",
-    "difficultyHard": "Advanced"
+    "difficultyHard": "Advanced",
+    "emptyTitle": "No quiz generated yet",
+    "emptyDesc": "Configure the topic, question count and Bloom's level on the left, then click 'Generate AI Quiz' to begin.",
+    "selectWorkspaceFirst": "Please select a workspace first"
   },
   "history": {
     "title": "Draft & Generation History",
@@ -833,5 +850,22 @@
     "arts": "Fine Arts",
     "music": "Music",
     "physicalEducation": "Physical Education"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "allCaughtUp": "You're all caught up!",
+    "unreadCount": "{{count}} unread notifications",
+    "noNotifications": "No notifications yet",
+    "noUnread": "No unread notifications",
+    "wellNotify": "We'll notify you when something important happens.",
+    "markAllAsRead": "Mark all as read",
+    "clearAll": "Clear all",
+    "viewAll": "View all notifications",
+    "clickToView": "Click to view",
+    "justNow": "just now",
+    "minutesAgo": "{{count}} minutes ago",
+    "hoursAgo": "{{count}} hours ago",
+    "daysAgo": "{{count}} days ago"
   }
 }
+

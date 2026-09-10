@@ -59,7 +59,6 @@ const features = [
 
 const navLinks = [
   { nameKey: 'header.nav.features', href: '/#features', hasDropdown: true },
-  { nameKey: 'header.nav.tour', href: PATHS.WELCOME },
   { nameKey: 'header.nav.howItWorks', href: '/#how-it-works' },
   { nameKey: 'header.nav.faq', href: '/#faq' },
 ];
@@ -169,14 +168,7 @@ export function Header() {
                                 </Link>
                               ))}
                             </div>
-                            <div className="mt-4 pt-4 border-t border-border/50 flex items-center justify-between">
-                              <Link
-                                to={PATHS.WELCOME}
-                                className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
-                              >
-                                <Sparkles className="w-3.5 h-3.5" />
-                                {t('header.nav.tour')}
-                              </Link>
+                            <div className="mt-4 pt-4 border-t border-border/50 flex items-center justify-end">
                               <Link
                                 to={PATHS.WORKSPACES}
                                 className="flex items-center justify-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
