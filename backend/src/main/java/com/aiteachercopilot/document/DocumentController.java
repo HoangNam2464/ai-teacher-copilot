@@ -27,7 +27,7 @@ public class DocumentController {
     /**
      * POST /api/workspaces/{workspaceId}/documents — Upload a document.
      */
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = {"", "/upload"}, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<DocumentDto.UploadResponse>> upload(
             @AuthenticationPrincipal User user,
             @PathVariable UUID workspaceId,
@@ -51,5 +51,17 @@ public class DocumentController {
         List<DocumentDto.ListResponse> documents =
                 documentService.listByWorkspace(workspaceId, user.getId());
         return ResponseEntity.ok(ApiResponse.success(documents));
+    }
+
+    /**
+     * DELETE /api/workspaces/{workspaceId}/documents/{documentId} — Delete a document.
+     */
+    @DeleteMapping("/{documentId}")
+    public ResponseEntity<Void> delete(
+            @AuthenticationPrincipal User user,
+            @PathVariable UUID workspaceId,
+            @PathVariable UUID documentId) {
+        documentService.deleteDocument(documentId, workspaceId, user.getId());
+        return ResponseEntity.noContent().build();
     }
 }

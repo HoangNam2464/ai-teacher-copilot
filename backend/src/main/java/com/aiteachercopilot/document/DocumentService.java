@@ -4,6 +4,7 @@ import com.aiteachercopilot.common.exception.ResourceNotFoundException;
 import com.aiteachercopilot.workspace.WorkspaceService;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
+import io.minio.RemoveObjectArgs;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -135,6 +136,37 @@ public class DocumentService {
         return documentRepository.findById(documentId)
                 .filter(d -> d.getWorkspaceId().equals(workspaceId))
                 .orElseThrow(() -> new ResourceNotFoundException("Document", documentId));
+    }
+
+    /**
+     * Delete document: verifies workspace ownership, removes object from MinIO,
+     * and deletes database records.
+     */
+    @Transactional
+    public void deleteDocument(UUID documentId, UUID workspaceId, UUID userId) {
+        workspaceService.findAndAuthorize(workspaceId, userId);
+        Document document = documentRepository.findById(documentId)
+                .filter(d -> d.getWorkspaceId().equals(workspaceId))
+                .orElseThrow(() -> new ResourceNotFoundException("Document", documentId));
+
+        // 1. Remove MinIO object if exists
+        if (document.getMinioObjectKey() != null) {
+            try {
+                minioClient.removeObject(
+                        RemoveObjectArgs.builder()
+                                .bucket(bucketName)
+                                .object(document.getMinioObjectKey())
+                                .build()
+                );
+                log.info("Removed MinIO object: {}", document.getMinioObjectKey());
+            } catch (Exception e) {
+                log.warn("Failed to remove MinIO object {}: {}", document.getMinioObjectKey(), e.getMessage());
+            }
+        }
+
+        // 2. Delete database record
+        documentRepository.delete(document);
+        log.info("Document deleted successfully: {}", documentId);
     }
 
     /**
