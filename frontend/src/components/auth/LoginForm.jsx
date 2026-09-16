@@ -53,6 +53,7 @@ export function LoginForm() {
 
         if (googleBtnRef.current) {
           try {
+            googleBtnRef.current.innerHTML = '';
             window.google.accounts.id.renderButton(googleBtnRef.current, {
               type: 'icon',
               shape: 'square',
@@ -66,7 +67,8 @@ export function LoginForm() {
       }
     };
 
-    if (!document.getElementById('google-signin-script')) {
+    const existingScript = document.getElementById('google-signin-script');
+    if (!existingScript) {
       const script = document.createElement('script');
       script.id = 'google-signin-script';
       script.src = 'https://accounts.google.com/gsi/client';
@@ -74,8 +76,10 @@ export function LoginForm() {
       script.defer = true;
       script.onload = initGoogle;
       document.body.appendChild(script);
-    } else {
+    } else if (window.google?.accounts?.id) {
       initGoogle();
+    } else {
+      existingScript.addEventListener('load', initGoogle);
     }
   }, []);
 
