@@ -556,7 +556,7 @@ function SetupWizard({ onSkip }) {
       // Simulate slight delay for UX
       await new Promise(resolve => setTimeout(resolve, 800));
       
-      navigate(PATHS.WORKSPACES);
+      navigate(PATHS.DASHBOARD);
     } catch (error) {
       console.error('Failed to complete onboarding:', error);
       setSaving(false);
@@ -743,7 +743,7 @@ export function OnboardingPage() {
   const handleSkip = () => {
     localStorage.setItem('onboarding_completed', 'true');
     if (isAuthenticated) {
-      navigate(PATHS.WORKSPACES);
+      navigate(PATHS.DASHBOARD);
     } else {
       navigate(PATHS.LOGIN);
     }

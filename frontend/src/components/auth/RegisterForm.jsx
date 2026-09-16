@@ -139,7 +139,7 @@ export function RegisterForm() {
         });
       }
       const hasCompletedOnboarding = localStorage.getItem('onboarding_completed') === 'true';
-      navigate(hasCompletedOnboarding ? PATHS.WORKSPACES : PATHS.ONBOARDING);
+      navigate(hasCompletedOnboarding ? PATHS.DASHBOARD : PATHS.ONBOARDING);
     } catch (err) {
       setError(
         err.response?.data?.message ||
@@ -190,7 +190,7 @@ export function RegisterForm() {
         });
       }
       const hasCompletedOnboarding = localStorage.getItem('onboarding_completed') === 'true';
-      navigate(hasCompletedOnboarding ? PATHS.WORKSPACES : PATHS.ONBOARDING);
+      navigate(hasCompletedOnboarding ? PATHS.DASHBOARD : PATHS.ONBOARDING);
     } catch (err) {
       if (err?.error !== 'popup_closed_by_user') {
         setError(err?.message || t('auth.register.appleFailed'));
