@@ -13,6 +13,7 @@ COPY --from=build /app/dist /usr/share/nginx/html
 
 RUN echo 'server { \
     listen 80; \
+    listen [::]:80; \
     location / { \
         root /usr/share/nginx/html; \
         index index.html; \
@@ -23,4 +24,4 @@ RUN echo 'server { \
 EXPOSE 80
 
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
-  CMD wget -qO- http://localhost/ || exit 1
+  CMD wget -qO- http://127.0.0.1/ || exit 1

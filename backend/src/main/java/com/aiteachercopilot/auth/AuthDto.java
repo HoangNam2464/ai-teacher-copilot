@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 public final class AuthDto {
 
@@ -34,17 +35,27 @@ public final class AuthDto {
     }
 
     @Data
+    @NoArgsConstructor
     public static class AuthResponse {
         private String token;
         private String email;
         private String fullName;
         private String role;
+        private String avatarUrl;
 
         public AuthResponse(String token, String email, String fullName, String role) {
             this.token = token;
             this.email = email;
             this.fullName = fullName;
             this.role = role;
+        }
+
+        public AuthResponse(String token, String email, String fullName, String role, String avatarUrl) {
+            this.token = token;
+            this.email = email;
+            this.fullName = fullName;
+            this.role = role;
+            this.avatarUrl = avatarUrl;
         }
     }
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { BookOpenIcon } from '@/components/ui/Icons';
+import { BookOpen } from 'lucide-react';
 
 export function CitationBadge({ count = 0, onClick }) {
   const { t } = useTranslation();
@@ -9,13 +9,12 @@ export function CitationBadge({ count = 0, onClick }) {
   return (
     <button
       type="button"
-      className="citation-badge"
       onClick={onClick}
-      title={t('citation.badgeTitle')}
+      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 text-xs font-semibold border border-emerald-500/20 transition-colors shadow-xs"
+      title={t('citation.badgeTitle', 'Xem nguồn trích dẫn học liệu')}
     >
-      <BookOpenIcon size={12} />
-      <span>{t('citation.sourcesCount', { count })}</span>
+      <BookOpen className="w-3.5 h-3.5" />
+      <span>{t('citation.sourcesCount', { count: count })}</span>
     </button>
   );
 }
-

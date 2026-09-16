@@ -192,11 +192,15 @@ export function AccountSettingsPage() {
             </div>
             <div className="flex justify-between py-2 border-b border-border">
               <span className="text-muted-foreground">{t('accountSettingsPage.planLabel')}</span>
-              <span className="capitalize text-primary font-medium">{t('dashboard.user')}</span>
+              <span className="capitalize font-medium text-emerald-600 dark:text-emerald-400">{user?.plan || 'free'}</span>
             </div>
             <div className="flex justify-between py-2 border-b border-border">
               <span className="text-muted-foreground">{t('accountSettingsPage.emailVerified')}</span>
-              <span className="text-green-500">{t('accountSettingsPage.yes')}</span>
+              <span className="text-emerald-500">{user?.emailVerified !== false ? t('accountSettingsPage.yes') : t('accountSettingsPage.no')}</span>
+            </div>
+            <div className="flex justify-between py-2">
+              <span className="text-muted-foreground">{t('accountSettingsPage.memberSince')}</span>
+              <span>{user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : '-'}</span>
             </div>
           </div>
         </motion.div>

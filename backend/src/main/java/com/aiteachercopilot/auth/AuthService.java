@@ -2,21 +2,39 @@ package com.aiteachercopilot.auth;
 
 import com.aiteachercopilot.user.User;
 import com.aiteachercopilot.user.UserRepository;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
+
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
+
+    @Value("${app.google.client-id}")
+    private String googleClientId;
+
+    public AuthService(UserRepository userRepository,
+                       PasswordEncoder passwordEncoder,
+                       JwtTokenProvider tokenProvider) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.tokenProvider = tokenProvider;
+    }
 
     @Transactional
     public AuthDto.AuthResponse register(AuthDto.RegisterRequest request) {
@@ -65,26 +83,48 @@ public class AuthService {
             throw new IllegalArgumentException("Google credential không được để trống.");
         }
 
-        String email = null;
-        String fullName = "Giáo viên Google";
+        if (googleClientId == null || googleClientId.isBlank()) {
+            log.error("GOOGLE_CLIENT_ID is not configured. Cannot verify Google ID Token.");
+            throw new IllegalStateException("Google Login chưa được cấu hình trên server.");
+        }
 
+        GoogleIdToken idToken;
         try {
-            String[] parts = request.getCredential().split("\\.");
-            if (parts.length >= 2) {
-                String payloadJson = new String(java.util.Base64.getUrlDecoder().decode(parts[1]), java.nio.charset.StandardCharsets.UTF_8);
-                com.fasterxml.jackson.databind.JsonNode node = new com.fasterxml.jackson.databind.ObjectMapper().readTree(payloadJson);
-                if (node.has("email")) email = node.get("email").asText();
-                if (node.has("name")) fullName = node.get("name").asText();
-            }
+            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
+                    new NetHttpTransport(),
+                    GsonFactory.getDefaultInstance())
+                    .setAudience(Collections.singletonList(googleClientId))
+                    .build();
+
+            idToken = verifier.verify(request.getCredential());
         } catch (Exception e) {
-            log.warn("Failed to parse Google ID Token: {}", e.getMessage());
+            log.warn("Google ID Token verification failed: {}", e.getMessage());
+            throw new IllegalArgumentException("Không thể xác thực Google ID Token.");
+        }
+
+        if (idToken == null) {
+            log.warn("Google ID Token verification returned null — token is invalid or forged.");
+            throw new IllegalArgumentException("Google ID Token không hợp lệ hoặc đã hết hạn.");
+        }
+
+        Payload payload = idToken.getPayload();
+        String email = payload.getEmail();
+        String fullName = (String) payload.get("name");
+        String picture = (String) payload.get("picture");
+        if (fullName == null || fullName.isBlank()) {
+            fullName = "Giáo viên Google";
         }
 
         if (email == null || email.isBlank()) {
-            throw new IllegalArgumentException("Không thể xác thực thông tin tài khoản từ Google.");
+            throw new IllegalArgumentException("Không thể lấy email từ Google ID Token.");
         }
 
-        return getOrCreateSocialUser(email, fullName);
+        log.info("Google ID Token verified successfully for: {}", email);
+        AuthDto.AuthResponse response = getOrCreateSocialUser(email, fullName);
+        if (picture != null && !picture.isBlank()) {
+            response.setAvatarUrl(picture);
+        }
+        return response;
     }
 
     @Transactional
@@ -169,7 +209,7 @@ public class AuthService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Người dùng không tồn tại."));
 
-        user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+        user.setPasswordHash(passwordEncoder.encode(request.getNewPassword())); 
         userRepository.save(user);
         log.info("Password successfully reset for user: {}", email);
 

@@ -20,10 +20,10 @@ export function RegisterPage() {
 
           <div className="text-center space-y-1.5">
             <CardTitle className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-              {t('auth.register')}
+              {t('auth.register.title')}
             </CardTitle>
             <CardDescription className="text-gray-600 dark:text-gray-400">
-              {t('auth.registerSubtitle')}
+              {t('auth.register.description')}
             </CardDescription>
           </div>
         </div>

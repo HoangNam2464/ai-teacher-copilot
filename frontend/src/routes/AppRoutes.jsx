@@ -14,6 +14,7 @@ import { ForgotPasswordPage } from '@/pages/auth/ForgotPasswordPage';
 import { ResetPasswordPage } from '@/pages/auth/ResetPasswordPage';
 import { VerifyEmailPage } from '@/pages/auth/VerifyEmailPage';
 import { OnboardingPage } from '@/pages/auth/OnboardingPage';
+import { DashboardHomePage } from '@/pages/dashboard/DashboardHomePage';
 import { WorkspaceListPage } from '@/pages/workspace/WorkspaceListPage';
 import { DocumentManagementPage } from '@/pages/documents/DocumentManagementPage';
 import { LessonPlannerPage } from '@/pages/lesson-planner/LessonPlannerPage';
@@ -25,6 +26,7 @@ import { ProfileSettingsPage } from '@/pages/settings/ProfileSettingsPage';
 import { AccountSettingsPage } from '@/pages/settings/AccountSettingsPage';
 import { AppearanceSettingsPage } from '@/pages/settings/AppearanceSettingsPage';
 import { NotificationSettingsPage } from '@/pages/settings/NotificationSettingsPage';
+import { SubscriptionPage } from '@/pages/settings/SubscriptionPage';
 
 // Scroll to top on route change
 function ScrollToTop() {
@@ -76,15 +78,9 @@ export function AppRoutes() {
           <Route path={PATHS.VERIFY_EMAIL} element={<VerifyEmailPage />} />
         </Route>
 
-        {/* Protected Onboarding (No Layout) */}
-        <Route
-          path={PATHS.ONBOARDING}
-          element={
-            <PrivateRoute>
-              <OnboardingPage />
-            </PrivateRoute>
-          }
-        />
+        {/* Welcome Tour & Onboarding (Accessible to all) */}
+        <Route path={PATHS.WELCOME} element={<OnboardingPage />} />
+        <Route path={PATHS.ONBOARDING} element={<OnboardingPage />} />
 
         {/* Protected Application Routes (Dashboard Layout) */}
         <Route
@@ -94,18 +90,30 @@ export function AppRoutes() {
             </PrivateRoute>
           }
         >
-          <Route path={PATHS.WORKSPACES} element={<WorkspaceListPage />} />
+          <Route path="/dashboard" element={<DashboardHomePage />} />
+          <Route path="/dashboard/workspace" element={<WorkspaceListPage />} />
+          <Route path="/dashboard/workspaces" element={<Navigate to="/dashboard/workspace" replace />} />
+          <Route path="/workspaces" element={<Navigate to="/dashboard/workspace" replace />} />
           <Route path={PATHS.DOCUMENTS} element={<DocumentManagementPage />} />
           <Route path={PATHS.LESSON_PLANNER} element={<LessonPlannerPage />} />
           <Route path={PATHS.QUIZ_GENERATOR} element={<QuizGeneratorPage />} />
           <Route path={PATHS.HISTORY} element={<HistoryListPage />} />
           
-          {/* Settings */}
+          {/* Settings & Subscription */}
           <Route path={PATHS.SETTINGS.ROOT} element={<SettingsPage />} />
           <Route path={PATHS.SETTINGS.PROFILE} element={<ProfileSettingsPage />} />
           <Route path={PATHS.SETTINGS.ACCOUNT} element={<AccountSettingsPage />} />
           <Route path={PATHS.SETTINGS.APPEARANCE} element={<AppearanceSettingsPage />} />
           <Route path={PATHS.SETTINGS.NOTIFICATIONS} element={<NotificationSettingsPage />} />
+          <Route path={PATHS.SETTINGS.SUBSCRIPTION} element={<SubscriptionPage />} />
+          <Route path="/dashboard/subscription/manage" element={<SubscriptionPage />} />
+
+          {/* Backward compatibility redirects */}
+          <Route path="/settings" element={<Navigate to={PATHS.SETTINGS.ROOT} replace />} />
+          <Route path="/settings/profile" element={<Navigate to={PATHS.SETTINGS.PROFILE} replace />} />
+          <Route path="/settings/account" element={<Navigate to={PATHS.SETTINGS.ACCOUNT} replace />} />
+          <Route path="/settings/appearance" element={<Navigate to={PATHS.SETTINGS.APPEARANCE} replace />} />
+          <Route path="/settings/notifications" element={<Navigate to={PATHS.SETTINGS.NOTIFICATIONS} replace />} />
         </Route>
 
         {/* 404 */}

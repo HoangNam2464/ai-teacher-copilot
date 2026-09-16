@@ -7,6 +7,7 @@ import { Spinner } from '@/components/ui/Spinner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { PATHS } from '@/routes/paths';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import {
   BookOpen,
   GraduationCap,
@@ -277,7 +278,7 @@ const featureSlideVariants = {
   exit: (dir) => ({ x: dir > 0 ? '-50%' : '50%', opacity: 0, scale: 0.95 }),
 };
 
-function FeatureSlideshow({ onFinish }) {
+function FeatureSlideshow({ onFinish, onSkip }) {
   const { t } = useTranslation();
   const { user } = useAuthStore();
   const [current, setCurrent] = useState(0);
@@ -348,9 +349,12 @@ function FeatureSlideshow({ onFinish }) {
             {t('common.appName')}
           </span>
         </div>
-        <button onClick={onFinish} className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium px-3 py-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5">
-          {t('onboarding.slides.skip')}
-        </button>
+        <div className="flex items-center gap-3">
+          <LanguageSwitcher />
+          <button onClick={onSkip} className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium px-3 py-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5">
+            {t('onboarding.slides.skip')}
+          </button>
+        </div>
       </div>
 
       {/* Slide Content */}
@@ -490,7 +494,7 @@ const setupSlideVariants = {
 
 const SETUP_STEPS = ['education', 'subjects', 'goal'];
 
-function SetupWizard() {
+function SetupWizard({ onSkip }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [step, setStep] = useState('education');
@@ -548,10 +552,11 @@ function SetupWizard() {
       // If the API existed, it would look like this:
       // await api.put('/users/me', { educationLevel: education, subjects: selectedSubjects, studyGoal: goal });
       
+      localStorage.setItem('onboarding_completed', 'true');
       // Simulate slight delay for UX
       await new Promise(resolve => setTimeout(resolve, 800));
       
-      navigate(PATHS.ROOT);
+      navigate(PATHS.WORKSPACES);
     } catch (error) {
       console.error('Failed to complete onboarding:', error);
       setSaving(false);
@@ -571,6 +576,25 @@ function SetupWizard() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      {/* Top Header */}
+      <div className="flex items-center justify-between px-6 py-4 border-b border-border/40 relative z-10">
+        <div className="flex items-center gap-2">
+          <Brain className="w-6 h-6 text-emerald-600" />
+          <span className="text-base font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+            {t('common.appName')}
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <LanguageSwitcher />
+          <button
+            onClick={onSkip}
+            className="text-xs text-muted-foreground hover:text-foreground transition-colors font-medium px-2.5 py-1.5 rounded-lg hover:bg-muted"
+          >
+            {t('onboarding.slides.skip')}
+          </button>
+        </div>
+      </div>
+
       {/* Top Progress Bar */}
       <div className="h-1.5 bg-muted w-full fixed top-0 z-50">
         <motion.div className="h-full bg-emerald-600" animate={{ width: `${progress}%` }} transition={{ duration: 0.5, ease: 'easeInOut' }} />
@@ -704,11 +728,30 @@ function SetupWizard() {
 }
 
 export function OnboardingPage() {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuthStore();
   const [showWizard, setShowWizard] = useState(false);
 
+  const handleFinishSlideshow = () => {
+    if (isAuthenticated) {
+      setShowWizard(true);
+    } else {
+      navigate(PATHS.REGISTER);
+    }
+  };
+
+  const handleSkip = () => {
+    localStorage.setItem('onboarding_completed', 'true');
+    if (isAuthenticated) {
+      navigate(PATHS.WORKSPACES);
+    } else {
+      navigate(PATHS.LOGIN);
+    }
+  };
+
   if (showWizard) {
-    return <SetupWizard />;
+    return <SetupWizard onSkip={handleSkip} />;
   }
 
-  return <FeatureSlideshow onFinish={() => setShowWizard(true)} />;
+  return <FeatureSlideshow onFinish={handleFinishSlideshow} onSkip={handleSkip} />;
 }

@@ -46,6 +46,13 @@ async def process_document_pipeline(document_id: str, workspace_id: str, minio_k
         ai_provider = get_ai_provider()
         
         async with async_session() as session:
+            # Delete any existing chunks for this document (idempotency)
+            from sqlalchemy import text as sa_text
+            await session.execute(
+                sa_text("DELETE FROM document_chunks WHERE document_id = :doc_id"),
+                {"doc_id": uuid.UUID(document_id)}
+            )
+
             for c in chunks:
                 if not c.text.strip():
                     continue
@@ -60,7 +67,7 @@ async def process_document_pipeline(document_id: str, workspace_id: str, minio_k
                     raise Exception(f"Failed to generate embedding for chunk {c.chunk_index}: {e}")
                 
                 doc_chunk = DocumentChunk(
-                    id=str(uuid.uuid4()),
+                    id=uuid.uuid4(),
                     document_id=uuid.UUID(document_id),
                     workspace_id=uuid.UUID(workspace_id),
                     content=c.text,
@@ -69,9 +76,24 @@ async def process_document_pipeline(document_id: str, workspace_id: str, minio_k
                 )
                 session.add(doc_chunk)
                 
+            # Update document status to READY and save chunk count
+            await session.execute(
+                sa_text("UPDATE documents SET processing_status = 'READY', chunk_count = :count, updated_at = NOW() WHERE id = :doc_id"),
+                {"doc_id": uuid.UUID(document_id), "count": len(chunks)}
+            )
             await session.commit()
         
         logger.info("pipeline_completed", doc_id=document_id, total_chunks=len(chunks))
     except Exception as e:
         logger.error("pipeline_failed", doc_id=document_id, error=str(e))
+        try:
+            async with async_session() as session:
+                from sqlalchemy import text as sa_text
+                await session.execute(
+                    sa_text("UPDATE documents SET processing_status = 'FAILED', updated_at = NOW() WHERE id = :doc_id"),
+                    {"doc_id": uuid.UUID(document_id)}
+                )
+                await session.commit()
+        except Exception as db_err:
+            logger.error("failed_to_update_status_failed", doc_id=document_id, error=str(db_err))
         raise e

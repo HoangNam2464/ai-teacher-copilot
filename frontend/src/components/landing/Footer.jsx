@@ -30,7 +30,7 @@ export function Footer() {
 
   const handleSubscribe = (e) => {
     e.preventDefault();
-    if (email) {
+    if (email && /\S+@\S+\.\S+/.test(email)) {
       setIsSubscribed(true);
       setEmail('');
       setTimeout(() => setIsSubscribed(false), 3000);
@@ -77,7 +77,7 @@ export function Footer() {
                 {t('footer.newsletterDesc')}
               </p>
 
-              <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+              <form onSubmit={handleSubscribe} noValidate className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
                 <div className="relative flex-1">
                   <input
                     type="email"

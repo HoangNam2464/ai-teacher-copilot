@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/workspaces/{workspaceId}/generate")
+@RequestMapping({"/workspaces/{workspaceId}/generate", "/workspaces/{workspaceId}/generations"})
 @RequiredArgsConstructor
 public class GenerationController {
 

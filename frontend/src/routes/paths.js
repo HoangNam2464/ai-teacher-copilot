@@ -10,12 +10,13 @@ export const PATHS = {
   FORGOT_PASSWORD: '/forgot-password',
   RESET_PASSWORD: '/reset-password',
   VERIFY_EMAIL: '/verify-email',
+  WELCOME: '/welcome',
   ONBOARDING: '/onboarding',
 
   // Core App & Dashboards
   ROOT: '/',
-  DASHBOARD: '/',
-  WORKSPACES: '/workspaces',
+  DASHBOARD: '/dashboard',
+  WORKSPACES: '/dashboard/workspace',
   DOCUMENTS: '/documents',
 
   // AI Content Generation
@@ -28,12 +29,13 @@ export const PATHS = {
   HISTORY: '/history',
   HISTORY_DETAIL: '/history/:id',
 
-  // Settings
+  // Settings & Subscription
   SETTINGS: {
-    ROOT: '/settings',
-    PROFILE: '/settings/profile',
-    ACCOUNT: '/settings/account',
-    APPEARANCE: '/settings/appearance',
-    NOTIFICATIONS: '/settings/notifications',
+    ROOT: '/dashboard/settings',
+    PROFILE: '/dashboard/settings/profile',
+    ACCOUNT: '/dashboard/settings/account',
+    APPEARANCE: '/dashboard/settings/appearance',
+    NOTIFICATIONS: '/dashboard/settings/notifications',
+    SUBSCRIPTION: '/dashboard/subscription',
   }
 };
