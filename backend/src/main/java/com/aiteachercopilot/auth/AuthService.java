@@ -88,6 +88,22 @@ public class AuthService {
             throw new IllegalStateException("Google Login chưa được cấu hình trên server.");
         }
 
+        log.info("googleLogin: configured googleClientId = {}", googleClientId);
+        try {
+            GoogleIdToken parsed = GoogleIdToken.parse(GsonFactory.getDefaultInstance(), request.getCredential());
+            if (parsed != null && parsed.getPayload() != null) {
+                Payload p = parsed.getPayload();
+                long nowSec = System.currentTimeMillis() / 1000;
+                log.info("Google Token Parsed: aud={}, iss={}, exp={}, iat={}, serverNowSec={}, diffSec={}",
+                        p.getAudience(), p.getIssuer(), p.getExpirationTimeSeconds(), p.getIssuedAtTimeSeconds(),
+                        nowSec, (p.getExpirationTimeSeconds() - nowSec));
+                boolean audMatch = parsed.verifyAudience(Collections.singletonList(googleClientId));
+                log.info("verifyAudience: {}", audMatch);
+            }
+        } catch (Exception parseEx) {
+            log.warn("Failed to parse token for diagnostic: {}", parseEx.getMessage());
+        }
+
         GoogleIdToken idToken;
         try {
             GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
@@ -99,11 +115,11 @@ public class AuthService {
             idToken = verifier.verify(request.getCredential());
         } catch (Exception e) {
             log.warn("Google ID Token verification failed: {}", e.getMessage());
-            throw new IllegalArgumentException("Không thể xác thực Google ID Token.");
+            throw new IllegalArgumentException("Không thể xác thực Google ID Token: " + e.getMessage());
         }
 
         if (idToken == null) {
-            log.warn("Google ID Token verification returned null — token is invalid or forged.");
+            log.warn("Google ID Token verification returned null — token is invalid, wrong audience, or expired.");
             throw new IllegalArgumentException("Google ID Token không hợp lệ hoặc đã hết hạn.");
         }
 

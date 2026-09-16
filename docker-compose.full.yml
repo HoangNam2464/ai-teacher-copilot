@@ -140,7 +140,8 @@ services:
       AI_SERVICE_API_KEY: ${AI_SERVICE_API_KEY:-changeme_internal_ai_service_shared_secret_key}
       JWT_SECRET: ${JWT_SECRET:-changeme_jwt_secret_at_least_32_characters_long_for_hmac256}
       JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS:-86400000}
-      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+    env_file:
+      - .env
     ports:
       - "8080:8080"
     depends_on:
