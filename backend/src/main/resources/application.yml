@@ -68,6 +68,8 @@ app:
     secret-key: ${MINIO_SECRET_KEY:changeme_minio_password}
     bucket-documents: ${MINIO_BUCKET_DOCUMENTS:documents}
     bucket-exports: ${MINIO_BUCKET_EXPORTS:exports}
+  google:
+    client-id: ${GOOGLE_CLIENT_ID:}
 
 # --- Logging ---
 logging:

@@ -93,6 +93,14 @@
             <version>8.5.11</version>
         </dependency>
 
+        <!-- ===== Google API Client (for GoogleIdTokenVerifier) ===== -->
+        <!-- Required to cryptographically verify Google ID Tokens from GSI popup flow -->
+        <dependency>
+            <groupId>com.google.api-client</groupId>
+            <artifactId>google-api-client</artifactId>
+            <version>2.7.0</version>
+        </dependency>
+
         <!-- ===== Lombok ===== -->
         <dependency>
             <groupId>org.projectlombok</groupId>
