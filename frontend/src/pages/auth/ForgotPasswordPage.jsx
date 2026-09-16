@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, CheckCircle, Loader2, BrainCircuit } from 'lucide-react';
+import { ArrowLeft, CheckCircle, Loader2, BrainCircuit, AlertCircle } from 'lucide-react';
 import { authService as authApi } from '@/services/auth';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -16,16 +16,31 @@ export function ForgotPasswordPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState(null);
+  const [fieldError, setFieldError] = useState('');
+
+  const validateEmail = (val) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email.trim()) return;
-
-    setIsLoading(true);
+    setFieldError('');
     setError(null);
 
+    const trimmed = email.trim();
+    if (!trimmed) {
+      setFieldError(t('auth.forgotPassword.emailRequired'));
+      return;
+    }
+    if (!validateEmail(trimmed)) {
+      setFieldError(t('auth.forgotPassword.emailInvalid'));
+      return;
+    }
+
+    setIsLoading(true);
+
     try {
-      await authApi.forgotPassword(email.trim());
+      await authApi.forgotPassword(trimmed);
       setIsSubmitted(true);
     } catch (err) {
       setError(
@@ -102,7 +117,7 @@ export function ForgotPasswordPage() {
             </Button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} noValidate className="space-y-5">
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 {t('auth.forgotPassword.email')}
@@ -111,12 +126,20 @@ export function ForgotPasswordPage() {
                 id="email"
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (fieldError) setFieldError('');
+                }}
                 placeholder={t('auth.forgotPassword.emailPlaceholder')}
-                required
                 disabled={isLoading}
-                className="h-11 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
+                className={`h-11 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 ${fieldError ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
               />
+              {fieldError && (
+                <p className="text-xs font-medium text-red-500 flex items-center gap-1.5 mt-1.5">
+                  <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
+                  <span>{fieldError}</span>
+                </p>
+              )}
             </div>
 
             {error && <Alert variant="destructive">{error}</Alert>}

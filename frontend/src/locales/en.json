@@ -430,7 +430,10 @@
       "appleNotAvailable": "Apple Sign-In is not available. Please try again later.",
       "googleFailed": "Google sign in failed. Please try again.",
       "appleFailed": "Apple sign in failed. Please try again.",
-      "signInFailed": "Sign in failed. Please try again."
+      "signInFailed": "Sign in failed. Please try again.",
+      "emailRequired": "Email is required.",
+      "emailInvalid": "Please enter a valid email address.",
+      "passwordRequired": "Password is required."
     },
     "register": {
       "title": "Create Your Account",
@@ -456,7 +459,13 @@
       "accountCreated": "Account created successfully! Please sign in.",
       "googleFailed": "Google sign up failed. Please try again.",
       "appleFailed": "Apple sign up failed. Please try again.",
-      "registrationFailed": "Registration failed. Please try again."
+      "registrationFailed": "Registration failed. Please try again.",
+      "nameRequired": "Full name is required.",
+      "emailRequired": "Email is required.",
+      "emailInvalid": "Please enter a valid email address.",
+      "passwordRequired": "Password is required.",
+      "agreeTermsRequired": "You must agree to the Terms of Service and Privacy Policy.",
+      "signUpFailed": "Registration failed. Please try again."
     },
     "forgotPassword": {
       "title": "Forgot Password?",
@@ -470,7 +479,9 @@
       "emailSent": "We've sent a password reset link to",
       "didntReceive": "Didn't receive the email? Check your spam folder or",
       "tryAgain": "try again",
-      "sendFailed": "Failed to send reset link. Please try again."
+      "sendFailed": "Failed to send reset link. Please try again.",
+      "emailRequired": "Email is required.",
+      "emailInvalid": "Please enter a valid email address."
     },
     "resetPassword": {
       "title": "Set New Password",
@@ -491,7 +502,9 @@
       "passwordsNoMatch": "Passwords do not match",
       "passwordMinLength": "Password must be at least 8 characters",
       "invalidToken": "Invalid reset token",
-      "resetFailed": "Failed to reset password. Please try again."
+      "resetFailed": "Failed to reset password. Please try again.",
+      "passwordRequired": "New password is required.",
+      "confirmPasswordRequired": "Please confirm your password."
     },
     "backToLogin": "Back to Sign In",
     "newPassword": "New Password",
@@ -4303,6 +4316,7 @@
   },
   "workspace": {
     "title": "Workspaces",
+    "knowledgeBase": "Knowledge Base",
     "subtitle": "Manage and group curriculum materials by grade and subject",
     "create": "Create Workspace",
     "createTitle": "Create Teaching Workspace",
@@ -4384,6 +4398,7 @@
   },
   "lessonPlanner": {
     "title": "AI Lesson Planner",
+    "topicRequired": "Please enter a topic or lesson title.",
     "subtitle": "Generate structured lesson plans strictly grounded in RAG retrieved sources",
     "formTitle": "Lesson Plan Requirements",
     "topic": "Topic / Lesson Title",
@@ -4409,6 +4424,7 @@
   },
   "quizGenerator": {
     "title": "AI Quiz & Question Generator",
+    "topicRequired": "Please enter a topic or unit for the quiz.",
     "subtitle": "Generate MCQs and short answers tagged with Bloom's Taxonomy grounded in sources",
     "formTitle": "Quiz Configuration",
     "topic": "Assessment Topic",

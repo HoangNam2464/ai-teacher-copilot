@@ -97,6 +97,7 @@ export function SettingsPage() {
                 src={user.avatarUrl}
                 alt={user?.displayName || user?.name}
                 className="w-14 h-14 rounded-full object-cover"
+                referrerPolicy="no-referrer"
               />
             ) : (
               <span className="text-xl font-bold text-green-600">

@@ -430,7 +430,10 @@
       "appleNotAvailable": "Đăng nhập bằng Apple không khả dụng. Vui lòng thử lại sau.",
       "googleFailed": "Đăng nhập bằng Google thất bại. Vui lòng thử lại.",
       "appleFailed": "Đăng nhập bằng Apple thất bại. Vui lòng thử lại.",
-      "signInFailed": "Đăng nhập thất bại. Vui lòng thử lại."
+      "signInFailed": "Đăng nhập thất bại. Vui lòng thử lại.",
+      "emailRequired": "Vui lòng nhập email.",
+      "emailInvalid": "Định dạng email không hợp lệ.",
+      "passwordRequired": "Vui lòng nhập mật khẩu."
     },
     "register": {
       "title": "Tạo Tài Khoản Của Bạn",
@@ -456,7 +459,13 @@
       "accountCreated": "Tài khoản đã được tạo thành công! Vui lòng đăng nhập.",
       "googleFailed": "Đăng ký bằng Google thất bại. Vui lòng thử lại.",
       "appleFailed": "Đăng ký bằng Apple thất bại. Vui lòng thử lại.",
-      "registrationFailed": "Đăng ký thất bại. Vui lòng thử lại."
+      "registrationFailed": "Đăng ký thất bại. Vui lòng thử lại.",
+      "nameRequired": "Vui lòng nhập họ và tên.",
+      "emailRequired": "Vui lòng nhập email.",
+      "emailInvalid": "Định dạng email không hợp lệ.",
+      "passwordRequired": "Vui lòng nhập mật khẩu.",
+      "agreeTermsRequired": "Vui lòng đồng ý với Điều Khoản Dịch Vụ & Chính Sách Bảo Mật.",
+      "signUpFailed": "Đăng ký thất bại. Vui lòng thử lại."
     },
     "forgotPassword": {
       "title": "Quên Mật Khẩu?",
@@ -470,7 +479,9 @@
       "emailSent": "Chúng tôi đã gửi một liên kết đặt lại mật khẩu đến",
       "didntReceive": "Không nhận được email? Kiểm tra thư rác hoặc",
       "tryAgain": "thử lại",
-      "sendFailed": "Gửi liên kết đặt lại thất bại. Vui lòng thử lại."
+      "sendFailed": "Gửi liên kết đặt lại thất bại. Vui lòng thử lại.",
+      "emailRequired": "Vui lòng nhập email.",
+      "emailInvalid": "Định dạng email không hợp lệ."
     },
     "resetPassword": {
       "title": "Đặt Mật Khẩu Mới",
@@ -491,7 +502,9 @@
       "passwordsNoMatch": "Mật khẩu không khớp",
       "passwordMinLength": "Mật khẩu phải có ít nhất 8 ký tự",
       "invalidToken": "Mã đặt lại không hợp lệ",
-      "resetFailed": "Đặt lại mật khẩu thất bại. Vui lòng thử lại."
+      "resetFailed": "Đặt lại mật khẩu thất bại. Vui lòng thử lại.",
+      "passwordRequired": "Vui lòng nhập mật khẩu mới.",
+      "confirmPasswordRequired": "Vui lòng xác nhận mật khẩu mới."
     },
     "backToLogin": "Quay lại Đăng Nhập",
     "newPassword": "Mật khẩu mới",
@@ -4303,6 +4316,7 @@
   },
   "workspace": {
     "title": "Không gian làm việc",
+    "knowledgeBase": "Kho học liệu",
     "subtitle": "Quản lý và phân nhóm tài liệu giảng dạy theo lớp và môn học",
     "create": "Tạo không gian mới",
     "createTitle": "Tạo không gian giảng dạy mới",
@@ -4384,6 +4398,7 @@
   },
   "lessonPlanner": {
     "title": "Soạn Giáo Án AI",
+    "topicRequired": "Vui lòng nhập chủ đề hoặc tên bài dạy",
     "subtitle": "Sinh kế hoạch bài dạy có cấu trúc bám sát tài liệu nguồn được trích xuất từ RAG",
     "formTitle": "Thiết Lập Yêu Cầu Soạn Bài",
     "topic": "Chủ đề / Tên bài dạy",
@@ -4409,6 +4424,7 @@
   },
   "quizGenerator": {
     "title": "Tạo Đề Thi & Câu Hỏi AI",
+    "topicRequired": "Vui lòng nhập chủ đề hoặc bài học cần tạo câu hỏi.",
     "subtitle": "Sinh trắc nghiệm và câu hỏi tự luận ngắn gắn nhãn Bloom's Taxonomy bám sát tài liệu học liệu",
     "formTitle": "Thiết Lập Đề Kiểm Tra",
     "topic": "Chủ đề kiểm tra",

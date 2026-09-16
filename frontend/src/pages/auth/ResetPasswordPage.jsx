@@ -23,18 +23,28 @@ export function ResetPasswordPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState(null);
+  const [fieldErrors, setFieldErrors] = useState({});
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+    setFieldErrors({});
 
-    if (password !== confirmPassword) {
-      setError(t('auth.resetPassword.passwordsNoMatch'));
-      return;
+    const errors = {};
+    if (!password) {
+      errors.password = t('auth.resetPassword.passwordRequired');
+    } else if (password.length < 8) {
+      errors.password = t('auth.resetPassword.passwordMinLength');
     }
 
-    if (password.length < 8) {
-      setError(t('auth.resetPassword.passwordMinLength'));
+    if (!confirmPassword) {
+      errors.confirmPassword = t('auth.resetPassword.confirmPasswordRequired');
+    } else if (password && confirmPassword && password !== confirmPassword) {
+      errors.confirmPassword = t('auth.resetPassword.passwordsNoMatch');
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
       return;
     }
 
@@ -136,7 +146,7 @@ export function ResetPasswordPage() {
             </Button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} noValidate className="space-y-5">
             {error && <Alert variant="destructive">{error}</Alert>}
 
             <div className="space-y-2">
@@ -148,11 +158,13 @@ export function ResetPasswordPage() {
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (fieldErrors.password) setFieldErrors(prev => ({ ...prev, password: null }));
+                  }}
                   placeholder={t('auth.resetPassword.newPasswordPlaceholder')}
-                  required
                   disabled={isLoading}
-                  className="h-11 pr-11 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
+                  className={`h-11 pr-11 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 ${fieldErrors.password ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
                 />
                 <button
                   type="button"
@@ -163,6 +175,12 @@ export function ResetPasswordPage() {
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
+              {fieldErrors.password && (
+                <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
+                  <AlertCircle className="w-3.5 h-3.5" />
+                  {fieldErrors.password}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -174,11 +192,13 @@ export function ResetPasswordPage() {
                   id="confirmPassword"
                   type={showConfirmPassword ? 'text' : 'password'}
                   value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  onChange={(e) => {
+                    setConfirmPassword(e.target.value);
+                    if (fieldErrors.confirmPassword) setFieldErrors(prev => ({ ...prev, confirmPassword: null }));
+                  }}
                   placeholder={t('auth.resetPassword.confirmPasswordPlaceholder')}
-                  required
                   disabled={isLoading}
-                  className="h-11 pr-11 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
+                  className={`h-11 pr-11 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 ${fieldErrors.confirmPassword ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
                 />
                 <button
                   type="button"
@@ -189,6 +209,12 @@ export function ResetPasswordPage() {
                   {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
+              {fieldErrors.confirmPassword && (
+                <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
+                  <AlertCircle className="w-3.5 h-3.5" />
+                  {fieldErrors.confirmPassword}
+                </p>
+              )}
             </div>
 
             <Button

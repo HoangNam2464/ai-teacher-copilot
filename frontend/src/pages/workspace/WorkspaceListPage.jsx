@@ -160,7 +160,7 @@ function WorkspaceCardItem({
         ) : (
           <span className="flex items-center gap-1 text-xs text-muted-foreground flex-shrink-0">
             <BookOpen className="w-3.5 h-3.5" />
-            Kho học liệu
+            {t('workspace.knowledgeBase', 'Kho học liệu')}
           </span>
         )}
       </div>
@@ -449,7 +449,7 @@ export function WorkspaceListPage() {
                 </button>
               </div>
 
-              <form onSubmit={handleFormSubmit} className="space-y-4">
+              <form onSubmit={handleFormSubmit} noValidate className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium mb-1.5">
                     {t('workspace.name', 'Tên không gian')}{' '}

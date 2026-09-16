@@ -115,6 +115,17 @@ export function RegisterForm() {
     setSocialLoading('google');
     setError(null);
 
+    let googlePicture = null;
+    try {
+      const payloadBase64 = response?.credential?.split('.')?.[1];
+      if (payloadBase64) {
+        const decoded = JSON.parse(atob(payloadBase64.replace(/-/g, '+').replace(/_/g, '/')));
+        googlePicture = decoded?.picture || null;
+      }
+    } catch (e) {
+      console.warn('Could not extract picture from Google credential:', e);
+    }
+
     try {
       const res = await authService.googleAuth(response.credential);
       const authData = res?.data || res;
@@ -124,6 +135,7 @@ export function RegisterForm() {
           email: authData.email,
           fullName: authData.fullName,
           role: authData.role || 'TEACHER',
+          avatarUrl: authData.avatarUrl || googlePicture,
         });
       }
       const hasCompletedOnboarding = localStorage.getItem('onboarding_completed') === 'true';
@@ -203,7 +215,7 @@ export function RegisterForm() {
     }
 
     if (!password) {
-      errors.password = t('auth.passwordRequired');
+      errors.password = t('auth.register.passwordRequired', t('auth.passwordRequired'));
     } else if (password.length < 8) {
       errors.password = t('auth.register.passwordMinLength');
     }

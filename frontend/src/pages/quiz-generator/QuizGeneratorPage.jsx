@@ -62,7 +62,7 @@ export function QuizGeneratorPage() {
     }
 
     if (!topic.trim()) {
-      toast.error('Vui lòng nhập chủ đề hoặc bài học cần tạo câu hỏi.');
+      toast.error(t('quizGenerator.topicRequired', 'Vui lòng nhập chủ đề hoặc bài học cần tạo câu hỏi.'));
       return;
     }
 
@@ -178,7 +178,7 @@ export function QuizGeneratorPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-5">
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} noValidate className="space-y-4">
               {/* Topic / Unit */}
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-foreground flex items-center gap-1">

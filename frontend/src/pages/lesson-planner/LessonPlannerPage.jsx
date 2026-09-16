@@ -57,7 +57,7 @@ export function LessonPlannerPage() {
     }
 
     if (!topic.trim()) {
-      toast.error('Vui lòng nhập chủ đề hoặc tên bài dạy');
+      toast.error(t('lessonPlanner.topicRequired', 'Vui lòng nhập chủ đề hoặc tên bài dạy'));
       return;
     }
 
@@ -150,7 +150,7 @@ export function LessonPlannerPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-5">
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} noValidate className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-1.5">
                   {t('lessonPlanner.topic', 'Chủ đề / Tên bài dạy')} <span className="text-red-500">*</span>

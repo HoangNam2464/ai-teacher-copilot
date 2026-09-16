@@ -145,7 +145,7 @@ export function ProfileSettingsPage() {
               <div className="w-24 h-24 rounded-full flex items-center justify-center overflow-hidden ring-4 ring-background shadow-md">
                 <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
                   {avatarUrl ? (
-                    <img src={avatarUrl} alt={name} className="w-24 h-24 rounded-full object-cover" />
+                    <img src={avatarUrl} alt={name} className="w-24 h-24 rounded-full object-cover" referrerPolicy="no-referrer" />
                   ) : (
                     <span className="text-3xl font-bold text-primary">
                       {name.charAt(0).toUpperCase() || 'T'}

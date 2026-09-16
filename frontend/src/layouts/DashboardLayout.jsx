@@ -274,7 +274,8 @@ export function DashboardLayout({ children }) {
                     <img
                       src={user.avatarUrl}
                       alt={displayName}
-                      className="w-8 h-8 rounded-full object-cover"
+                      className="w-full h-full rounded-full object-cover"
+                      referrerPolicy="no-referrer"
                     />
                   ) : (
                     <span>{initials || (displayName ? displayName.charAt(0).toUpperCase() : 'N')}</span>
@@ -302,7 +303,7 @@ export function DashboardLayout({ children }) {
                           <CreditCard className="w-4 h-4" />
                           {t('common.subscription')}
                           <span className="ml-auto px-1.5 py-0.5 bg-green-500/10 text-green-500 rounded text-[10px] font-medium capitalize">
-                            {user?.plan || 'Free'}
+                            {user?.plan ? (user.plan.toLowerCase() === 'free' ? t('common.free', 'Miễn phí') : user.plan) : t('common.free', 'Miễn phí')}
                           </span>
                         </Link>
                         <Link

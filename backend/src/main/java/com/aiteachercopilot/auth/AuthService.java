@@ -110,6 +110,7 @@ public class AuthService {
         Payload payload = idToken.getPayload();
         String email = payload.getEmail();
         String fullName = (String) payload.get("name");
+        String picture = (String) payload.get("picture");
         if (fullName == null || fullName.isBlank()) {
             fullName = "Giáo viên Google";
         }
@@ -119,7 +120,11 @@ public class AuthService {
         }
 
         log.info("Google ID Token verified successfully for: {}", email);
-        return getOrCreateSocialUser(email, fullName);
+        AuthDto.AuthResponse response = getOrCreateSocialUser(email, fullName);
+        if (picture != null && !picture.isBlank()) {
+            response.setAvatarUrl(picture);
+        }
+        return response;
     }
 
     @Transactional
