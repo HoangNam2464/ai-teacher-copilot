@@ -57,7 +57,7 @@ const settingsSections = [
     icon: CreditCard,
     href: PATHS.SETTINGS.SUBSCRIPTION,
     color: 'emerald',
-    badge: 'Free',
+    badgeKey: 'plan',
   },
 ];
 
@@ -151,6 +151,11 @@ export function SettingsPage() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <p className="text-sm font-medium">{t(section.labelKey)}</p>
+                  {section.badgeKey === 'plan' && (
+                    <span className="px-2 py-0.5 rounded-full text-xs font-semibold capitalize bg-green-500/10 text-green-600 dark:text-green-400">
+                      {user?.plan || 'free'}
+                    </span>
+                  )}
                   {section.badge && (
                     <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-green-500/10 text-green-600 dark:text-green-400">
                       {section.badge}

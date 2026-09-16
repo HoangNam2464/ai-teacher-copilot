@@ -220,7 +220,7 @@ export function Header() {
             ) : (
               <>
                 <Button variant="ghost" asChild>
-                  <Link to={PATHS.LOGIN}>{t('auth.login')}</Link>
+                  <Link to={PATHS.LOGIN}>{t('common.signIn')}</Link>
                 </Button>
                 <Button asChild>
                   <Link to={PATHS.WELCOME}>
@@ -375,7 +375,7 @@ export function Header() {
                   ) : (
                     <>
                       <Button variant="outline" className="w-full h-12" asChild>
-                        <Link to={PATHS.LOGIN} onClick={() => setIsMobileMenuOpen(false)}>{t('auth.login')}</Link>
+                        <Link to={PATHS.LOGIN} onClick={() => setIsMobileMenuOpen(false)}>{t('common.signIn')}</Link>
                       </Button>
                       <Button className="w-full h-12" asChild>
                         <Link to={PATHS.WELCOME} onClick={() => setIsMobileMenuOpen(false)}>

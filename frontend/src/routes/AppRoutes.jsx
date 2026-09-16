@@ -26,6 +26,7 @@ import { ProfileSettingsPage } from '@/pages/settings/ProfileSettingsPage';
 import { AccountSettingsPage } from '@/pages/settings/AccountSettingsPage';
 import { AppearanceSettingsPage } from '@/pages/settings/AppearanceSettingsPage';
 import { NotificationSettingsPage } from '@/pages/settings/NotificationSettingsPage';
+import { SubscriptionPage } from '@/pages/settings/SubscriptionPage';
 
 // Scroll to top on route change
 function ScrollToTop() {
@@ -104,7 +105,8 @@ export function AppRoutes() {
           <Route path={PATHS.SETTINGS.ACCOUNT} element={<AccountSettingsPage />} />
           <Route path={PATHS.SETTINGS.APPEARANCE} element={<AppearanceSettingsPage />} />
           <Route path={PATHS.SETTINGS.NOTIFICATIONS} element={<NotificationSettingsPage />} />
-          <Route path={PATHS.SETTINGS.SUBSCRIPTION} element={<AccountSettingsPage />} />
+          <Route path={PATHS.SETTINGS.SUBSCRIPTION} element={<SubscriptionPage />} />
+          <Route path="/dashboard/subscription/manage" element={<SubscriptionPage />} />
 
           {/* Backward compatibility redirects */}
           <Route path="/settings" element={<Navigate to={PATHS.SETTINGS.ROOT} replace />} />
