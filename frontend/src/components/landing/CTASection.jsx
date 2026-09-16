@@ -73,7 +73,7 @@ export function CTASection() {
                     asChild
                   >
                     <Link to={PATHS.LOGIN}>
-                      {t('auth.login')}
+                      {t('common.signIn')}
                       <ArrowRight className="w-4 h-4" />
                     </Link>
                   </Button>

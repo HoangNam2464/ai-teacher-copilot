@@ -29,17 +29,17 @@ export function ResetPasswordPage() {
     setError(null);
 
     if (password !== confirmPassword) {
-      setError(t('auth.resetPasswordPage.notMatch'));
+      setError(t('auth.resetPassword.passwordsNoMatch'));
       return;
     }
 
     if (password.length < 8) {
-      setError(t('auth.resetPasswordPage.minLength'));
+      setError(t('auth.resetPassword.passwordMinLength'));
       return;
     }
 
     if (!token) {
-      setError(t('auth.resetPasswordPage.invalidToken'));
+      setError(t('auth.resetPassword.invalidToken'));
       return;
     }
 
@@ -51,7 +51,7 @@ export function ResetPasswordPage() {
       setError(
         err.response?.data?.message ||
         err.message ||
-        t('auth.resetPasswordPage.failed')
+        t('auth.resetPassword.resetFailed')
       );
     } finally {
       setIsLoading(false);
@@ -76,10 +76,10 @@ export function ResetPasswordPage() {
               </div>
               <div className="space-y-1.5">
                 <CardTitle className="text-2xl font-bold text-foreground">
-                  {t('auth.resetPasswordPage.invalidLink')}
+                  {t('auth.resetPassword.invalidLinkTitle')}
                 </CardTitle>
                 <CardDescription className="text-gray-600 dark:text-gray-400">
-                  {t('auth.resetPasswordPage.invalidLinkDesc')}
+                  {t('auth.resetPassword.invalidLinkDescription')}
                 </CardDescription>
               </div>
             </div>
@@ -90,20 +90,20 @@ export function ResetPasswordPage() {
               </div>
               <div className="space-y-1.5">
                 <CardTitle className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                  {t('auth.resetPasswordPage.success')}
+                  {t('auth.resetPassword.successTitle')}
                 </CardTitle>
                 <CardDescription className="text-gray-600 dark:text-gray-400">
-                  {t('auth.resetPasswordPage.successDesc')}
+                  {t('auth.resetPassword.successDescription')}
                 </CardDescription>
               </div>
             </div>
           ) : (
             <div className="text-center space-y-1.5">
               <CardTitle className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                {t('auth.resetPasswordPage.title')}
+                {t('auth.resetPassword.title')}
               </CardTitle>
               <CardDescription className="text-gray-600 dark:text-gray-400">
-                {t('auth.resetPasswordPage.desc')}
+                {t('auth.resetPassword.description')}
               </CardDescription>
             </div>
           )}
@@ -117,12 +117,12 @@ export function ResetPasswordPage() {
               className="w-full h-11 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-medium shadow-lg transition-all duration-200"
               asChild
             >
-              <Link to={PATHS.FORGOT_PASSWORD}>{t('auth.resetPasswordPage.requestNewLink')}</Link>
+              <Link to={PATHS.FORGOT_PASSWORD}>{t('auth.resetPassword.requestNewLink')}</Link>
             </Button>
             <Button variant="outline" className="w-full h-11" asChild>
               <Link to={PATHS.LOGIN}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                {t('auth.backToLogin')}
+                {t('auth.resetPassword.backToSignIn')}
               </Link>
             </Button>
           </div>
@@ -132,7 +132,7 @@ export function ResetPasswordPage() {
               className="w-full h-11 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-medium shadow-lg transition-all duration-200"
               asChild
             >
-              <Link to={PATHS.LOGIN}>{t('auth.verifyEmailPage.loginNow')}</Link>
+              <Link to={PATHS.LOGIN}>{t('auth.resetPassword.backToSignIn')}</Link>
             </Button>
           </div>
         ) : (
@@ -141,7 +141,7 @@ export function ResetPasswordPage() {
 
             <div className="space-y-2">
               <Label htmlFor="password" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                {t('auth.newPassword')}
+                {t('auth.resetPassword.newPassword')}
               </Label>
               <div className="relative">
                 <Input
@@ -149,7 +149,7 @@ export function ResetPasswordPage() {
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••••••"
+                  placeholder={t('auth.resetPassword.newPasswordPlaceholder')}
                   required
                   disabled={isLoading}
                   className="h-11 pr-11 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
@@ -167,7 +167,7 @@ export function ResetPasswordPage() {
 
             <div className="space-y-2">
               <Label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                {t('auth.confirmPassword')}
+                {t('auth.resetPassword.confirmPassword')}
               </Label>
               <div className="relative">
                 <Input
@@ -175,7 +175,7 @@ export function ResetPasswordPage() {
                   type={showConfirmPassword ? 'text' : 'password'}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="••••••••••••"
+                  placeholder={t('auth.resetPassword.confirmPasswordPlaceholder')}
                   required
                   disabled={isLoading}
                   className="h-11 pr-11 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
@@ -199,10 +199,10 @@ export function ResetPasswordPage() {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {t('auth.resetPasswordPage.updating')}
+                  {t('auth.resetPassword.resetting')}
                 </>
               ) : (
-                t('auth.resetPasswordPage.submit')
+                t('auth.resetPassword.resetPassword')
               )}
             </Button>
 
@@ -212,7 +212,7 @@ export function ResetPasswordPage() {
                 className="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-emerald-600 transition-colors"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                {t('auth.backToLogin')}
+                {t('auth.resetPassword.backToSignIn')}
               </Link>
             </div>
           </form>

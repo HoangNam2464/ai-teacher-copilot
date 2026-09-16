@@ -18,6 +18,14 @@ export const useAuthStore = create((set) => ({
     set({ token, user, isAuthenticated: true });
   },
 
+  updateUser: (updatedFields) => {
+    set((state) => {
+      const newUser = { ...(state.user || {}), ...updatedFields };
+      localStorage.setItem('user', JSON.stringify(newUser));
+      return { user: newUser };
+    });
+  },
+
   logout: () => {
     tokenStorage.clearTokens();
     localStorage.removeItem('active_workspace_id');

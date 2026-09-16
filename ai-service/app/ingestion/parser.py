@@ -29,5 +29,7 @@ class DocumentParser:
             return DocumentParser.parse_pdf(file_bytes)
         elif extension in ["docx", "doc"]:
             return DocumentParser.parse_docx(file_bytes)
+        elif extension in ["txt", "text", "md", "markdown"]:
+            return file_bytes.decode("utf-8", errors="replace")
         else:
             raise ValueError(f"Unsupported file format: {extension}")
