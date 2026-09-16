@@ -69,7 +69,7 @@ app:
     bucket-documents: ${MINIO_BUCKET_DOCUMENTS:documents}
     bucket-exports: ${MINIO_BUCKET_EXPORTS:exports}
   google:
-    client-id: ${GOOGLE_CLIENT_ID:}
+    client-id: ${GOOGLE_CLIENT_ID:942534151074-ab6puktojdb5ana4ipjntuvafb3vs3e1.apps.googleusercontent.com}
 
 # --- Logging ---
 logging:

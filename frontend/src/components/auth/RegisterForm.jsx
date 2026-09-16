@@ -143,6 +143,7 @@ export function RegisterForm() {
     } catch (err) {
       setError(
         err.response?.data?.message ||
+        err.response?.data?.error ||
         err.message ||
         t('auth.register.googleFailed')
       );

@@ -144,6 +144,7 @@ export function LoginForm() {
     } catch (err) {
       setError(
         err.response?.data?.message ||
+        err.response?.data?.error ||
         err.message ||
         t('auth.login.googleFailed')
       );

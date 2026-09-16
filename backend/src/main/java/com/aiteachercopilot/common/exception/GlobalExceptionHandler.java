@@ -46,7 +46,8 @@ public class GlobalExceptionHandler {
         Map<String, String> errors = ex.getBindingResult().getFieldErrors().stream()
                 .collect(Collectors.toMap(
                         FieldError::getField,
-                        fe -> fe.getDefaultMessage() != null ? fe.getDefaultMessage() : "Invalid value",
+                        fe -> fe.getDefaultMessage() != null ? fe.getDefaultMessage()
+                                : "Invalid value",
                         (a, b) -> a));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.<Map<String, String>>builder()
