@@ -9,6 +9,7 @@ import { historyService } from '@/services/history';
 import { PATHS } from '@/routes/paths';
 import { Button } from '@/components/ui/Button';
 import { Spinner } from '@/components/ui/Spinner';
+import { XPProgressBar } from '@/components/XPProgressBar';
 import {
   Plus,
   FolderOpen,
@@ -221,6 +222,16 @@ export function DashboardHomePage() {
             </Button>
           </div>
         </div>
+      </motion.div>
+
+      {/* XP Progress Bar */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.05 }}
+        className="bg-card border border-border rounded-xl p-4 shadow-xs"
+      >
+        <XPProgressBar />
       </motion.div>
 
       {/* Stats Grid */}

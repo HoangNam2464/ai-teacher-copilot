@@ -10,7 +10,7 @@ import '@/lib/i18n';
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <QueryProvider>
-      <BrowserRouter>
+      <BrowserRouter basename={import.meta.env.BASE_URL}>
         <AuthProvider>
           <Suspense fallback={null}>
             <App />

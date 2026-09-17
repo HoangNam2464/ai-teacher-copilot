@@ -37,6 +37,22 @@ public class User {
     @Builder.Default
     private Boolean isActive = true;
 
+    @Column(name = "avatar_url")
+    private String avatarUrl;
+
+    @Column(name = "education_level")
+    private String educationLevel;
+
+    @Column(columnDefinition = "TEXT")
+    private String subjects;
+
+    @Column(name = "notification_preferences", columnDefinition = "TEXT")
+    private String notificationPreferences;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private String plan = "FREE";
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;

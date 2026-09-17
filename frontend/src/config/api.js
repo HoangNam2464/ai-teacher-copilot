@@ -20,6 +20,16 @@ export const ENDPOINTS = {
     changePassword: '/auth/change-password',
   },
 
+  // Users & Profile Settings
+  users: {
+    me: '/users/me',
+    updateProfile: '/users/me',
+    changePassword: '/users/me/password',
+    updateNotifications: '/users/me/notifications',
+    updatePlan: '/users/me/plan',
+    deleteAccount: '/users/me',
+  },
+
   // Workspaces
   workspaces: {
     list: '/workspaces',

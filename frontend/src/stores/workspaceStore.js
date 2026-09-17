@@ -8,18 +8,41 @@ import { workspaceService } from '@/services/workspace';
 export const useWorkspaceStore = create((set, get) => ({
   workspaces: [],
   activeWorkspace: null,
+  currentUserId: null,
   isLoading: false,
   isInitialized: false,
   error: null,
 
+  reset: () => {
+    localStorage.removeItem('active_workspace_id');
+    set({
+      workspaces: [],
+      activeWorkspace: null,
+      currentUserId: null,
+      isLoading: false,
+      isInitialized: false,
+      error: null,
+    });
+  },
+
   fetchWorkspaces: async (force = false) => {
-    const { isInitialized, workspaces } = get();
-    // Cache-first: if already loaded and not forced, return immediately
-    if (isInitialized && workspaces.length > 0 && !force) {
+    let authUserId = null;
+    try {
+      const stored = JSON.parse(localStorage.getItem('user') || 'null');
+      authUserId = stored?.id || stored?.email || null;
+    } catch {
+      authUserId = null;
+    }
+
+    const { isInitialized, workspaces, currentUserId } = get();
+    const userChanged = Boolean(authUserId && currentUserId && currentUserId !== authUserId);
+
+    // Cache-first: if already loaded for the same user and not forced, return immediately
+    if (isInitialized && !userChanged && workspaces.length > 0 && !force) {
       return workspaces;
     }
 
-    if (!isInitialized) {
+    if (!isInitialized || userChanged) {
       set({ isLoading: true, error: null });
     }
 
@@ -33,11 +56,14 @@ export const useWorkspaceStore = create((set, get) => ({
 
       if (active) {
         localStorage.setItem('active_workspace_id', active.id);
+      } else {
+        localStorage.removeItem('active_workspace_id');
       }
 
       set({
         workspaces: list,
         activeWorkspace: active,
+        currentUserId: authUserId,
         isLoading: false,
         isInitialized: true,
         error: null,
@@ -62,6 +88,8 @@ export const useWorkspaceStore = create((set, get) => ({
 
     if (active) {
       localStorage.setItem('active_workspace_id', active.id);
+    } else {
+      localStorage.removeItem('active_workspace_id');
     }
 
     set({ workspaces: list, activeWorkspace: active, isInitialized: true });
@@ -70,6 +98,8 @@ export const useWorkspaceStore = create((set, get) => ({
   setActiveWorkspace: (workspace) => {
     if (workspace) {
       localStorage.setItem('active_workspace_id', workspace.id);
+    } else {
+      localStorage.removeItem('active_workspace_id');
     }
     set({ activeWorkspace: workspace });
   },

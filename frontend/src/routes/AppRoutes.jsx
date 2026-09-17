@@ -27,6 +27,7 @@ import { AccountSettingsPage } from '@/pages/settings/AccountSettingsPage';
 import { AppearanceSettingsPage } from '@/pages/settings/AppearanceSettingsPage';
 import { NotificationSettingsPage } from '@/pages/settings/NotificationSettingsPage';
 import { SubscriptionPage } from '@/pages/settings/SubscriptionPage';
+import { AnalyticsPage } from '@/pages/dashboard/AnalyticsPage';
 
 // Scroll to top on route change
 function ScrollToTop() {
@@ -98,6 +99,7 @@ export function AppRoutes() {
           <Route path={PATHS.LESSON_PLANNER} element={<LessonPlannerPage />} />
           <Route path={PATHS.QUIZ_GENERATOR} element={<QuizGeneratorPage />} />
           <Route path={PATHS.HISTORY} element={<HistoryListPage />} />
+          <Route path={PATHS.ANALYTICS} element={<AnalyticsPage />} />
           
           {/* Settings & Subscription */}
           <Route path={PATHS.SETTINGS.ROOT} element={<SettingsPage />} />

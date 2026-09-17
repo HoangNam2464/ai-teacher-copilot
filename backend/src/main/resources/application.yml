@@ -32,11 +32,26 @@ spring:
     locations: classpath:db/migration
     baseline-on-migrate: true
 
-  # --- Jackson ---
-  jackson:
-    default-property-inclusion: non_null
-    serialization:
-      write-dates-as-timestamps: false
+  # --- Mail (SMTP) ---
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: false
+
+  # --- Servlet Multipart ---
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 55MB
+
 
 # --- Server ---
 server:
@@ -53,6 +68,9 @@ management:
   endpoint:
     health:
       show-details: when_authorized
+  health:
+    mail:
+      enabled: false
 
 # --- Application custom properties ---
 app:
@@ -70,6 +88,11 @@ app:
     bucket-exports: ${MINIO_BUCKET_EXPORTS:exports}
   google:
     client-id: ${GOOGLE_CLIENT_ID:}
+  frontend-url: ${FRONTEND_URL:http://localhost:3000}
+  mail:
+    enabled: ${MAIL_ENABLED:true}
+    from: ${MAIL_FROM:noreply@aiteachercopilot.com}
+    sender-name: ${MAIL_SENDER_NAME:AI Teacher Copilot}
 
 # --- Logging ---
 logging:

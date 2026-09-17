@@ -140,7 +140,14 @@ services:
       AI_SERVICE_API_KEY: ${AI_SERVICE_API_KEY:-changeme_internal_ai_service_shared_secret_key}
       JWT_SECRET: ${JWT_SECRET:-changeme_jwt_secret_at_least_32_characters_long_for_hmac256}
       JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS:-86400000}
-      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      MAIL_HOST: ${MAIL_HOST:-smtp.gmail.com}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      MAIL_FROM: ${MAIL_FROM:-noreply@aiteachercopilot.com}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+    env_file:
+      - .env
     ports:
       - "8080:8080"
     depends_on:

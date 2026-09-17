@@ -1,5 +1,6 @@
 package com.aiteachercopilot.auth;
 
+import com.aiteachercopilot.common.service.EmailService;
 import com.aiteachercopilot.user.User;
 import com.aiteachercopilot.user.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,6 +33,9 @@ class AuthServiceTest {
     @Mock
     private JwtTokenProvider tokenProvider;
 
+    @Mock
+    private EmailService emailService;
+
     @InjectMocks
     private AuthService authService;
 
@@ -46,13 +50,14 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("Should successfully register teacher with BCrypt hashed password and role TEACHER")
+    @DisplayName("Should successfully register teacher with BCrypt hashed password, role TEACHER and send verification email")
     void register_Success() {
         // Arrange
         UUID userId = UUID.randomUUID();
         when(userRepository.existsByEmail("teacher@school.edu.vn")).thenReturn(false);
         when(passwordEncoder.encode("SecretPassword123!")).thenReturn("$2a$10$hashedPasswordString");
-        when(tokenProvider.generateToken(any(), eq("teacher@school.edu.vn"))).thenReturn("mocked.jwt.token");
+        when(tokenProvider.generatePurposeToken(eq("teacher@school.edu.vn"), eq("VERIFY_EMAIL"), anyLong()))
+                .thenReturn("mocked.verify.token");
 
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
             User user = invocation.getArgument(0);
@@ -65,12 +70,12 @@ class AuthServiceTest {
 
         // Assert
         assertThat(response).isNotNull();
-        assertThat(response.getToken()).isEqualTo("mocked.jwt.token");
+        assertThat(response.getRequiresEmailVerification()).isTrue();
         assertThat(response.getEmail()).isEqualTo("teacher@school.edu.vn");
         assertThat(response.getFullName()).isEqualTo("Thầy Nguyễn Văn A");
         assertThat(response.getRole()).isEqualTo("TEACHER");
 
-        // Verify password hashing and persistence
+        // Verify password hashing, inactive state, and persistence
         ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
         verify(userRepository).save(userCaptor.capture());
         User savedUser = userCaptor.getValue();
@@ -79,6 +84,10 @@ class AuthServiceTest {
         assertThat(savedUser.getPasswordHash()).isEqualTo("$2a$10$hashedPasswordString");
         assertThat(savedUser.getPasswordHash()).isNotEqualTo("SecretPassword123!");
         assertThat(savedUser.getRole()).isEqualTo("TEACHER");
+        assertThat(savedUser.getIsActive()).isFalse();
+
+        // Verify email dispatch
+        verify(emailService).sendVerificationEmail(eq("teacher@school.edu.vn"), eq("Thầy Nguyễn Văn A"), contains("verify-email"));
     }
 
     @Test
