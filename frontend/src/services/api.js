@@ -54,8 +54,11 @@ api.interceptors.response.use(
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('user');
-        if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
-          window.location.href = '/login';
+        const base = import.meta.env.BASE_URL || '/';
+        const cleanBase = base.endsWith('/') ? base.slice(0, -1) : base;
+        const currentPath = window.location.pathname;
+        if (currentPath !== `${cleanBase}/login` && currentPath !== `${cleanBase}/register`) {
+          window.location.href = `${cleanBase}/login`;
         }
       }
     }
