@@ -25,3 +25,8 @@ app:
     secret-key: minioadmin
     bucket-documents: test-documents
     bucket-exports: test-exports
+  frontend-url: http://localhost:3000
+  mail:
+    enabled: false
+    from: test@school.edu.vn
+    sender-name: AI Teacher Copilot

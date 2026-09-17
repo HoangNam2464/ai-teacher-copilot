@@ -18,6 +18,7 @@ export const PATHS = {
   DASHBOARD: '/dashboard',
   WORKSPACES: '/dashboard/workspace',
   DOCUMENTS: '/documents',
+  ANALYTICS: '/dashboard/analytics',
 
   // AI Content Generation
   LESSON_PLANNER: '/lesson-planner',

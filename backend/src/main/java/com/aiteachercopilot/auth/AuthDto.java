@@ -42,6 +42,8 @@ public final class AuthDto {
         private String fullName;
         private String role;
         private String avatarUrl;
+        private Boolean requiresEmailVerification;
+        private String message;
 
         public AuthResponse(String token, String email, String fullName, String role) {
             this.token = token;
@@ -56,6 +58,15 @@ public final class AuthDto {
             this.fullName = fullName;
             this.role = role;
             this.avatarUrl = avatarUrl;
+        }
+
+        public AuthResponse(String token, String email, String fullName, String role, Boolean requiresEmailVerification, String message) {
+            this.token = token;
+            this.email = email;
+            this.fullName = fullName;
+            this.role = role;
+            this.requiresEmailVerification = requiresEmailVerification;
+            this.message = message;
         }
     }
 

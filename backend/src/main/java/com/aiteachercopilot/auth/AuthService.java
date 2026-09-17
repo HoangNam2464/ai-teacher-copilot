@@ -1,5 +1,6 @@
 package com.aiteachercopilot.auth;
 
+import com.aiteachercopilot.common.service.EmailService;
 import com.aiteachercopilot.user.User;
 import com.aiteachercopilot.user.UserRepository;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
@@ -7,7 +8,6 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -24,16 +24,22 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
+    private final EmailService emailService;
 
     @Value("${app.google.client-id}")
     private String googleClientId;
 
+    @Value("${app.frontend-url:http://localhost:3000}")
+    private String frontendUrl;
+
     public AuthService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
-                       JwtTokenProvider tokenProvider) {
+                       JwtTokenProvider tokenProvider,
+                       EmailService emailService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.tokenProvider = tokenProvider;
+        this.emailService = emailService;
     }
 
     @Transactional
@@ -47,14 +53,26 @@ public class AuthService {
                 .passwordHash(passwordEncoder.encode(request.getPassword()))
                 .fullName(request.getFullName())
                 .role("TEACHER")
+                .isActive(false)
                 .build();
 
         user = userRepository.save(user);
-        log.info("New user registered: {}", user.getEmail());
+        log.info("New user registered (pending email verification): {}", user.getEmail());
 
-        String token = tokenProvider.generateToken(user.getId(), user.getEmail());
-        return new AuthDto.AuthResponse(token, user.getEmail(),
-                user.getFullName(), user.getRole());
+        String verifyToken = tokenProvider.generatePurposeToken(user.getEmail(), "VERIFY_EMAIL", 86400000L);
+        String verificationUrl = String.format("%s/verify-email?token=%s&email=%s",
+                frontendUrl, verifyToken, user.getEmail());
+
+        emailService.sendVerificationEmail(user.getEmail(), user.getFullName(), verificationUrl);
+
+        return new AuthDto.AuthResponse(
+                null,
+                user.getEmail(),
+                user.getFullName(),
+                user.getRole(),
+                true,
+                "Tài khoản đã được tạo thành công. Vui lòng kiểm tra email để kích hoạt tài khoản của bạn."
+        );
     }
 
     @Transactional(readOnly = true)
@@ -63,7 +81,7 @@ public class AuthService {
                 .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
 
         if (!user.getIsActive()) {
-            throw new BadCredentialsException("Account is disabled");
+            throw new BadCredentialsException("Tài khoản chưa được kích hoạt. Vui lòng kiểm tra email để kích hoạt trước khi đăng nhập.");
         }
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
@@ -253,8 +271,14 @@ public class AuthService {
         var userOpt = userRepository.findByEmail(request.getEmail());
         String token = null;
         if (userOpt.isPresent()) {
-            token = tokenProvider.generatePurposeToken(request.getEmail(), "VERIFY_EMAIL", 86400000L);
-            log.info("Resent verification token for {}: [VERIFY_URL: /verify-email?token={}]", request.getEmail(), token);
+            User user = userOpt.get();
+            if (!user.getIsActive()) {
+                token = tokenProvider.generatePurposeToken(request.getEmail(), "VERIFY_EMAIL", 86400000L);
+                String verificationUrl = String.format("%s/verify-email?token=%s&email=%s",
+                        frontendUrl, token, user.getEmail());
+                emailService.sendVerificationEmail(user.getEmail(), user.getFullName(), verificationUrl);
+                log.info("Resent verification token for {}: [VERIFY_URL: {}]", request.getEmail(), verificationUrl);
+            }
         }
         return new AuthDto.MessageResponse("Email kích hoạt đã được gửi lại vào hòm thư của bạn.", token);
     }

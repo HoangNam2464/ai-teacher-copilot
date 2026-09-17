@@ -115,8 +115,7 @@ public class DocumentService {
                 .retrieve()
                 .bodyToMono(Void.class)
                 .doOnSuccess(v -> log.info("Successfully triggered AI processing for document: {}", savedDocId))
-                .doOnError(e -> log.error("Failed to trigger AI processing for document: {}", savedDocId, e))
-                .subscribe();
+                .subscribe(v -> {}, e -> log.warn("AI service trigger completed with error: {}", e.getMessage()));
 
         return DocumentDto.UploadResponse.fromEntity(doc);
     }

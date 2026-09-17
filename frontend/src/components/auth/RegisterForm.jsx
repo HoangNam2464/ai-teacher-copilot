@@ -241,8 +241,16 @@ export function RegisterForm() {
           fullName: authData.fullName || name.trim(),
           role: authData.role || 'TEACHER',
         });
+        navigate(PATHS.ONBOARDING);
+      } else {
+        // Email activation required -> navigate to verify-email page
+        navigate(PATHS.VERIFY_EMAIL, {
+          state: {
+            email: email.trim(),
+            message: authData?.message,
+          },
+        });
       }
-      navigate(PATHS.ONBOARDING);
     } catch (err) {
       console.error('Register error:', err);
       setError(

@@ -21,6 +21,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { PATHS } from '@/routes/paths';
 import { cn } from '@/lib/utils';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const features = [
   {
@@ -204,6 +205,7 @@ export function Header() {
           {/* Desktop Auth Buttons */}
           <div className="hidden lg:flex items-center gap-3">
             <LanguageSwitcher />
+            <ThemeToggle />
             {isAuthenticated ? (
               <Link
                 to={PATHS.WORKSPACES}
@@ -352,7 +354,8 @@ export function Header() {
                   transition={{ delay: 0.3 }}
                   className="pt-4 border-t border-border space-y-3"
                 >
-                  <div className="flex justify-end mb-4">
+                  <div className="flex items-center justify-end gap-2 mb-4">
+                    <ThemeToggle />
                     <LanguageSwitcher />
                   </div>
                   {isAuthenticated ? (

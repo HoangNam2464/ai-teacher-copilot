@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { tokenStorage } from '@/services/auth';
+import { useWorkspaceStore } from '@/stores/workspaceStore';
 
 /**
  * Authentication Store (Zustand)
@@ -15,6 +16,12 @@ export const useAuthStore = create((set) => ({
     if (user) {
       localStorage.setItem('user', JSON.stringify(user));
     }
+    // Cleanly reset workspace store on login/switch to prevent cross-account cache leaks
+    try {
+      useWorkspaceStore.getState().reset();
+    } catch {
+      // safe fallback
+    }
     set({ token, user, isAuthenticated: true });
   },
 
@@ -29,6 +36,12 @@ export const useAuthStore = create((set) => ({
   logout: () => {
     tokenStorage.clearTokens();
     localStorage.removeItem('active_workspace_id');
+    localStorage.removeItem('onboarding_completed');
+    try {
+      useWorkspaceStore.getState().reset();
+    } catch {
+      // safe fallback
+    }
     set({ token: null, user: null, isAuthenticated: false });
   },
 }));

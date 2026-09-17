@@ -1,15 +1,12 @@
 ---
-description: >-
-  Rules for UI/UX implementation in AI Teacher Copilot.
-  Enforces strict template fidelity to frontend1, minimalism,
-  forbids unnecessary text/decorations and prevents "too AI" clutter.
 trigger: always_on
+description: >-
 ---
 
 # Feature Rules: UI/UX & Template Standards
 
-## 1. Core Mandate: Template Fidelity (`frontend1/`)
-- Khi xây dựng hoặc chỉnh sửa giao diện cho bất kỳ chức năng nào (Authentication, Workspace, Documents, Lesson Planner, Quiz Generator, History, v.v.), **BẮT BUỘC** phải mở và đối chiếu trực tiếp với trang/component tương ứng trong thư mục mẫu [frontend1/src/](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/frontend1/src).
+## 1. Core Mandate: Template Fidelity
+- Khi xây dựng hoặc chỉnh sửa giao diện cho bất kỳ chức năng nào (Authentication, Workspace, Documents, Lesson Planner, Quiz Generator, History, v.v.).
 - Tuân thủ cấu trúc bố cục, tỷ lệ kích thước (ví dụ: kích thước nút social `w-14 h-14 rounded-xl`, độ bo tròn card, khoảng cách padding) và phân cấp thông tin của bản mẫu.
 - Không tự ý thay đổi cấu trúc cốt lõi nếu không có yêu cầu cụ thể từ người dùng.
 
@@ -30,7 +27,7 @@ trigger: always_on
 ---
 
 ## 3. Checklist khi hoàn thiện một màn hình UI
-- [ ] Đã mở file tương ứng trong `frontend1/` để đối chiếu trực tiếp?
+- [ ] Đã đối chiếu trực tiếp với thiết kế chuẩn?
 - [ ] Bố cục đã gọn gàng, đơn giản, không bị thừa chi tiết so với mẫu?
 - [ ] Đã loại bỏ hết các đoạn text "AI hướng dẫn" rườm rà, máy móc?
 - [ ] Các trạng thái rỗng (empty state), đang tải (loading) và lỗi (error) tinh giản, đúng vị trí?

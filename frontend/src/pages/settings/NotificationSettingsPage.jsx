@@ -6,6 +6,8 @@ import { Spinner } from '@/components/ui/Spinner';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Bell, Check } from 'lucide-react';
 import { PATHS } from '@/routes/paths';
+import { userService } from '@/services/user';
+import { toast } from 'sonner';
 
 const DEFAULT_PREFS = {
   enabled: true,
@@ -63,13 +65,23 @@ export function NotificationSettingsPage() {
   useEffect(() => {
     const loadPrefs = async () => {
       try {
-        // Mock API call
-        await new Promise((r) => setTimeout(r, 500));
-        setPrefs(DEFAULT_PREFS);
-      } catch {
-        // Silently ignore fetch errors
+        const res = await userService.getProfile();
+        const profile = res?.data || res;
+        if (profile.notificationPreferences) {
+          try {
+            const parsed = typeof profile.notificationPreferences === 'string'
+              ? JSON.parse(profile.notificationPreferences)
+              : profile.notificationPreferences;
+            setPrefs((prev) => ({ ...prev, ...parsed }));
+          } catch {
+            // fallback to default
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to load notification preferences:', err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
     loadPrefs();
   }, []);
@@ -81,14 +93,15 @@ export function NotificationSettingsPage() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      // Mock API call
-      await new Promise((r) => setTimeout(r, 1500));
+      await userService.updateNotifications(JSON.stringify(prefs));
       setSaved(true);
+      toast.success(t('notificationSettingsPage.saveSuccess', { defaultValue: 'Đã lưu cài đặt thông báo!' }));
       setTimeout(() => setSaved(false), 2000);
-    } catch {
-      // Silently ignore save errors for demo
+    } catch (err) {
+      toast.error(err.response?.data?.message || err.message || 'Lưu cài đặt thông báo thất bại');
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
   };
 
   if (loading) {

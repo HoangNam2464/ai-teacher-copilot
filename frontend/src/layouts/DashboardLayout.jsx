@@ -6,6 +6,7 @@ import { useWorkspaceStore } from '@/stores/workspaceStore';
 import { Button } from '@/components/ui/Button';
 import { NotificationBell } from '@/components/NotificationBell';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { cn } from '@/lib/utils';
 import { PATHS } from '@/routes/paths';
 import {
@@ -24,6 +25,8 @@ import {
   ChevronDown,
   Check,
   Plus,
+  Crown,
+  BarChart3,
 } from 'lucide-react';
 
 export function DashboardLayout({ children }) {
@@ -47,6 +50,8 @@ export function DashboardLayout({ children }) {
     { labelKey: 'nav.lessonPlanner', icon: Brain, href: PATHS.LESSON_PLANNER },
     { labelKey: 'nav.quizGenerator', icon: FileText, href: PATHS.QUIZ_GENERATOR },
     { labelKey: 'nav.history', icon: History, href: PATHS.HISTORY },
+    { labelKey: 'nav.analytics', icon: BarChart3, href: PATHS.ANALYTICS },
+    { labelKey: 'common.subscription', icon: Crown, href: PATHS.SETTINGS.SUBSCRIPTION },
   ];
 
   const handleLogout = async () => {
@@ -55,7 +60,7 @@ export function DashboardLayout({ children }) {
   };
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-200">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div
@@ -252,8 +257,11 @@ export function DashboardLayout({ children }) {
 
             <div className="flex-1" />
 
-            {/* Header Right Side: Language switcher + Notification bell + Divider + User menu */}
+            {/* Header Right Side: Theme toggle + Language switcher + Notification bell + Divider + User menu */}
             <div className="flex items-center gap-1.5 sm:gap-2">
+              {/* Theme toggle */}
+              <ThemeToggle />
+
               {/* Language switcher */}
               <LanguageSwitcher />
 
@@ -263,23 +271,36 @@ export function DashboardLayout({ children }) {
               {/* Vertical divider */}
               <div className="h-6 w-px bg-border mx-2" />
 
-              {/* User avatar menu */}
+              {/* User avatar menu (Avatar + Name + Plan + Chevron) */}
               <div className="relative">
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#8B5CF6] hover:bg-[#7c3aed] text-white font-bold flex items-center justify-center text-sm sm:text-base transition-transform hover:scale-105 shadow-sm overflow-hidden focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2"
+                  className="flex items-center gap-2 p-1 sm:px-2 py-1 rounded-full sm:rounded-xl hover:bg-muted/70 transition-colors focus:outline-none"
                   aria-label="User menu"
                 >
-                  {user?.avatarUrl ? (
-                    <img
-                      src={user.avatarUrl}
-                      alt={displayName}
-                      className="w-full h-full rounded-full object-cover"
-                      referrerPolicy="no-referrer"
-                    />
-                  ) : (
-                    <span>{initials || (displayName ? displayName.charAt(0).toUpperCase() : 'N')}</span>
-                  )}
+                  <div className="w-8 h-8 rounded-full bg-[#8B5CF6] hover:bg-[#7c3aed] text-white font-bold flex items-center justify-center text-xs sm:text-sm shadow-sm overflow-hidden shrink-0">
+                    {user?.avatarUrl ? (
+                      <img
+                        src={user.avatarUrl}
+                        alt={displayName}
+                        className="w-full h-full rounded-full object-cover"
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : (
+                      <span>{initials || (displayName ? displayName.charAt(0).toUpperCase() : 'N')}</span>
+                    )}
+                  </div>
+                  <div className="hidden sm:flex flex-col text-left">
+                    <div className="flex items-center gap-1">
+                      <span className="text-xs font-semibold text-foreground truncate max-w-[110px]">
+                        {displayName || 'Giáo viên'}
+                      </span>
+                      <ChevronDown className="w-3 h-3 text-muted-foreground" />
+                    </div>
+                    <span className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
+                      {user?.plan?.toLowerCase() === 'pro' ? 'Pro Plan' : 'Free Plan'}
+                    </span>
+                  </div>
                 </button>
 
                 {/* Dropdown menu */}

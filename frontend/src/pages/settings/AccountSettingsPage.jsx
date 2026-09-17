@@ -16,6 +16,8 @@ import {
   EyeOff,
 } from 'lucide-react';
 import { PATHS } from '@/routes/paths';
+import { userService } from '@/services/user';
+import { toast } from 'sonner';
 
 export function AccountSettingsPage() {
   const navigate = useNavigate();
@@ -41,41 +43,46 @@ export function AccountSettingsPage() {
     setPasswordError('');
 
     if (newPassword.length < 8) {
-      setPasswordError(t('accountSettingsPage.passwordMinLength'));
+      setPasswordError(t('accountSettingsPage.passwordMinLength', { defaultValue: 'Mật khẩu phải từ 8 ký tự trở lên' }));
       return;
     }
     if (newPassword !== confirmPassword) {
-      setPasswordError(t('accountSettingsPage.passwordsDoNotMatch'));
+      setPasswordError(t('accountSettingsPage.passwordsDoNotMatch', { defaultValue: 'Mật khẩu xác nhận không khớp' }));
       return;
     }
 
     setChangingPassword(true);
     try {
-      // Mock API call
-      await new Promise(r => setTimeout(r, 1500));
+      await userService.changePassword(oldPassword, newPassword);
       setPasswordChanged(true);
       setOldPassword('');
       setNewPassword('');
       setConfirmPassword('');
+      toast.success(t('accountSettingsPage.passwordChangedSuccess', { defaultValue: 'Đổi mật khẩu thành công!' }));
       setTimeout(() => setPasswordChanged(false), 3000);
-    } catch {
-      setPasswordError(t('accountSettingsPage.incorrectPassword'));
+    } catch (err) {
+      const msg = err.response?.data?.message || err.message || t('accountSettingsPage.incorrectPassword', { defaultValue: 'Mật khẩu hiện tại không đúng' });
+      setPasswordError(msg);
+      toast.error(msg);
+    } finally {
+      setChangingPassword(false);
     }
-    setChangingPassword(false);
   };
 
   const handleDeleteAccount = async () => {
     if (deleteConfirmText !== 'DELETE') return;
     setDeleting(true);
     try {
-      // Mock API call
-      await new Promise(r => setTimeout(r, 1500));
+      await userService.deleteAccount();
+      toast.success('Tài khoản đã được xóa vĩnh viễn.');
       logout();
       navigate(PATHS.LOGIN);
-    } catch {
-      // Silently ignore delete errors for demo
+    } catch (err) {
+      const msg = err.response?.data?.message || err.message || 'Xóa tài khoản thất bại';
+      toast.error(msg);
+    } finally {
+      setDeleting(false);
     }
-    setDeleting(false);
   };
 
   return (

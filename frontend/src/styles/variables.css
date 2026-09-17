@@ -69,6 +69,67 @@
     --color-border-focus: hsl(var(--ring));
   }
 
+  .dark {
+    /* Base Canvas & Text - Deep Academic Dark Palette */
+    --background: 222 47% 7%;
+    --foreground: 210 40% 98%;
+
+    /* Surfaces & Popovers */
+    --card: 222 47% 10%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 10%;
+    --popover-foreground: 210 40% 98%;
+
+    /* Brand Primary: Vibrant Academic Teal (#14B8A6) */
+    --primary: 172 84% 38%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Neutral Secondary, Muted & Accent */
+    --secondary: 217 33% 16%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 33% 14%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 217 33% 16%;
+    --accent-foreground: 210 40% 98%;
+
+    /* Destructive & Feedback */
+    --destructive: 0 63% 45%;
+    --destructive-foreground: 210 40% 98%;
+
+    /* Borders, Inputs & Focus Rings */
+    --border: 217 33% 18%;
+    --input: 217 33% 18%;
+    --ring: 172 84% 38%;
+
+    /* Bloom Taxonomy Badge Tokens for Dark Mode */
+    --bloom-remember-bg: 214 40% 18%;
+    --bloom-remember-fg: 214 90% 75%;
+    --bloom-understand-bg: 189 40% 18%;
+    --bloom-understand-fg: 189 90% 75%;
+    --bloom-apply-bg: 172 40% 18%;
+    --bloom-apply-fg: 172 90% 75%;
+    --bloom-analyze-bg: 38 40% 18%;
+    --bloom-analyze-fg: 38 90% 75%;
+    --bloom-evaluate-bg: 270 40% 18%;
+    --bloom-evaluate-fg: 270 90% 75%;
+    --bloom-create-bg: 340 40% 18%;
+    --bloom-create-fg: 340 90% 75%;
+
+    /* Backward Compatibility */
+    --color-primary: hsl(var(--primary));
+    --color-primary-hover: hsl(172 84% 44%);
+    --color-primary-light: hsl(172 40% 16%);
+    --color-primary-dark: hsl(172 84% 30%);
+    --color-secondary: hsl(var(--secondary));
+    --color-bg-app: hsl(var(--background));
+    --color-bg-surface: hsl(var(--card));
+    --color-bg-subtle: hsl(var(--muted));
+    --color-text-primary: hsl(var(--foreground));
+    --color-text-secondary: hsl(var(--muted-foreground));
+    --color-border: hsl(var(--border));
+    --color-border-focus: hsl(var(--ring));
+  }
+
   * {
     @apply border-border;
   }
@@ -106,7 +167,7 @@
 }
 
 /* ============================================================
-   Gradient & Glass Utilities (ported from frontend1)
+   Gradient & Glass Utilities
    ============================================================ */
 .gradient-primary {
   background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%);

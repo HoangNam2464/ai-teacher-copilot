@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/stores/authStore';
+import { userService } from '@/services/user';
 import { Button } from '@/components/ui/Button';
 import { Spinner } from '@/components/ui/Spinner';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -507,10 +508,8 @@ function SetupWizard({ onSkip }) {
 
   const EDUCATION_LEVELS = [
     { id: 'elementary', label: t('onboarding.education.elementary'), icon: School, desc: t('onboarding.education.elementaryDesc') },
-    { id: 'middleSchool', label: t('onboarding.education.middleSchool'), icon: GraduationCap, desc: t('onboarding.education.middleSchoolDesc') },
-    { id: 'highSchool', label: t('onboarding.education.highSchool'), icon: Award, desc: t('onboarding.education.highSchoolDesc') },
-    { id: 'university', label: t('onboarding.education.university'), icon: Briefcase, desc: t('onboarding.education.universityDesc') },
-    { id: 'center', label: t('onboarding.education.center'), icon: Lightbulb, desc: t('onboarding.education.centerDesc') },
+    { id: 'middle_school', label: t('onboarding.education.middleSchool'), icon: GraduationCap, desc: t('onboarding.education.middleSchoolDesc') },
+    { id: 'high_school', label: t('onboarding.education.highSchool'), icon: Award, desc: t('onboarding.education.highSchoolDesc') },
   ];
 
   const SUBJECTS = [
@@ -547,18 +546,14 @@ function SetupWizard({ onSkip }) {
   const handleComplete = async () => {
     setSaving(true);
     try {
-      // NOTE: Backend user profile update API (PUT /api/v1/users/me) does not exist yet.
-      // Skipping the API call to adhere to RULE 7: DO NOT CREATE MOCK PERSISTENCE.
-      // If the API existed, it would look like this:
-      // await api.put('/users/me', { educationLevel: education, subjects: selectedSubjects, studyGoal: goal });
-      
-      localStorage.setItem('onboarding_completed', 'true');
-      // Simulate slight delay for UX
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      navigate(PATHS.DASHBOARD);
+      await userService.updateProfile({
+        educationLevel: education,
+        subjects: JSON.stringify(selectedSubjects),
+      });
     } catch (error) {
       console.error('Failed to complete onboarding:', error);
+    } finally {
+      localStorage.setItem('onboarding_completed', 'true');
       setSaving(false);
     }
   };
@@ -608,7 +603,7 @@ function SetupWizard({ onSkip }) {
                 <h2 className="text-3xl font-black mb-3">{t('onboarding.wizard.titleEducation')}</h2>
                 <p className="text-muted-foreground">{t('onboarding.wizard.descEducation')}</p>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8">
                 {EDUCATION_LEVELS.map((level) => {
                   const isSelected = education === level.id;
                   return (
@@ -690,15 +685,126 @@ function SetupWizard({ onSkip }) {
           )}
 
           {step === 'done' && (
-            <motion.div key="done" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex-1 flex flex-col items-center justify-center text-center">
-              <div className="w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mb-6 relative">
-                <motion.div animate={{ rotate: 360 }} transition={{ duration: 3, repeat: Infinity, ease: "linear" }} className="absolute inset-0 rounded-full border-4 border-emerald-500 border-t-transparent" />
-                <Brain className="w-10 h-10 text-emerald-600" />
-              </div>
-              <h2 className="text-2xl font-bold mb-2">{t('onboarding.wizard.saving')}</h2>
-              <p className="text-muted-foreground max-w-sm">
-                {t('onboarding.wizard.savingDesc')}
-              </p>
+            <motion.div
+              key="done"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3 }}
+              className="flex-1 flex flex-col items-center justify-center text-center py-4"
+            >
+              {saving ? (
+                <div className="flex flex-col items-center justify-center">
+                  <div className="w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mb-6 relative">
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
+                      className="absolute inset-0 rounded-full border-4 border-emerald-500 border-t-transparent"
+                    />
+                    <Brain className="w-10 h-10 text-emerald-600" />
+                  </div>
+                  <h2 className="text-2xl font-bold mb-2">{t('onboarding.wizard.saving')}</h2>
+                  <p className="text-muted-foreground max-w-sm">
+                    {t('onboarding.wizard.savingDesc')}
+                  </p>
+                </div>
+              ) : (
+                <div className="w-full max-w-xl mx-auto">
+                  {/* Glowing Green Check Circle */}
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: 'spring', damping: 12, stiffness: 200 }}
+                    className="w-16 h-16 rounded-full bg-emerald-500/15 border-2 border-emerald-500 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-emerald-500/20"
+                  >
+                    <Check className="w-8 h-8 stroke-[2.5]" />
+                  </motion.div>
+
+                  <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-2">
+                    Thầy/Cô Đã Sẵn Sàng!
+                  </h2>
+                  <p className="text-muted-foreground text-sm sm:text-base max-w-md mx-auto mb-8 leading-relaxed">
+                    Không gian làm việc đã được cá nhân hóa hoàn tất. Thầy/cô muốn bắt đầu với hoạt động nào trước?
+                  </p>
+
+                  {/* 3 Quick Action Cards */}
+                  <div className="grid sm:grid-cols-3 gap-3.5 mb-8 text-left">
+                    <button
+                      type="button"
+                      onClick={() => navigate(PATHS.DOCUMENTS)}
+                      className="group p-4 rounded-xl border border-border bg-card hover:border-emerald-500/60 hover:bg-emerald-500/5 transition-all flex flex-col justify-between"
+                    >
+                      <div>
+                        <div className="w-10 h-10 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
+                          <BookOpen className="w-5 h-5" />
+                        </div>
+                        <h4 className="font-bold text-sm text-foreground mb-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                          Tải tài liệu SGK
+                        </h4>
+                        <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+                          Nạp tài liệu giảng dạy PDF/DOCX vào kho học liệu AI.
+                        </p>
+                      </div>
+                      <div className="mt-4 flex items-center text-xs font-semibold text-emerald-600 dark:text-emerald-400 gap-1">
+                        <span>Bắt đầu</span>
+                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => navigate(PATHS.LESSON_PLANNER)}
+                      className="group p-4 rounded-xl border border-border bg-card hover:border-emerald-500/60 hover:bg-emerald-500/5 transition-all flex flex-col justify-between"
+                    >
+                      <div>
+                        <div className="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
+                          <PenTool className="w-5 h-5" />
+                        </div>
+                        <h4 className="font-bold text-sm text-foreground mb-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                          Soạn giáo án
+                        </h4>
+                        <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+                          Soạn kế hoạch bài dạy chuẩn công văn 5512 với AI.
+                        </p>
+                      </div>
+                      <div className="mt-4 flex items-center text-xs font-semibold text-emerald-600 dark:text-emerald-400 gap-1">
+                        <span>Bắt đầu</span>
+                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => navigate(PATHS.QUIZ_GENERATOR)}
+                      className="group p-4 rounded-xl border border-border bg-card hover:border-emerald-500/60 hover:bg-emerald-500/5 transition-all flex flex-col justify-between"
+                    >
+                      <div>
+                        <div className="w-10 h-10 rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
+                          <FileCheck2 className="w-5 h-5" />
+                        </div>
+                        <h4 className="font-bold text-sm text-foreground mb-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                          Tạo đề thi
+                        </h4>
+                        <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+                          Sinh đề trắc nghiệm & tự luận phân loại ma trận Bloom.
+                        </p>
+                      </div>
+                      <div className="mt-4 flex items-center text-xs font-semibold text-emerald-600 dark:text-emerald-400 gap-1">
+                        <span>Bắt đầu</span>
+                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </button>
+                  </div>
+
+                  {/* Big CTA button */}
+                  <Button
+                    onClick={() => navigate(PATHS.DASHBOARD)}
+                    className="w-full sm:w-auto px-8 h-11 bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-lg shadow-emerald-600/20 text-sm"
+                  >
+                    <Rocket className="w-4 h-4 mr-2" />
+                    Đi tới Bảng điều khiển
+                  </Button>
+                </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
