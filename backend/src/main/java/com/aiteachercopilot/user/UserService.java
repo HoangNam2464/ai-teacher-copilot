@@ -2,7 +2,6 @@ package com.aiteachercopilot.user;
 
 import com.aiteachercopilot.common.exception.ResourceNotFoundException;
 import com.aiteachercopilot.workspace.WorkspaceRepository;
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -81,6 +80,9 @@ public class UserService {
     @Transactional
     public UserDto.ProfileResponse updatePlan(UUID userId, UserDto.UpdatePlanRequest request) {
         User user = findUserById(userId);
+        if (request.getPlan() == null || request.getPlan().isBlank()) {
+            throw new IllegalArgumentException("Gói đăng ký không được để trống.");
+        }
         String plan = request.getPlan().trim().toUpperCase();
         user.setPlan(plan);
         User updated = userRepository.save(user);
@@ -93,21 +95,27 @@ public class UserService {
         User user = findUserById(userId);
         log.warn("Deleting account and all associated data for user: id={}, email={}", user.getId(), user.getEmail());
 
-        // 1. Delete documents uploaded by user
-        var docs = documentRepository.findAll().stream()
-                .filter(d -> userId.equals(d.getUploadedBy()))
-                .toList();
-        if (!docs.isEmpty()) {
-            documentRepository.deleteAll(docs);
+        // 1. Collect workspace IDs owned by user
+        var workspaces = workspaceRepository.findByOwnerId(userId);
+        var workspaceIds = workspaces.stream().map(w -> w.getId()).toList();
+
+        // 2. Delete all documents in user's workspaces (covers docs uploaded by others)
+        if (!workspaceIds.isEmpty()) {
+            documentRepository.deleteByWorkspaceIdIn(workspaceIds);
         }
 
-        // 2. Delete all workspaces owned by user
-        var workspaces = workspaceRepository.findByOwnerId(userId);
+        // 3. Delete any remaining documents uploaded by user in other workspaces
+        var ownDocs = documentRepository.findByUploadedBy(userId);
+        if (!ownDocs.isEmpty()) {
+            documentRepository.deleteAll(ownDocs);
+        }
+
+        // 4. Delete all workspaces owned by user
         if (!workspaces.isEmpty()) {
             workspaceRepository.deleteAll(workspaces);
         }
 
-        // 3. Delete user record completely from database
+        // 5. Delete user record completely from database
         userRepository.delete(user);
         log.info("Account successfully purged from system: id={}, email={}", userId, user.getEmail());
     }

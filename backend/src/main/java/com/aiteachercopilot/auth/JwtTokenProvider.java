@@ -44,7 +44,16 @@ public class JwtTokenProvider {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
-        return UUID.fromString(claims.getSubject());
+        String subject = claims.getSubject();
+        if (subject == null || subject.isBlank()) {
+            return null;
+        }
+        try {
+            return UUID.fromString(subject);
+        } catch (IllegalArgumentException e) {
+            log.warn("Invalid UUID in token subject: {}", subject);
+            return null;
+        }
     }
 
     public String getEmailFromToken(String token) {
@@ -58,7 +67,12 @@ public class JwtTokenProvider {
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
+            Claims claims = Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
+            String subject = claims.getSubject();
+            if (subject == null || subject.isBlank()) {
+                return false;
+            }
+            UUID.fromString(subject);
             return true;
         } catch (JwtException | IllegalArgumentException ex) {
             log.warn("Invalid JWT token: {}", ex.getMessage());

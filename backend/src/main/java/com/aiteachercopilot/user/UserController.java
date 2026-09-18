@@ -29,6 +29,14 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success("Cập nhật thông tin thành công", response));
     }
 
+    @PatchMapping("/me")
+    public ResponseEntity<ApiResponse<UserDto.ProfileResponse>> patchProfile(
+            @AuthenticationPrincipal User user,
+            @Valid @RequestBody UserDto.UpdateProfileRequest request) {
+        UserDto.ProfileResponse response = userService.updateProfile(user.getId(), request);
+        return ResponseEntity.ok(ApiResponse.success("Cập nhật thông tin thành công", response));
+    }
+
     @PutMapping("/me/password")
     public ResponseEntity<ApiResponse<Void>> changePassword(
             @AuthenticationPrincipal User user,

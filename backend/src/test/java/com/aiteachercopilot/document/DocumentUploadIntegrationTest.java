@@ -12,19 +12,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -68,7 +65,6 @@ public class DocumentUploadIntegrationTest {
     private User teacherB;
 
     private String tokenA;
-    private String tokenB;
 
     private Workspace workspaceA;
     private Workspace workspaceB;
@@ -99,7 +95,6 @@ public class DocumentUploadIntegrationTest {
                 .isActive(true)
                 .build();
         teacherB = userRepository.save(teacherB);
-        tokenB = jwtTokenProvider.generateToken(teacherB.getId(), teacherB.getEmail());
 
         // 3. Seed Workspace for Teacher A
         workspaceA = Workspace.builder()
