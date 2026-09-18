@@ -17,7 +17,12 @@ import { cn } from '@/lib/utils';
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 const APPLE_CLIENT_ID = import.meta.env.VITE_APPLE_CLIENT_ID || '';
 const APPLE_REDIRECT_URI = import.meta.env.VITE_APPLE_REDIRECT_URI || window.location.origin;
-
+/**
+ * Teacher Login Form Component.
+ * Implements email/password authentication, validates input, handles loading/error states,
+ * supports social login (Google/Apple), and persists JWT token upon success.
+ * Redirects the user to the Workspaces dashboard when login succeeds.
+ */
 export function LoginForm() {
   const { t } = useTranslation();
   const [email, setEmail] = useState('');
