@@ -95,7 +95,12 @@
     "quizGenerator": "Tạo bài kiểm tra",
     "workspace": "Không gian làm việc",
     "history": "Lịch sử",
-    "workspaces": "Không gian làm việc"
+    "workspaces": "Không gian làm việc",
+    "howItWorks": "Quy Trình",
+    "testimonials": "Đánh Giá",
+    "faq": "Câu Hỏi Thường Gặp",
+    "login": "Đăng Nhập",
+    "register": "Bắt Đầu Miễn Phí"
   },
   "header": {
     "features": {
@@ -217,12 +222,29 @@
     "titleSuffix": "với AI",
     "enterWorkspace": "Vào không gian làm việc",
     "startFree": "Bắt đầu miễn phí",
-    "login": "Đăng nhập"
+    "login": "Đăng nhập",
+    "badgeHighlight": "Chuẩn GDPT 2018 & 5512",
+    "titleGradient": "Chỉ Trong Vài Phút",
+    "ctaPrimary": "Bắt Đầu Soạn Giáo Án Miễn Phí",
+    "ctaSecondary": "Khám Phá Quy Trình 3 Bước",
+    "trustPoints": {
+      "cv5512": "Đúng khung Công Văn 5512",
+      "ragSGK": "Đối soát trang SGK gốc",
+      "exportWord": "Xuất file Word & PDF 1-click"
+    }
   },
   "trustedBy": {
     "title": "Dành cho sinh viên nghiêm túc với việc học",
     "heading": "Một nền tảng cho",
-    "headingHighlight": "mọi môn học"
+    "headingHighlight": "mọi môn học",
+    "teachersCount": "1,200+",
+    "teachersLabel": "Giáo viên K-12 tin dùng",
+    "standardsRate": "100%",
+    "standardsLabel": "Bám sát khung Công Văn 5512",
+    "timeSavedRate": "70%",
+    "timeSavedLabel": "Giảm thời gian soạn học liệu",
+    "provincesCount": "63/63",
+    "provincesLabel": "Tỉnh thành trên toàn quốc"
   },
   "testimonials": {
     "badge": "Đánh giá của sinh viên",
@@ -332,6 +354,23 @@
       "master": "Làm Chủ",
       "retrieve": "Truy xuất",
       "export": "Xuất bản"
+    },
+    "tag": "Quy Trình Chuẩn Sư Phạm",
+    "subtitle": "Quy trình khép kín giúp thầy cô tiết kiệm tối đa thời gian mà vẫn đảm bảo tính khoa học và chuẩn mực sư phạm.",
+    "step1": {
+      "badge": "Lập chỉ mục ngữ nghĩa",
+      "title": "Tải Sách & Học Liệu",
+      "desc": "Tải sách giáo khoa PDF (Kết nối tri thức, Chân trời sáng tạo, Cánh diều) hoặc tài liệu bài giảng vào Không gian làm việc riêng của môn học."
+    },
+    "step2": {
+      "badge": "RAG Grounding chính xác",
+      "title": "AI Sinh Bản Thảo Bám Sát SGK",
+      "desc": "Chọn tên bài, khối lớp và mục tiêu sư phạm. AI Copilot phân tích dữ liệu, tự động dựng kịch bản 4 hoạt động 5512 hoặc bộ đề thi ma trận Bloom."
+    },
+    "step3": {
+      "badge": "Xuất DOCX chuẩn mẫu",
+      "title": "Tinh Chỉnh & Xuất Bản 1-Click",
+      "desc": "Giáo viên duyệt nhanh, chỉnh sửa linh hoạt theo năng lực học sinh từng lớp, đối chiếu trích dẫn nguồn và xuất file Word/PDF hoàn hảo."
     }
   },
   "cta": {
@@ -348,7 +387,14 @@
     },
     "enterWorkspace": "Vào không gian làm việc",
     "startFree": "Đăng ký miễn phí",
-    "subtext": "Không cần thẻ tín dụng · Cài đặt trong 5 phút · Bảo mật dữ liệu tuyệt đối"
+    "subtext": "Không cần thẻ tín dụng · Cài đặt trong 5 phút · Bảo mật dữ liệu tuyệt đối",
+    "subtitle": "Trải nghiệm trợ lý AI soạn kế hoạch bài dạy 5512, trích dẫn SGK và ra đề thi ma trận Bloom ngay hôm nay. Không yêu cầu thẻ tín dụng.",
+    "button": "Tạo Tài Khoản Giáo Viên Miễn Phí",
+    "guarantees": {
+      "setup": "Khởi tạo trong 30 giây",
+      "privacy": "Bảo mật dữ liệu học liệu sư phạm",
+      "export": "Không giới hạn số lần xuất Word"
+    }
   },
   "footer": {
     "newsletter": {
@@ -408,7 +454,9 @@
     "terms": "Điều khoản sử dụng",
     "privacy": "Chính sách bảo mật",
     "rights": "AI Teacher Copilot. Bảo lưu mọi quyền.",
-    "madeWithHeart": "dành cho giáo viên Việt Nam"
+    "madeWithHeart": "dành cho giáo viên Việt Nam",
+    "desc": "Trợ lý AI chuyên biệt cho giáo viên K-12 Việt Nam. Đồng hành nâng cao hiệu quả giảng dạy và giảm tải hồ sơ sư phạm.",
+    "motto": "Thiết kế vì sự phát triển của nền Giáo dục Việt Nam."
   },
   "auth": {
     "login": {
@@ -1141,7 +1189,9 @@
       "liveChat": "Trò chuyện trực tiếp",
       "liveChatHours": "Thứ Hai - Thứ Sáu, 9am-6pm EST"
     },
-    "contactFallback": "Không tìm thấy câu trả lời? Hãy liên hệ với chúng tôi."
+    "contactFallback": "Không tìm thấy câu trả lời? Hãy liên hệ với chúng tôi.",
+    "tag": "Giải Đáp Thắc Mắc",
+    "subtitle": "Những thông tin cần biết để bắt đầu sử dụng AI Teacher Copilot hiệu quả nhất."
   },
   "featuresPage": {
     "badge": "Tính Năng Mạnh Mẽ",
@@ -4564,6 +4614,30 @@
       "aiRegeneration": "Tái tạo bằng AI",
       "exportWord": "Xuất file Word",
       "exportPdf": "Xuất file PDF"
+    },
+    "tag": "Tính Năng Đột Phá",
+    "subtitle": "Kết hợp sức mạnh trí tuệ nhân tạo tạo sinh và công nghệ RAG đối soát tri thức, được tinh chỉnh chuyên sâu theo đặc thù giáo dục phổ thông Việt Nam.",
+    "lessonPlan": {
+      "tag": "Trọng tâm nghiệp vụ",
+      "title": "Kế Hoạch Bài Dạy Chuẩn Khung Công Văn 5512",
+      "desc": "Tự động xây dựng tiến trình dạy học hoàn chỉnh theo 4 hoạt động sư phạm chuẩn mực: Khởi động, Hình thành kiến thức, Luyện tập và Vận dụng. Tích hợp rõ ràng bảng đối chiếu hoạt động giữa Thầy & Trò, thiết bị dạy học và sản phẩm học tập tương ứng."
+    },
+    "ragGrounding": {
+      "title": "RAG Trích Dẫn SGK Minh Bạch",
+      "desc": "Loại bỏ hoàn toàn tình trạng bịa đặt. Mỗi mục tiêu và nội dung đều được đối soát và trích dẫn trực tiếp từ số trang sách giáo khoa gốc."
+    },
+    "bloomQuiz": {
+      "title": "Ma Trận Đề & Phân Loại Bloom",
+      "desc": "Sinh câu hỏi trắc nghiệm & tự luận phân tầng chuẩn xác theo thang Bloom (Nhận biết → Thông hiểu → Vận dụng → Vận dụng cao) có đáp án và ma trận xuất bản."
+    },
+    "exportDocx": {
+      "title": "Xuất File Word (.docx) & PDF Chuẩn Mực Sư Phạm",
+      "desc": "Tải về văn bản giáo án và đề thi được căn lề chuẩn 2-2-3-2 cm, bảng biểu rõ nét, chân trang trích dẫn hoàn chỉnh và công thức Toán học KaTeX hiển thị sắc sảo. Thầy cô chỉ việc in ấn hoặc nộp tổ chuyên môn ngay."
     }
+  },
+  "brand": {
+    "name": "AI Teacher Copilot",
+    "tagline": "Trợ lý AI sư phạm cho giáo viên K-12",
+    "subtitle": "Soạn kế hoạch bài dạy 5512, trích dẫn SGK và kiến tạo đề thi ma trận Bloom"
   }
 }

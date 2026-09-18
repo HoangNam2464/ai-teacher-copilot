@@ -95,7 +95,12 @@
     "quizGenerator": "Quiz Generator",
     "workspace": "Workspace",
     "history": "History",
-    "workspaces": "Workspaces"
+    "workspaces": "Workspaces",
+    "howItWorks": "How It Works",
+    "testimonials": "Testimonials",
+    "faq": "FAQ",
+    "login": "Sign In",
+    "register": "Start Free"
   },
   "header": {
     "features": {
@@ -217,12 +222,29 @@
     "titleSuffix": "with AI",
     "enterWorkspace": "Enter Workspace",
     "startFree": "Get Started Free",
-    "login": "Sign In"
+    "login": "Sign In",
+    "badgeHighlight": "Standard GDPT 2018 & CV 5512",
+    "titleGradient": "In Just Minutes",
+    "ctaPrimary": "Start Drafting Free",
+    "ctaSecondary": "Explore 3-Step Process",
+    "trustPoints": {
+      "cv5512": "Strictly adheres to Official CV 5512",
+      "ragSGK": "Verifiable textbook source grounding",
+      "exportWord": "1-click Word & PDF export"
+    }
   },
   "trustedBy": {
     "title": "Built for students who take studying seriously",
     "heading": "One platform for",
-    "headingHighlight": "every subject"
+    "headingHighlight": "every subject",
+    "teachersCount": "1,200+",
+    "teachersLabel": "Active K-12 Teachers",
+    "standardsRate": "100%",
+    "standardsLabel": "Curriculum Compliance",
+    "timeSavedRate": "70%",
+    "timeSavedLabel": "Prep Time Saved",
+    "provincesCount": "63/63",
+    "provincesLabel": "Provinces Covered"
   },
   "testimonials": {
     "badge": "Student Reviews",
@@ -332,6 +354,23 @@
       "master": "Master",
       "retrieve": "Retrieve",
       "export": "Export"
+    },
+    "tag": "Pedagogical Workflow",
+    "subtitle": "A seamless pipeline allowing teachers to save maximum time while maintaining pedagogical excellence.",
+    "step1": {
+      "badge": "Semantic Indexing",
+      "title": "Upload Textbooks & Materials",
+      "desc": "Upload textbook PDFs or lecture documents to your dedicated subject workspace."
+    },
+    "step2": {
+      "badge": "Accurate RAG Grounding",
+      "title": "AI Generates Curriculum Draft",
+      "desc": "Select lesson topic and grade. The AI analyzes context and drafts 4-stage activities or Bloom quizzes."
+    },
+    "step3": {
+      "badge": "Standard DOCX Export",
+      "title": "Review & Export in 1-Click",
+      "desc": "Fine-tune according to classroom dynamics, verify evidence citations, and export clean Word/PDF files."
     }
   },
   "cta": {
@@ -348,7 +387,14 @@
     },
     "enterWorkspace": "Go to Workspace",
     "startFree": "Get Started Free",
-    "subtext": "No credit card required · 5-minute setup · Strict data isolation"
+    "subtext": "No credit card required · 5-minute setup · Strict data isolation",
+    "subtitle": "Experience the AI assistant for 5512 lesson plans, textbook citations, and Bloom quizzes today. No credit card required.",
+    "button": "Create Free Teacher Account",
+    "guarantees": {
+      "setup": "Set up in 30 seconds",
+      "privacy": "Secure pedagogical workspace",
+      "export": "Unlimited Word exports"
+    }
   },
   "footer": {
     "newsletter": {
@@ -408,7 +454,9 @@
     "terms": "Terms of Service",
     "privacy": "Privacy Policy",
     "rights": "AI Teacher Copilot. All rights reserved.",
-    "madeWithHeart": "for Vietnamese K-12 educators"
+    "madeWithHeart": "for Vietnamese K-12 educators",
+    "desc": "AI assistant specialized for Vietnamese K-12 educators. Advancing teaching quality and reducing administrative workload.",
+    "motto": "Designed for the advancement of Vietnamese education."
   },
   "auth": {
     "login": {
@@ -1141,7 +1189,9 @@
       "liveChat": "Live Chat",
       "liveChatHours": "Mon-Fri, 9am-6pm EST"
     },
-    "contactFallback": "Didn't find an answer? Contact us."
+    "contactFallback": "Didn't find an answer? Contact us.",
+    "tag": "Common Inquiries",
+    "subtitle": "Everything you need to know about getting started with AI Teacher Copilot."
   },
   "featuresPage": {
     "badge": "Powerful Features",
@@ -4564,6 +4614,30 @@
       "aiRegeneration": "AI Regeneration",
       "exportWord": "Export Word",
       "exportPdf": "Export PDF"
+    },
+    "tag": "Breakthrough Capabilities",
+    "subtitle": "Combining Generative AI with RAG knowledge grounding, specialized for K-12 educational standards.",
+    "lessonPlan": {
+      "tag": "Pedagogical Core",
+      "title": "Structured Lesson Plans (CV 5512)",
+      "desc": "Automatically generates the complete 4-activity structure: Warm-up, Knowledge Construction, Practice, and Application with Teacher/Student interaction tables."
+    },
+    "ragGrounding": {
+      "title": "Transparent Textbook RAG Grounding",
+      "desc": "Eliminates hallucinations. Every objective and content item is cross-referenced with exact page numbers from official textbooks."
+    },
+    "bloomQuiz": {
+      "title": "Bloom Taxonomy Assessment Matrix",
+      "desc": "Generates multiple-choice and open-ended question banks classified across Bloom's levels (Remember, Understand, Apply, Analyze)."
+    },
+    "exportDocx": {
+      "title": "Publication-Ready Word & PDF Export",
+      "desc": "Download formatted documents with standard 2-2-3-2 cm margins, clean tables, citation footers, and rendered KaTeX formulas."
     }
+  },
+  "brand": {
+    "name": "AI Teacher Copilot",
+    "tagline": "Curriculum-Grounded AI Teaching Assistant for K-12",
+    "subtitle": "Draft lesson plans, SGK citations, and Bloom matrix quizzes"
   }
 }
