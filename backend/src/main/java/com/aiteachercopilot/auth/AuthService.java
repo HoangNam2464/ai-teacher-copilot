@@ -225,12 +225,16 @@ public class AuthService {
     @Transactional(readOnly = true)
     public AuthDto.MessageResponse forgotPassword(AuthDto.ForgotPasswordRequest request) {
         var userOpt = userRepository.findByEmail(request.getEmail());
-        String token = null;
         if (userOpt.isPresent()) {
-            token = tokenProvider.generatePurposeToken(request.getEmail(), "RESET_PASSWORD", 3600000L);
-            log.info("Generated password reset token for {}: [RESET_URL: /reset-password?token={}]", request.getEmail(), token);
+            User user = userOpt.get();
+            String token = tokenProvider.generatePurposeToken(request.getEmail(), "RESET_PASSWORD", 3600000L);
+            String resetUrl = String.format("%s/reset-password?token=%s&email=%s",
+                    frontendUrl, token, user.getEmail());
+            emailService.sendPasswordResetEmail(user.getEmail(), user.getFullName(), resetUrl);
+            log.info("Sent password reset email to: {}", request.getEmail());
         }
-        return new AuthDto.MessageResponse("Nếu email tồn tại trong hệ thống, hướng dẫn đặt lại mật khẩu đã được gửi.", token);
+        // Always return the same message to prevent email enumeration
+        return new AuthDto.MessageResponse("Nếu email tồn tại trong hệ thống, hướng dẫn đặt lại mật khẩu đã được gửi.");
     }
 
     @Transactional
@@ -267,19 +271,19 @@ public class AuthService {
         return new AuthDto.MessageResponse("Tài khoản của bạn đã được kích hoạt thành công. Vui lòng đăng nhập.");
     }
 
+    @Transactional(readOnly = true)
     public AuthDto.MessageResponse resendVerification(AuthDto.ResendVerificationRequest request) {
         var userOpt = userRepository.findByEmail(request.getEmail());
-        String token = null;
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             if (!user.getIsActive()) {
-                token = tokenProvider.generatePurposeToken(request.getEmail(), "VERIFY_EMAIL", 86400000L);
+                String token = tokenProvider.generatePurposeToken(request.getEmail(), "VERIFY_EMAIL", 86400000L);
                 String verificationUrl = String.format("%s/verify-email?token=%s&email=%s",
                         frontendUrl, token, user.getEmail());
                 emailService.sendVerificationEmail(user.getEmail(), user.getFullName(), verificationUrl);
-                log.info("Resent verification token for {}: [VERIFY_URL: {}]", request.getEmail(), verificationUrl);
+                log.info("Resent verification email to: {}", request.getEmail());
             }
         }
-        return new AuthDto.MessageResponse("Email kích hoạt đã được gửi lại vào hòm thư của bạn.", token);
+        return new AuthDto.MessageResponse("Email kích hoạt đã được gửi lại vào hòm thư của bạn.");
     }
 }

@@ -14,5 +14,9 @@ public interface DocumentRepository extends JpaRepository<Document, UUID> {
 
     List<Document> findByWorkspaceIdOrderByCreatedAtDesc(UUID workspaceId);
 
+    List<Document> findByUploadedBy(UUID uploadedBy);
+
+    void deleteByWorkspaceIdIn(List<UUID> workspaceIds);
+
     long countByWorkspaceId(UUID workspaceId);
 }
