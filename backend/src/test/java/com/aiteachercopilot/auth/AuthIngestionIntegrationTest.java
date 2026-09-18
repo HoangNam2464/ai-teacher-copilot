@@ -66,6 +66,9 @@ class AuthIngestionIntegrationTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @org.springframework.boot.test.mock.mockito.MockBean
+    private io.minio.MinioClient minioClient;
+
     @Value("${app.jwt.secret}")
     private String jwtSecret;
 
@@ -431,13 +434,20 @@ class AuthIngestionIntegrationTest {
         @DisplayName("Test: Document upload to authorized workspace succeeds")
         void testDocumentUploadSuccess() throws Exception {
             // Arrange
-            byte[] fileContent = "PDF content here".getBytes();
+            byte[] fileContent = "%PDF-1.4 PDF content here".getBytes();
+            org.springframework.mock.web.MockMultipartFile multipartFile =
+                    new org.springframework.mock.web.MockMultipartFile(
+                            "file",
+                            "test.pdf",
+                            "application/pdf",
+                            fileContent
+                    );
             
             // Act & Assert
             mockMvc.perform(multipart("/workspaces/" + testWorkspaceId + "/documents/upload")
-                    .file("file", fileContent)
+                    .file(multipartFile)
                     .header("Authorization", "Bearer " + jwtToken))
-                    .andExpect(status().isOk())
+                    .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.success").value(true))
                     .andExpect(jsonPath("$.data.fileName").exists())
                     .andExpect(jsonPath("$.data.workspaceId").value(testWorkspaceId.toString()));
@@ -566,6 +576,11 @@ class AuthIngestionIntegrationTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(registerRequest)))
                     .andExpect(status().isCreated());
+
+            // Activate user so login succeeds
+            User journeyUser = userRepository.findByEmail("journey@school.edu.vn").orElseThrow();
+            journeyUser.setIsActive(true);
+            userRepository.save(journeyUser);
 
             // Step 2: Login
             AuthDto.LoginRequest loginRequest = new AuthDto.LoginRequest();

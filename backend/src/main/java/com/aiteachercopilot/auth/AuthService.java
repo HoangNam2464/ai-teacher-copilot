@@ -44,12 +44,13 @@ public class AuthService {
 
     @Transactional
     public AuthDto.AuthResponse register(AuthDto.RegisterRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
+        String email = request.getEmail() != null ? request.getEmail().trim().toLowerCase() : null;
+        if (userRepository.existsByEmail(email)) {
             throw new IllegalArgumentException("Email is already registered");
         }
 
         User user = User.builder()
-                .email(request.getEmail())
+                .email(email)
                 .passwordHash(passwordEncoder.encode(request.getPassword()))
                 .fullName(request.getFullName())
                 .role("TEACHER")
@@ -77,7 +78,8 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public AuthDto.AuthResponse login(AuthDto.LoginRequest request) {
-        User user = userRepository.findByEmail(request.getEmail())
+        String email = request.getEmail() != null ? request.getEmail().trim().toLowerCase() : null;
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
 
         if (!user.getIsActive()) {
@@ -224,14 +226,15 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public AuthDto.MessageResponse forgotPassword(AuthDto.ForgotPasswordRequest request) {
-        var userOpt = userRepository.findByEmail(request.getEmail());
+        String email = request.getEmail() != null ? request.getEmail().trim().toLowerCase() : null;
+        var userOpt = userRepository.findByEmail(email);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-            String token = tokenProvider.generatePurposeToken(request.getEmail(), "RESET_PASSWORD", 3600000L);
+            String token = tokenProvider.generatePurposeToken(user.getEmail(), "RESET_PASSWORD", 3600000L);
             String resetUrl = String.format("%s/reset-password?token=%s&email=%s",
                     frontendUrl, token, user.getEmail());
             emailService.sendPasswordResetEmail(user.getEmail(), user.getFullName(), resetUrl);
-            log.info("Sent password reset email to: {}", request.getEmail());
+            log.info("Sent password reset email to: {}", user.getEmail());
         }
         // Always return the same message to prevent email enumeration
         return new AuthDto.MessageResponse("Nếu email tồn tại trong hệ thống, hướng dẫn đặt lại mật khẩu đã được gửi.");
@@ -273,15 +276,16 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public AuthDto.MessageResponse resendVerification(AuthDto.ResendVerificationRequest request) {
-        var userOpt = userRepository.findByEmail(request.getEmail());
+        String email = request.getEmail() != null ? request.getEmail().trim().toLowerCase() : null;
+        var userOpt = userRepository.findByEmail(email);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             if (!user.getIsActive()) {
-                String token = tokenProvider.generatePurposeToken(request.getEmail(), "VERIFY_EMAIL", 86400000L);
+                String token = tokenProvider.generatePurposeToken(user.getEmail(), "VERIFY_EMAIL", 86400000L);
                 String verificationUrl = String.format("%s/verify-email?token=%s&email=%s",
                         frontendUrl, token, user.getEmail());
                 emailService.sendVerificationEmail(user.getEmail(), user.getFullName(), verificationUrl);
-                log.info("Resent verification email to: {}", request.getEmail());
+                log.info("Resent verification email to: {}", user.getEmail());
             }
         }
         return new AuthDto.MessageResponse("Email kích hoạt đã được gửi lại vào hòm thư của bạn.");

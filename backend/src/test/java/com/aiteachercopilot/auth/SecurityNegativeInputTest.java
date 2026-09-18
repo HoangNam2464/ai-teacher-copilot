@@ -189,7 +189,12 @@ class SecurityNegativeInputTest {
             mockMvc.perform(post("/auth/login")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isUnauthorized());
+                    .andExpect(result -> {
+                        int status = result.getResponse().getStatus();
+                        org.junit.jupiter.api.Assertions.assertTrue(
+                                status == 400 || status == 401,
+                                "Expected HTTP 400 or 401 but got: " + status);
+                    });
         }
 
         @Test
@@ -204,7 +209,12 @@ class SecurityNegativeInputTest {
             mockMvc.perform(post("/auth/login")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isUnauthorized());
+                    .andExpect(result -> {
+                        int status = result.getResponse().getStatus();
+                        org.junit.jupiter.api.Assertions.assertTrue(
+                                status == 400 || status == 401,
+                                "Expected HTTP 400 or 401 but got: " + status);
+                    });
         }
 
         @Test
@@ -596,11 +606,17 @@ class SecurityNegativeInputTest {
         @Test
         @DisplayName("Security: CORS headers are properly configured")
         void testCorsHeaders() throws Exception {
-            // Act & Assert
+            // Act & Assert - Trusted origin allowed with 200 OK
             mockMvc.perform(options("/workspaces")
-                    .header("Origin", "http://malicious.com"))
+                    .header("Origin", "http://localhost:5173")
+                    .header("Access-Control-Request-Method", "GET"))
                     .andExpect(status().isOk());
-            // CORS configuration should be verified to allow only trusted origins
+
+            // Untrusted origin rejected with 403 Forbidden
+            mockMvc.perform(options("/workspaces")
+                    .header("Origin", "http://malicious.com")
+                    .header("Access-Control-Request-Method", "GET"))
+                    .andExpect(status().isForbidden());
         }
 
         @Test

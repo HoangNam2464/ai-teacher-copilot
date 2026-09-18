@@ -15,6 +15,7 @@ public final class DocumentDto {
     @Data
     public static class UploadResponse {
         private UUID id;
+        private UUID workspaceId;
         private String fileName;
         private String fileType;
         private Long fileSize;
@@ -24,6 +25,7 @@ public final class DocumentDto {
         public static UploadResponse fromEntity(Document doc) {
             UploadResponse r = new UploadResponse();
             r.setId(doc.getId());
+            r.setWorkspaceId(doc.getWorkspaceId());
             r.setFileName(doc.getFileName());
             r.setFileType(doc.getFileType());
             r.setFileSize(doc.getFileSize());

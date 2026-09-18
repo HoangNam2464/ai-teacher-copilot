@@ -31,10 +31,17 @@ public class DocumentController {
     public ResponseEntity<ApiResponse<DocumentDto.UploadResponse>> upload(
             @AuthenticationPrincipal User user,
             @PathVariable UUID workspaceId,
-            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "file", required = false) MultipartFile file,
+            org.springframework.web.multipart.MultipartHttpServletRequest multipartRequest,
             @RequestParam(required = false) String subject,
             @RequestParam(required = false) String gradeLevel,
             @RequestParam(required = false) String topic) {
+        if (file == null && multipartRequest != null && !multipartRequest.getFileMap().isEmpty()) {
+            file = multipartRequest.getFileMap().values().iterator().next();
+        }
+        if (file == null) {
+            throw new IllegalArgumentException("File is required");
+        }
         DocumentDto.UploadResponse response = documentService.upload(
                 workspaceId, user.getId(), file, subject, gradeLevel, topic);
         return ResponseEntity.status(HttpStatus.CREATED)

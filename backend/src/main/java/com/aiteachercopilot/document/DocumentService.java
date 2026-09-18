@@ -63,6 +63,21 @@ public class DocumentService {
         if (file.getSize() > MAX_FILE_SIZE) {
             throw new IllegalArgumentException("File exceeds maximum size of 50MB");
         }
+        String originalFilename = file.getOriginalFilename();
+        if (originalFilename == null || originalFilename.isBlank()) {
+            originalFilename = file.getName();
+        }
+        if (originalFilename != null) {
+            if (originalFilename.contains("..") || originalFilename.contains("/") || originalFilename.contains("\\")) {
+                throw new IllegalArgumentException("Suspicious file name detected");
+            }
+            String lower = originalFilename.toLowerCase();
+            if (lower.endsWith(".exe") || lower.endsWith(".bat") || lower.endsWith(".sh")
+                    || lower.endsWith(".dll") || lower.endsWith(".zip") || lower.endsWith(".tar")
+                    || lower.endsWith(".gz") || lower.endsWith(".7z")) {
+                throw new IllegalArgumentException("Unsupported file type. Executable or archive files are not allowed. Allowed: PDF, DOCX, TXT");
+            }
+        }
         String contentType = file.getContentType();
         if (contentType == null || !ALLOWED_TYPES.contains(contentType)) {
             throw new IllegalArgumentException(
