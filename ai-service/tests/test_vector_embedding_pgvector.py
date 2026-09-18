@@ -11,13 +11,22 @@ import pytest
 from unittest.mock import AsyncMock, patch
 
 from app.core.models import DocumentChunk
-from app.providers.base import AIProvider
+from app.providers.base import BaseAIProvider
 from app.ingestion.chunker import StructureAwareChunker
 from app.ingestion.models import DocumentMetadata
 
 
-class MockAIProvider(AIProvider):
+class MockAIProvider(BaseAIProvider):
     """Mock AI Provider for unit/integration testing without external API calls."""
+
+    async def generate_structured_output(
+        self,
+        system_prompt: str,
+        user_prompt: str,
+        response_schema: dict,
+        context_chunks: list = None
+    ) -> dict:
+        return {}
 
     async def generate_embeddings(self, texts: list[str]) -> list[list[float]]:
         results = []
@@ -28,9 +37,6 @@ class MockAIProvider(AIProvider):
             vector = [math.sin(seed + i * 0.1) for i in range(768)]
             results.append(vector)
         return results
-
-    async def generate_chat_completion(self, messages: list[dict], **kwargs) -> str:
-        return "Mock completion"
 
 
 @pytest.fixture
