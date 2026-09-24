@@ -4485,11 +4485,17 @@
   },
   "citation": {
     "drawerTitle": "Tài Liệu Tham Khảo Bài Dạy",
-    "empty": "Chưa có tài liệu tham khảo nào.",
+    "drawerSubtitle": "Các đoạn trích dẫn được đối chiếu từ tài liệu bài học trong không gian làm việc",
+    "empty": "Chưa có tài liệu tham khảo nào cho nội dung này.",
     "sourceDoc": "Tài liệu học liệu",
     "page": "Trang",
     "badgeTitle": "Xem tài liệu bài học tham khảo",
-    "sourcesCount": "{{count}} tài liệu tham khảo"
+    "sourcesCount": "{{count}} tài liệu tham khảo",
+    "sourceItem": "Trích đoạn tham khảo #{{number}}",
+    "copyExcerpt": "Sao chép đoạn trích",
+    "excerptCopied": "Đã sao chép đoạn trích vào bộ nhớ tạm",
+    "close": "Đóng bảng tham khảo",
+    "totalCount": "Tổng số {{count}} trích dẫn"
   },
   "export": {
     "button": "Xuất tài liệu",

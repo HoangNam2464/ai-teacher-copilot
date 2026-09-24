@@ -544,10 +544,10 @@ export function LessonPlannerPage() {
                   : activePlan.source_chunk_ids && activePlan.source_chunk_ids.length > 0
                   ? activePlan.source_chunk_ids.map((id, idx) => ({
                       chunkId: id,
-                      fileName: `${activeWorkspace?.name || 'Tài liệu bài học'} (Mục ${idx + 1})`,
+                      fileName: `${activeWorkspace?.name || t('citation.sourceDoc', 'Tài liệu học liệu')} (Mục ${idx + 1})`,
                       sourcePage: idx + 1,
                       excerpt: t(
-                        'lessonPlanner.chunkExcerpt',
+                        'citation.drawerSubtitle',
                         'Trích đoạn tham khảo từ tài liệu bài học trong không gian làm việc.'
                       ),
                     }))
@@ -557,7 +557,7 @@ export function LessonPlannerPage() {
                         fileName: activeWorkspace?.name || t('citation.sourceDoc', 'Tài liệu học liệu'),
                         sourcePage: 1,
                         excerpt: t(
-                          'lessonPlanner.chunkExcerpt',
+                          'citation.drawerSubtitle',
                           'Trích đoạn tham khảo từ tài liệu bài học trong không gian làm việc.'
                         ),
                       },

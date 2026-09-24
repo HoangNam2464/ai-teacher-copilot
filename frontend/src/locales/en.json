@@ -4485,11 +4485,17 @@
   },
   "citation": {
     "drawerTitle": "Reference Materials",
-    "empty": "No reference materials available.",
+    "drawerSubtitle": "Excerpts referenced from lesson materials in your workspace",
+    "empty": "No reference materials available for this content.",
     "sourceDoc": "Lesson Material",
     "page": "Page",
     "badgeTitle": "View reference materials",
-    "sourcesCount": "{{count}} references"
+    "sourcesCount": "{{count}} references",
+    "sourceItem": "Reference Excerpt #{{number}}",
+    "copyExcerpt": "Copy excerpt",
+    "excerptCopied": "Excerpt copied to clipboard",
+    "close": "Close reference panel",
+    "totalCount": "{{count}} total references"
   },
   "export": {
     "button": "Export Document",
