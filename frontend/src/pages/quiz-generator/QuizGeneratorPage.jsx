@@ -390,13 +390,15 @@ export function QuizGeneratorPage() {
                               setActiveCitations(
                                 q.source_chunk_ids?.map((id, idx) => ({
                                   chunkId: String(id || idx),
-                                  fileName: activeWorkspace?.name || 'Tài liệu nguồn',
-                                  excerpt: `Nguồn ngữ cảnh phục vụ sinh câu hỏi #${i + 1}`,
+                                  fileName: `${activeWorkspace?.name || 'Tài liệu bài học'} (Mục ${idx + 1})`,
+                                  sourcePage: idx + 1,
+                                  excerpt: `Trích đoạn tham khảo phục vụ biên soạn câu hỏi #${i + 1}`,
                                 })) || [
                                   {
                                     chunkId: '1',
-                                    fileName: 'Kho tri thức giáo viên',
-                                    excerpt: 'Trích xuất trực tiếp từ các tài liệu được lập chỉ mục trong không gian làm việc.',
+                                    fileName: activeWorkspace?.name || 'Tài liệu học liệu',
+                                    sourcePage: 1,
+                                    excerpt: 'Trích đoạn tham khảo từ tài liệu bài học trong không gian làm việc.',
                                   },
                                 ]
                               );

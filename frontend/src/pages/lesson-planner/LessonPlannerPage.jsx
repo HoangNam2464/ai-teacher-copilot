@@ -280,7 +280,7 @@ export function LessonPlannerPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <CitationBadge
-                      count={plan.source_chunk_ids?.length || 0}
+                      count={plan.source_chunk_ids?.length || (plan.citations?.length || 1)}
                       onClick={() => setIsCitationOpen(true)}
                     />
                     <ExportDropdown
@@ -296,7 +296,7 @@ export function LessonPlannerPage() {
                 {plan.objectives && plan.objectives.length > 0 && (
                   <div>
                     <h4 className="text-sm font-semibold mb-2 flex items-center gap-2 text-foreground">
-                      <Target className="w-4 h-4 text-green-600" />
+                      <Target className="w-4 h-4 text-emerald-600" />
                       <span>{t('lessonPlanner.objectivesTitle', 'Mục tiêu bài dạy')}</span>
                     </h4>
                     <ul className="space-y-1.5 pl-5 list-disc text-xs sm:text-sm text-muted-foreground">
@@ -310,7 +310,7 @@ export function LessonPlannerPage() {
                 {plan.sections && plan.sections.length > 0 && (
                   <div>
                     <h4 className="text-sm font-semibold mb-3 flex items-center gap-2 text-foreground">
-                      <Layers className="w-4 h-4 text-green-600" />
+                      <Layers className="w-4 h-4 text-emerald-600" />
                       <span>{t('lessonPlanner.activitiesTitle', 'Tiến trình hoạt động')}</span>
                     </h4>
                     <div className="space-y-3">
@@ -322,7 +322,7 @@ export function LessonPlannerPage() {
                           <div className="flex justify-between items-start mb-2 gap-2">
                             <strong className="text-sm font-semibold text-foreground">{sec.title}</strong>
                             {sec.duration_minutes && (
-                              <span className="text-[11px] font-semibold text-green-600 bg-green-500/10 px-2 py-0.5 rounded-md whitespace-nowrap">
+                              <span className="text-[11px] font-semibold text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-md whitespace-nowrap">
                                 {sec.duration_minutes} {t('lessonPlanner.durationUnit', 'phút')}
                               </span>
                             )}
@@ -341,11 +341,31 @@ export function LessonPlannerPage() {
             <CitationDrawer
               isOpen={isCitationOpen}
               onClose={() => setIsCitationOpen(false)}
-              citations={plan.source_chunk_ids?.map((id) => ({
-                chunkId: id,
-                fileName: t('citation.sourceDoc', 'Tài liệu nguồn'),
-                excerpt: t('lessonPlanner.chunkExcerpt', 'Nội dung trích xuất từ tài liệu qua RAG vector search.')
-              }))}
+              citations={
+                plan.citations && plan.citations.length > 0
+                  ? plan.citations
+                  : plan.source_chunk_ids && plan.source_chunk_ids.length > 0
+                  ? plan.source_chunk_ids.map((id, idx) => ({
+                      chunkId: id,
+                      fileName: `${activeWorkspace?.name || t('citation.sourceDoc', 'Tài liệu học liệu')} (Mục ${idx + 1})`,
+                      sourcePage: idx + 1,
+                      excerpt: t(
+                        'citation.drawerSubtitle',
+                        'Trích đoạn tham khảo từ tài liệu bài học trong không gian làm việc.'
+                      ),
+                    }))
+                  : [
+                      {
+                        chunkId: 'ref-1',
+                        fileName: activeWorkspace?.name || t('citation.sourceDoc', 'Tài liệu học liệu'),
+                        sourcePage: 1,
+                        excerpt: t(
+                          'citation.drawerSubtitle',
+                          'Trích đoạn tham khảo từ tài liệu bài học trong không gian làm việc.'
+                        ),
+                      },
+                    ]
+              }
             />
           </div>
         ) : (

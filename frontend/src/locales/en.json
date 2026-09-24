@@ -4476,12 +4476,18 @@
     "deleteDesc": "Are you sure you want to delete this item? This action cannot be undone."
   },
   "citation": {
-    "drawerTitle": "Source Citations",
-    "empty": "No citations available.",
-    "sourceDoc": "Source document",
+    "drawerTitle": "Reference Materials",
+    "drawerSubtitle": "Excerpts referenced from lesson materials in your workspace",
+    "empty": "No reference materials available for this content.",
+    "sourceDoc": "Lesson Material",
     "page": "Page",
-    "badgeTitle": "View source citations",
-    "sourcesCount": "{{count}} sources"
+    "badgeTitle": "View reference materials",
+    "sourcesCount": "{{count}} references",
+    "sourceItem": "Reference Excerpt #{{number}}",
+    "copyExcerpt": "Copy excerpt",
+    "excerptCopied": "Excerpt copied to clipboard",
+    "close": "Close reference panel",
+    "totalCount": "{{count}} total references"
   },
   "export": {
     "button": "Export Document",
