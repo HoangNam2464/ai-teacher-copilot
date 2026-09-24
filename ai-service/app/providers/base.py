@@ -11,6 +11,10 @@ class BaseAIProvider(ABC):
     decoupling core business workflows from vendor-specific SDK implementations.
     """
 
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        """Base constructor accepting variable parameters for provider implementations."""
+        pass
+
     @property
     def provider_name(self) -> str:
         """Return the unique identifier for the provider (e.g. 'gemini', 'openai', 'mock')."""

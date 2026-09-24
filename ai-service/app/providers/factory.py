@@ -53,23 +53,22 @@ class AIProviderFactory:
                 f"Unsupported AI Provider: '{target}'. Supported providers are: {supported}."
             )
 
-        provider_cls = self._registry[target]
-
         if target == "openai":
-            instance = provider_cls(
+            instance = OpenAIProvider(
                 api_key=settings.OPENAI_API_KEY,
                 model_name=getattr(settings, "OPENAI_MODEL", "gpt-4o-mini"),
             )
         elif target == "gemini":
-            instance = provider_cls(
+            instance = GeminiProvider(
                 api_key=settings.GEMINI_API_KEY,
                 model_name=getattr(settings, "GEMINI_MODEL", "gemini-1.5-flash"),
             )
         elif target == "mock":
-            instance = provider_cls(
+            instance = MockAIProvider(
                 embedding_dimension=getattr(settings, "EMBEDDING_DIMENSION", 768),
             )
         else:
+            provider_cls = self._registry[target]
             instance = provider_cls()
 
         self._instances[target] = instance

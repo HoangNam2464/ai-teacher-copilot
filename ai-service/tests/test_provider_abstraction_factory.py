@@ -35,7 +35,7 @@ class TestBaseAIProviderInterface:
     def test_cannot_instantiate_base_class_directly(self):
         """Test that BaseAIProvider cannot be instantiated directly without implementing abstract methods."""
         with pytest.raises(TypeError):
-            BaseAIProvider()
+            BaseAIProvider()  # type: ignore
 
     def test_subclass_must_implement_all_abstract_methods(self):
         """Test that a subclass missing abstract methods cannot be instantiated."""
@@ -44,7 +44,7 @@ class TestBaseAIProviderInterface:
                 return [[0.1] * 768]
 
         with pytest.raises(TypeError):
-            IncompleteProvider()
+            IncompleteProvider()  # type: ignore
 
     def test_prompt_sources_boundary_convention(self):
         """Test Rule 7.3: format_prompt_with_sources encloses context in <sources>...</sources> tags."""
