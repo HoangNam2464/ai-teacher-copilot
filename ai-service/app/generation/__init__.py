@@ -9,6 +9,10 @@ from app.generation.evidence_validator import (
     InsufficientEvidenceError,
     validate_retrieval_evidence,
 )
+from app.generation.lesson_planner import (
+    LessonPlannerPipeline,
+    lesson_planner_pipeline,
+)
 from app.generation.prompt_builder import (
     UNTRUSTED_SOURCES_SECURITY_DIRECTIVE,
     build_grounded_generation_prompt,
@@ -18,11 +22,22 @@ from app.generation.prompt_builder import (
     format_single_source,
     wrap_sources_boundary,
 )
-from app.generation.schemas import LessonPlan, LessonSection, Quiz, QuizQuestion
+from app.generation.schemas import (
+    LessonPlan,
+    LessonPlanGenerationRequest,
+    LessonPlanSchema,
+    LessonSection,
+    Quiz,
+    QuizQuestion,
+)
 
 __all__ = [
     "LessonPlan",
+    "LessonPlanSchema",
     "LessonSection",
+    "LessonPlanGenerationRequest",
+    "LessonPlannerPipeline",
+    "lesson_planner_pipeline",
     "Quiz",
     "QuizQuestion",
     "UNTRUSTED_SOURCES_SECURITY_DIRECTIVE",

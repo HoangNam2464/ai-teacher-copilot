@@ -110,10 +110,10 @@ class TestAntiHallucinationGenerationHalting:
         """Khi thiếu bằng chứng, pipeline soạn giáo án ngắt trước khi gọi LLM."""
         empty_retrieval = RetrievalResponse(chunks=[], insufficient_evidence=True)
 
-        with patch("app.generation.service.search_similar_chunks", new_callable=AsyncMock) as mock_retrieval:
+        with patch("app.generation.lesson_planner.search_similar_chunks", new_callable=AsyncMock) as mock_retrieval:
             mock_retrieval.return_value = empty_retrieval
 
-            with patch("app.generation.service.get_ai_provider") as mock_get_provider:
+            with patch("app.generation.lesson_planner.get_ai_provider") as mock_get_provider:
                 mock_provider = MagicMock()
                 mock_provider.generate_structured_output = AsyncMock()
                 mock_get_provider.return_value = mock_provider
