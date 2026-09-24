@@ -31,6 +31,9 @@ class Settings(BaseSettings):
     AI_PROVIDER: str = "gemini"
     OPENAI_API_KEY: str = ""
     GEMINI_API_KEY: str = ""
+    GEMINI_MODEL: str = "gemini-1.5-flash"
+    OPENAI_MODEL: str = "gpt-4o-mini"
+    EMBEDDING_DIMENSION: int = 768
 
     # --- MinIO ---
     MINIO_ENDPOINT: str = "http://localhost:9000"
