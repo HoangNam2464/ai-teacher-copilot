@@ -44,18 +44,14 @@ class BaseAIProvider(ABC):
     def format_prompt_with_sources(
         self,
         base_prompt: str,
-        context_chunks: Optional[List[Dict[str, Any]]] = None,
+        context_chunks: Optional[List[Any]] = None,
     ) -> str:
         """
         Helper method to strictly enforce prompt boundary convention (Rule 7.3):
         Retrieved context chunks MUST be passed inside dedicated <sources>...</sources> boundaries
         and treated strictly as untrusted reference data.
         """
-        if not context_chunks:
-            return base_prompt
+        from app.generation.prompt_builder import wrap_sources_boundary
 
-        sources_text = "\n".join(
-            f"[Chunk {chunk.get('chunk_id', i+1)}]: {chunk.get('content', '')}"
-            for i, chunk in enumerate(context_chunks)
-        )
-        return f"{base_prompt}\n\n<sources>\n{sources_text}\n</sources>"
+        return wrap_sources_boundary(base_prompt, context_chunks)
+
