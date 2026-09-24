@@ -1,32 +1,33 @@
 import json
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 import google.generativeai as genai
 
 from app.providers.base import BaseAIProvider
 
 class GeminiProvider(BaseAIProvider):
-    def __init__(self, api_key: str):
+    def __init__(self, api_key: str = "", model_name: str = "gemini-1.5-flash"):
         self.api_key = api_key
-        if api_key.strip():
+        self.model_name = model_name
+        if api_key and api_key.strip():
             genai.configure(api_key=api_key.strip())
+
+    @property
+    def provider_name(self) -> str:
+        return "gemini"
 
     async def generate_structured_output(
         self,
         system_prompt: str,
         user_prompt: str,
         response_schema: Any,
-        context_chunks: List[Dict[str, Any]] = None
+        context_chunks: Optional[List[Dict[str, Any]]] = None
     ) -> Any:
         # Using gemini-1.5-flash for fast and cheap inference
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel(self.model_name)
         
-        # Combine system and user prompt with context if available
-        full_prompt = f"{system_prompt}\n\n{user_prompt}"
-        if context_chunks:
-            full_prompt += "\n\n<sources>\n"
-            for chunk in context_chunks:
-                full_prompt += f"{chunk.get('content', '')}\n"
-            full_prompt += "</sources>"
+        # Combine system and user prompt with context if available inside <sources> tags
+        base_prompt = f"{system_prompt}\n\n{user_prompt}"
+        full_prompt = self.format_prompt_with_sources(base_prompt, context_chunks)
             
         response = model.generate_content(
             full_prompt,
