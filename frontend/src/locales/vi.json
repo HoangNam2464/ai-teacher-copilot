@@ -4495,7 +4495,21 @@
     "button": "Xuất tài liệu",
     "word": "Xuất file Word (.docx)",
     "pdf": "Xuất file PDF (.pdf)",
-    "failed": "Xuất tài liệu thất bại. Vui lòng thử lại."
+    "failed": "Xuất tài liệu thất bại. Vui lòng thử lại.",
+    "modalTitle": "Xuất Tài Liệu Bài Dạy",
+    "modalSubtitle": "Lựa chọn định dạng để tải tệp về máy tính của Thầy/Cô",
+    "selectFormat": "Định dạng tệp tải về",
+    "docxTitle": "Microsoft Word (.docx)",
+    "docxDesc": "Dễ dàng chỉnh sửa, thay đổi định dạng và in ấn",
+    "pdfTitle": "Tài liệu PDF (.pdf)",
+    "pdfDesc": "Bố cục trang trọng, cố định định dạng chuẩn sư phạm",
+    "fileName": "Tên tệp",
+    "includeCitations": "Đính kèm phụ lục nguồn trích dẫn học liệu ở chân trang",
+    "downloading": "Đang khởi tạo tài liệu {{format}}...",
+    "downloadBtn": "Tải xuống tệp {{format}}",
+    "success": "Tải xuống tài liệu thành công!",
+    "errorTitle": "Xuất tài liệu chưa thành công",
+    "close": "Đóng"
   },
   "bloom": {
     "title": "Cấp độ Bloom",

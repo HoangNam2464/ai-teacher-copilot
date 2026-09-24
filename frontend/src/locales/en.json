@@ -4495,7 +4495,21 @@
     "button": "Export Document",
     "word": "Export Word (.docx)",
     "pdf": "Export PDF (.pdf)",
-    "failed": "Document export failed. Please try again."
+    "failed": "Document export failed. Please try again.",
+    "modalTitle": "Export Lesson Document",
+    "modalSubtitle": "Choose a document format to download to your computer",
+    "selectFormat": "Download Format",
+    "docxTitle": "Microsoft Word (.docx)",
+    "docxDesc": "Easily editable, customizable styles, and print-ready",
+    "pdfTitle": "PDF Document (.pdf)",
+    "pdfDesc": "Fixed layout, professional typography, ready for printing",
+    "fileName": "File name",
+    "includeCitations": "Include referenced learning materials appendix at footer",
+    "downloading": "Preparing {{format}} document...",
+    "downloadBtn": "Download {{format}} File",
+    "success": "Document downloaded successfully!",
+    "errorTitle": "Document export failed",
+    "close": "Close"
   },
   "bloom": {
     "title": "Bloom Level",

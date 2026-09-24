@@ -325,11 +325,14 @@ export function InlineLessonEditor({
                 )}
               </Button>
 
-              {/* Export Dropdown */}
+              {/* Export Dropdown / Modal */}
               <ExportDropdown
                 workspaceId={workspaceId}
                 generationId={generationId || 'latest'}
                 defaultFileName={`giao-an-${(plan.title || 'bai-day').toLowerCase().replace(/\s+/g, '-')}`}
+                planData={plan}
+                subject={subject}
+                gradeLevel={gradeLevel}
               />
             </div>
           </div>
