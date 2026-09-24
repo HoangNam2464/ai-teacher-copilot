@@ -1,4 +1,11 @@
 from app.providers.base import BaseAIProvider
+from app.providers.exceptions import (
+    AIProviderError,
+    AuthenticationError,
+    InvalidRequestError,
+    RateLimitError,
+    ServiceUnavailableError,
+)
 from app.providers.factory import (
     AIProviderFactory,
     UnsupportedProviderError,
@@ -18,4 +25,10 @@ __all__ = [
     "GeminiProvider",
     "OpenAIProvider",
     "MockAIProvider",
+    "AIProviderError",
+    "AuthenticationError",
+    "RateLimitError",
+    "InvalidRequestError",
+    "ServiceUnavailableError",
 ]
+
