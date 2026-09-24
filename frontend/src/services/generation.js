@@ -14,6 +14,11 @@ export const lessonPlannerApi = {
     const response = await api.get(`/workspaces/${workspaceId}/generations/${id}`);
     return response.data;
   },
+
+  async updateLessonPlan(workspaceId, id, data) {
+    const response = await api.put(`/workspaces/${workspaceId}/generations/${id}`, data);
+    return response.data;
+  },
 };
 
 export const quizApi = {

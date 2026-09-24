@@ -4,31 +4,23 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { lessonPlannerApi } from '@/services/generation';
 import { useWorkspaceStore } from '@/stores/workspaceStore';
+import { useAutoSave } from '@/hooks/useAutoSave';
+import { lessonStorage } from '@/utils/lessonStorage';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Spinner } from '@/components/ui/Spinner';
-import { CitationBadge } from '@/components/citation/CitationBadge';
+import { InlineLessonEditor } from '@/components/lesson-planner/InlineLessonEditor';
 import { CitationDrawer } from '@/components/citation/CitationDrawer';
-import { ExportDropdown } from '@/components/export/ExportDropdown';
 import { PATHS } from '@/routes/paths';
 import {
   Brain,
-  Target,
-  Clock,
   BookOpen,
   Sparkles,
   FolderOpen,
   Plus,
-  Layers,
-  HelpCircle,
-  FileCheck,
-  Copy,
-  Check,
   RotateCcw,
-  Package,
   FileText,
   AlertCircle,
-  GraduationCap,
 } from 'lucide-react';
 
 /**
@@ -58,18 +50,81 @@ export function LessonPlannerPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [result, setResult] = useState(null);
+  const [editedPlan, setEditedPlan] = useState(null);
   const [copied, setCopied] = useState(false);
 
   // Citation Drawer State
   const [isCitationOpen, setIsCitationOpen] = useState(false);
 
-  // Sync subject & grade from activeWorkspace when it changes
-  useEffect(() => {
-    if (activeWorkspace) {
-      setSubject(activeWorkspace.subject || '');
-      setGradeLevel(activeWorkspace.gradeLevel || '');
+  // Auto-Save callback: persists to localStorage and attempts backend sync
+  const handleAutoSave = async (currentPlan) => {
+    if (!activeWorkspace?.id || !currentPlan) return;
+
+    const formState = {
+      topic,
+      subject,
+      gradeLevel,
+      objectives,
+      durationMinutes,
+      instructions,
+    };
+
+    // 1. Primary persistence: localStorage for instant recovery upon page refresh
+    lessonStorage.saveDraft(activeWorkspace.id, {
+      result: {
+        ...(result || {}),
+        contentData: currentPlan,
+        lessonPlan: currentPlan,
+      },
+      plan: currentPlan,
+      form: formState,
+    });
+
+    // 2. Secondary persistence: attempt backend update if generationId is available
+    const generationId = result?.id || result?.data?.id;
+    if (generationId && generationId !== 'latest') {
+      try {
+        await lessonPlannerApi.updateLessonPlan(activeWorkspace.id, generationId, {
+          contentData: currentPlan,
+        });
+      } catch (err) {
+        // Backend PUT may not be present yet; draft is safely preserved in localStorage
+        console.warn('Backend update failed, draft safely preserved locally:', err);
+      }
     }
-  }, [activeWorkspace]);
+  };
+
+  const autoSaveState = useAutoSave({
+    data: editedPlan,
+    onSave: handleAutoSave,
+    delay: 1200,
+    enabled: !!editedPlan && !!activeWorkspace?.id,
+  });
+
+  // Restore draft from localStorage upon mount or when activeWorkspace changes
+  useEffect(() => {
+    if (activeWorkspace?.id) {
+      const draft = lessonStorage.getDraft(activeWorkspace.id);
+      if (draft && draft.plan) {
+        setResult(draft.result || { contentData: draft.plan });
+        setEditedPlan(draft.plan);
+        if (draft.form) {
+          if (draft.form.topic) setTopic(draft.form.topic);
+          if (draft.form.subject) setSubject(draft.form.subject);
+          if (draft.form.gradeLevel) setGradeLevel(draft.form.gradeLevel);
+          if (draft.form.objectives) setObjectives(draft.form.objectives);
+          if (draft.form.durationMinutes) setDurationMinutes(draft.form.durationMinutes);
+          if (draft.form.instructions) setInstructions(draft.form.instructions);
+        }
+        autoSaveState.markSaved(draft.savedAt ? new Date(draft.savedAt) : new Date());
+        toast.info(t('lessonPlanner.restoredDraft', 'Đã khôi phục bản thảo bài dạy gần nhất'));
+      } else {
+        // Fallback sync subject & grade from activeWorkspace
+        setSubject(activeWorkspace.subject || '');
+        setGradeLevel(activeWorkspace.gradeLevel || '');
+      }
+    }
+  }, [activeWorkspace?.id]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -87,10 +142,10 @@ export function LessonPlannerPage() {
       setLoading(true);
       setError('');
       setResult(null);
+      setEditedPlan(null);
 
       const parsedObjectives = objectives ? objectives.split('\n').map((s) => s.trim()).filter(Boolean) : [];
 
-      // Combine pedagogical instructions with objectives & duration to ensure any backend endpoint format receives full context
       const combinedInstructions = [
         instructions.trim(),
         parsedObjectives.length > 0 ? `Mục tiêu bài dạy:\n${parsedObjectives.map((o) => `- ${o}`).join('\n')}` : '',
@@ -109,7 +164,25 @@ export function LessonPlannerPage() {
       };
 
       const data = await lessonPlannerApi.generateLessonPlan(activeWorkspace.id, payload);
+      const extracted = extractPlanData(data);
       setResult(data);
+      setEditedPlan(extracted);
+
+      // Immediately persist newly generated plan
+      lessonStorage.saveDraft(activeWorkspace.id, {
+        result: data,
+        plan: extracted,
+        form: {
+          topic,
+          subject,
+          gradeLevel,
+          objectives,
+          durationMinutes,
+          instructions,
+        },
+      });
+      autoSaveState.markSaved();
+
       toast.success(t('common.success', 'Đã soạn giáo án thành công!'));
     } catch (err) {
       console.error('Generation failed:', err);
@@ -130,46 +203,41 @@ export function LessonPlannerPage() {
     }
   };
 
-  const plan = extractPlanData(result);
-
-  // Parse objectives supporting both array and single string
-  const objectivesList = plan
-    ? Array.isArray(plan.objectives)
-      ? plan.objectives
-      : plan.objective
-      ? [plan.objective]
-      : []
-    : [];
-
-  // Parse materials needed
-  const materialsList = plan && Array.isArray(plan.materials_needed) ? plan.materials_needed : [];
+  const activePlan = editedPlan || extractPlanData(result);
 
   // Copy full plan to clipboard as formatted text
   const handleCopyPlan = async () => {
-    if (!plan) return;
+    if (!activePlan) return;
     try {
       const lines = [];
-      lines.push(`# ${plan.title || topic}`);
+      lines.push(`# ${activePlan.title || topic}`);
       lines.push(
-        `- Môn học: ${subject || activeWorkspace?.subject || ''} | Khối: ${gradeLevel || activeWorkspace?.gradeLevel || ''} | Thời lượng: ${plan.duration_minutes || durationMinutes} phút`
+        `- Môn học: ${subject || activeWorkspace?.subject || ''} | Khối: ${gradeLevel || activeWorkspace?.gradeLevel || ''} | Thời lượng: ${activePlan.duration_minutes || durationMinutes} phút`
       );
       lines.push('');
 
-      if (objectivesList.length > 0) {
+      const objList = Array.isArray(activePlan.objectives)
+        ? activePlan.objectives
+        : activePlan.objective
+        ? [activePlan.objective]
+        : [];
+
+      if (objList.length > 0) {
         lines.push('## Mục tiêu bài dạy');
-        objectivesList.forEach((obj) => lines.push(`- ${obj}`));
+        objList.forEach((obj) => lines.push(`- ${obj}`));
         lines.push('');
       }
 
-      if (materialsList.length > 0) {
+      const matList = Array.isArray(activePlan.materials_needed) ? activePlan.materials_needed : [];
+      if (matList.length > 0) {
         lines.push('## Thiết bị & Học liệu dạy học');
-        materialsList.forEach((mat) => lines.push(`- ${mat}`));
+        matList.forEach((mat) => lines.push(`- ${mat}`));
         lines.push('');
       }
 
-      if (plan.sections && plan.sections.length > 0) {
+      if (activePlan.sections && activePlan.sections.length > 0) {
         lines.push('## Tiến trình hoạt động');
-        plan.sections.forEach((sec, idx) => {
+        activePlan.sections.forEach((sec, idx) => {
           lines.push(`### ${idx + 1}. ${sec.title} (${sec.duration_minutes || ''} phút)`);
           lines.push(sec.content);
           lines.push('');
@@ -186,8 +254,14 @@ export function LessonPlannerPage() {
   };
 
   const handleResetForm = () => {
+    if (activeWorkspace?.id) {
+      lessonStorage.clearDraft(activeWorkspace.id);
+    }
     setResult(null);
+    setEditedPlan(null);
     setError('');
+    autoSaveState.resetStatus();
+    toast.success(t('lessonPlanner.resetSuccess', 'Đã tạo bản soạn mới'));
   };
 
   // Initial loading spinner
@@ -252,7 +326,7 @@ export function LessonPlannerPage() {
                 <FileText className="w-4 h-4 text-emerald-600" />
                 {t('lessonPlanner.formTitle', 'Thiết Lập Yêu Cầu Bài Dạy')}
               </span>
-              {result && (
+              {activePlan && (
                 <button
                   type="button"
                   onClick={handleResetForm}
@@ -310,78 +384,64 @@ export function LessonPlannerPage() {
                 </div>
               </div>
 
-              {/* Duration with quick presets */}
+              {/* Duration Minutes */}
               <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-sm font-medium text-foreground">
-                    {t('lessonPlanner.duration', 'Thời lượng (phút)')}
-                  </label>
-                  <div className="flex items-center gap-1.5">
-                    {[45, 90].map((preset) => (
-                      <button
-                        key={preset}
-                        type="button"
-                        onClick={() => setDurationMinutes(preset)}
-                        className={`text-xs px-2 py-0.5 rounded-md border transition-colors ${
-                          Number(durationMinutes) === preset
-                            ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-700 dark:text-emerald-400 font-medium'
-                            : 'border-border text-muted-foreground hover:bg-muted'
-                        }`}
-                      >
-                        {preset}p
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div className="relative">
-                  <Clock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <label className="block text-sm font-medium mb-1.5 text-foreground">
+                  {t('lessonPlanner.duration', 'Thời lượng tiết học')}
+                </label>
+                <div className="flex items-center gap-2">
                   <input
                     type="number"
-                    min={15}
-                    max={180}
+                    min="15"
+                    max="180"
+                    step="5"
                     value={durationMinutes}
                     onChange={(e) => setDurationMinutes(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors"
+                    className="w-32 px-3.5 py-2.5 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors"
                   />
+                  <span className="text-sm text-muted-foreground">{t('lessonPlanner.durationUnit', 'phút')}</span>
                 </div>
               </div>
 
-              {/* Learning Objectives */}
+              {/* Objectives */}
               <div>
                 <label className="block text-sm font-medium mb-1.5 text-foreground">
-                  {t('lessonPlanner.objectives', 'Mục tiêu bài học (Mỗi mục tiêu 1 dòng)')}
+                  {t('lessonPlanner.objectives', 'Mục tiêu bài dạy')}
                 </label>
                 <textarea
                   rows={3}
                   value={objectives}
                   onChange={(e) => setObjectives(e.target.value)}
-                  placeholder={t('lessonPlanner.objectivesPlaceholder', '- Nắm vững công thức định lý Cosin\n- Vận dụng tính cạnh và góc trong tam giác')}
-                  className="w-full px-3.5 py-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 resize-none transition-colors"
+                  placeholder={t(
+                    'lessonPlanner.objectivesPlaceholder',
+                    'Nhập mục tiêu bài dạy (mỗi dòng một mục tiêu)...'
+                  )}
+                  className="w-full px-3.5 py-2.5 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors"
                 />
               </div>
 
               {/* Pedagogical Instructions */}
               <div>
                 <label className="block text-sm font-medium mb-1.5 text-foreground">
-                  {t('lessonPlanner.instructions', 'Chỉ dẫn sư phạm bổ sung')}
+                  {t('lessonPlanner.instructions', 'Yêu cầu / Hướng dẫn sư phạm bổ sung')}
                 </label>
                 <textarea
                   rows={2}
                   value={instructions}
                   onChange={(e) => setInstructions(e.target.value)}
-                  placeholder={t('lessonPlanner.instructionsPlaceholder', 'Ví dụ: Tổ chức thảo luận nhóm 4 học sinh, liên hệ thực tế...')}
-                  className="w-full px-3.5 py-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 resize-none transition-colors"
+                  placeholder={t(
+                    'lessonPlanner.instructionsPlaceholder',
+                    'Ví dụ: Tập trung vào hoạt động nhóm và ví dụ thực tế liên môn...'
+                  )}
+                  className="w-full px-3.5 py-2.5 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors"
                 />
               </div>
 
               {/* Error Message */}
               {error && (
-                <div className="p-3.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-600 text-xs flex items-start gap-2.5">
+                <div className="p-3.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs flex items-start gap-2">
                   <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                  <div className="space-y-1">
-                    <p className="font-semibold">{t('common.error', 'Đã xảy ra lỗi')}</p>
-                    <p className="leading-relaxed">{error}</p>
-                  </div>
+                  <span className="leading-relaxed">{error}</span>
                 </div>
               )}
 
@@ -389,12 +449,12 @@ export function LessonPlannerPage() {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 shadow-sm transition-all"
+                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-lg shadow-sm hover:shadow transition-all"
               >
                 {loading ? (
                   <span className="flex items-center gap-2">
                     <Spinner className="w-4 h-4 text-white" />
-                    {t('lessonPlanner.generating', 'Đang tra cứu tài liệu & soạn giáo án...')}
+                    {t('lessonPlanner.generating', 'Đang soạn bài dạy...')}
                   </span>
                 ) : (
                   <span className="flex items-center gap-2">
@@ -455,172 +515,34 @@ export function LessonPlannerPage() {
               </CardContent>
             </Card>
           </div>
-        ) : plan ? (
-          /* Rendered Lesson Plan Viewer */
+        ) : activePlan ? (
+          /* Rendered Lesson Plan Viewer with Inline Editor & Auto-Save */
           <div className="sticky top-20 h-fit space-y-4">
-            <Card className="rounded-xl border border-emerald-500/30 shadow-sm overflow-hidden bg-card">
-              {/* Card Header with Badges & Action Buttons */}
-              <CardHeader className="bg-emerald-500/5 border-b border-border pb-4">
-                <div className="flex flex-wrap justify-between items-start gap-3">
-                  <div className="space-y-1.5">
-                    <CardTitle className="text-lg font-bold text-emerald-800 dark:text-emerald-400">
-                      {plan.title || topic}
-                    </CardTitle>
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                      <span className="inline-flex items-center gap-1 font-medium bg-background px-2 py-0.5 rounded-md border border-border">
-                        <Clock className="w-3.5 h-3.5 text-emerald-600" />
-                        {plan.duration_minutes || durationMinutes} {t('lessonPlanner.durationUnit', 'phút')}
-                      </span>
-                      {gradeLevel && (
-                        <span className="inline-flex items-center gap-1 font-medium bg-background px-2 py-0.5 rounded-md border border-border">
-                          <GraduationCap className="w-3.5 h-3.5 text-emerald-600" />
-                          {gradeLevel}
-                        </span>
-                      )}
-                      {subject && (
-                        <span className="inline-flex items-center gap-1 font-medium bg-background px-2 py-0.5 rounded-md border border-border">
-                          <BookOpen className="w-3.5 h-3.5 text-emerald-600" />
-                          {subject}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Actions Toolbar */}
-                  <div className="flex items-center gap-2">
-                    {/* Citation Badge */}
-                    <CitationBadge
-                      count={plan.source_chunk_ids?.length || (plan.citations?.length || 1)}
-                      onClick={() => setIsCitationOpen(true)}
-                    />
-
-                    {/* Copy to Clipboard Button */}
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleCopyPlan}
-                      className="flex items-center gap-1.5 text-xs font-medium border-border hover:bg-muted"
-                      title={t('lessonPlanner.copyPlan', 'Sao chép giáo án')}
-                    >
-                      {copied ? (
-                        <>
-                          <Check className="w-3.5 h-3.5 text-emerald-600" />
-                          <span className="text-emerald-600">{t('common.copied', 'Đã chép')}</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-3.5 h-3.5 text-muted-foreground" />
-                          <span>{t('common.copy', 'Sao chép')}</span>
-                        </>
-                      )}
-                    </Button>
-
-                    {/* Export Dropdown */}
-                    <ExportDropdown
-                      workspaceId={activeWorkspace?.id}
-                      generationId={result.id || result.data?.id || 'latest'}
-                      defaultFileName={`giao-an-${(plan.title || topic).toLowerCase().replace(/\s+/g, '-')}`}
-                    />
-                  </div>
-                </div>
-              </CardHeader>
-
-              {/* Card Content with Structured Plan Body */}
-              <CardContent className="p-5 overflow-y-auto max-h-[calc(100vh-14rem)] space-y-6">
-                {/* 1. Learning Objectives */}
-                {objectivesList.length > 0 && (
-                  <div>
-                    <h4 className="text-sm font-semibold mb-2.5 flex items-center gap-2 text-foreground">
-                      <Target className="w-4 h-4 text-emerald-600" />
-                      <span>{t('lessonPlanner.objectivesTitle', 'Mục tiêu bài dạy')}</span>
-                    </h4>
-                    <div className="p-3.5 rounded-xl bg-muted/30 border border-border">
-                      <ul className="space-y-1.5 pl-5 list-disc text-xs sm:text-sm text-foreground/90">
-                        {objectivesList.map((obj, i) => (
-                          <li key={i} className="leading-relaxed">
-                            {obj}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                )}
-
-                {/* 2. Teaching Materials Needed */}
-                {materialsList.length > 0 && (
-                  <div>
-                    <h4 className="text-sm font-semibold mb-2.5 flex items-center gap-2 text-foreground">
-                      <Package className="w-4 h-4 text-emerald-600" />
-                      <span>{t('lessonPlanner.materialsTitle', 'Thiết bị & Học liệu dạy học')}</span>
-                    </h4>
-                    <div className="p-3.5 rounded-xl bg-muted/30 border border-border">
-                      <ul className="space-y-1.5 pl-5 list-disc text-xs sm:text-sm text-foreground/90">
-                        {materialsList.map((mat, i) => (
-                          <li key={i} className="leading-relaxed">
-                            {mat}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                )}
-
-                {/* 3. Activity Sequence (Sections) */}
-                {plan.sections && plan.sections.length > 0 && (
-                  <div>
-                    <h4 className="text-sm font-semibold mb-3 flex items-center gap-2 text-foreground">
-                      <Layers className="w-4 h-4 text-emerald-600" />
-                      <span>{t('lessonPlanner.activitiesTitle', 'Tiến trình hoạt động')}</span>
-                    </h4>
-                    <div className="space-y-3.5">
-                      {plan.sections.map((sec, i) => (
-                        <div
-                          key={i}
-                          className="p-4 rounded-xl bg-muted/30 border border-border hover:border-emerald-500/30 transition-colors"
-                        >
-                          <div className="flex justify-between items-start mb-2.5 gap-2">
-                            <strong className="text-sm font-semibold text-foreground flex items-center gap-2">
-                              <span className="w-5 h-5 rounded-full bg-emerald-500/10 text-emerald-600 text-xs flex items-center justify-center font-bold">
-                                {i + 1}
-                              </span>
-                              {sec.title}
-                            </strong>
-                            {sec.duration_minutes && (
-                              <span className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-md whitespace-nowrap border border-emerald-500/20">
-                                {sec.duration_minutes} {t('lessonPlanner.durationUnit', 'phút')}
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-xs sm:text-sm text-muted-foreground whitespace-pre-line leading-relaxed pl-7">
-                            {sec.content}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Footer Grounding Note */}
-                <div className="pt-2 text-center border-t border-border">
-                  <p className="text-[11px] text-muted-foreground flex items-center justify-center gap-1.5">
-                    <FileCheck className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>
-                      {t('lessonPlanner.groundingNotice', 'Nội dung bài dạy được đối chiếu từ tài liệu học tập trong không gian làm việc')}
-                    </span>
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            <InlineLessonEditor
+              plan={activePlan}
+              onChange={setEditedPlan}
+              autoSaveState={autoSaveState}
+              workspaceName={activeWorkspace?.name}
+              workspaceId={activeWorkspace?.id}
+              generationId={result?.id || result?.data?.id || 'latest'}
+              subject={subject || activeWorkspace?.subject}
+              gradeLevel={gradeLevel || activeWorkspace?.gradeLevel}
+              durationMinutes={durationMinutes}
+              copied={copied}
+              onCopy={handleCopyPlan}
+              onOpenCitation={() => setIsCitationOpen(true)}
+              citationCount={activePlan.source_chunk_ids?.length || (activePlan.citations?.length || 1)}
+            />
 
             {/* Citation Drawer */}
             <CitationDrawer
               isOpen={isCitationOpen}
               onClose={() => setIsCitationOpen(false)}
               citations={
-                plan.citations && plan.citations.length > 0
-                  ? plan.citations
-                  : plan.source_chunk_ids && plan.source_chunk_ids.length > 0
-                  ? plan.source_chunk_ids.map((id, idx) => ({
+                activePlan.citations && activePlan.citations.length > 0
+                  ? activePlan.citations
+                  : activePlan.source_chunk_ids && activePlan.source_chunk_ids.length > 0
+                  ? activePlan.source_chunk_ids.map((id, idx) => ({
                       chunkId: id,
                       fileName: `${activeWorkspace?.name || 'Tài liệu bài học'} (Mục ${idx + 1})`,
                       sourcePage: idx + 1,
@@ -666,4 +588,3 @@ export function LessonPlannerPage() {
 }
 
 export default LessonPlannerPage;
-
