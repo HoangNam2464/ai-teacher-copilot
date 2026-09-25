@@ -1,6 +1,7 @@
 package com.aiteachercopilot.user;
 
 import com.aiteachercopilot.common.exception.ResourceNotFoundException;
+import com.aiteachercopilot.document.DocumentRepository;
 import com.aiteachercopilot.workspace.WorkspaceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +18,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final WorkspaceRepository workspaceRepository;
-    private final com.aiteachercopilot.document.DocumentRepository documentRepository;
+    private final DocumentRepository documentRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
