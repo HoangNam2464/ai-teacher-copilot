@@ -105,6 +105,13 @@
             <version>2.7.0</version>
         </dependency>
 
+        <!-- ===== Document Export (Apache POI for DOCX) ===== -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>5.2.5</version>
+        </dependency>
+
         <!-- ===== Lombok ===== -->
         <dependency>
             <groupId>org.projectlombok</groupId>
