@@ -122,6 +122,23 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error(ex.getMessage()));
     }
 
+    @ExceptionHandler(org.springframework.web.reactive.function.client.WebClientResponseException.class)
+    public ResponseEntity<ApiResponse<Object>> handleWebClientException(
+            org.springframework.web.reactive.function.client.WebClientResponseException ex) {
+        log.error("AI Service returned error [{}]: {}", ex.getStatusCode(), ex.getResponseBodyAsString());
+        HttpStatus status = HttpStatus.resolve(ex.getStatusCode().value());
+        if (status == null) {
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+        String body = ex.getResponseBodyAsString();
+        return ResponseEntity.status(status)
+                .body(ApiResponse.builder()
+                        .success(false)
+                        .error(body.isBlank() ? ex.getMessage() : body)
+                        .message("AI Service Error: " + ex.getStatusCode())
+                        .build());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleGeneral(Exception ex) {
         log.error("Unhandled exception", ex);
@@ -129,3 +146,4 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error("An internal error occurred"));
     }
 }
+
