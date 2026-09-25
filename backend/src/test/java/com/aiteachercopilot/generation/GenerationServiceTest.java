@@ -10,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.ParameterizedTypeReference;
@@ -26,6 +27,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class GenerationServiceTest {
 
     @Mock
@@ -41,7 +43,7 @@ public class GenerationServiceTest {
     private WebClient.RequestBodySpec requestBodySpec;
 
     @Mock
-    private WebClient.RequestHeadersSpec requestHeadersSpec;
+    private WebClient.RequestHeadersSpec<?> requestHeadersSpec;
 
     @Mock
     private WebClient.ResponseSpec responseSpec;
@@ -54,6 +56,12 @@ public class GenerationServiceTest {
 
     @Mock
     private ContentCitationRepository contentCitationRepository;
+
+    @Captor
+    private ArgumentCaptor<GeneratedContent> contentCaptor;
+
+    @Captor
+    private ArgumentCaptor<List<ContentCitation>> citationsCaptor;
 
     private GenerationService generationService;
 
@@ -115,11 +123,11 @@ public class GenerationServiceTest {
                 "data", aiPlanData
         );
 
-        when(aiServiceWebClient.post()).thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.uri(eq("/generation/lesson-plan"))).thenReturn(requestBodySpec);
-        when(requestBodySpec.bodyValue(any())).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.bodyToMono(any(ParameterizedTypeReference.class))).thenReturn(Mono.just(aiResponse));
+        doReturn(requestBodyUriSpec).when(aiServiceWebClient).post();
+        doReturn(requestBodySpec).when(requestBodyUriSpec).uri(eq("/generation/lesson-plan"));
+        doReturn(requestHeadersSpec).when(requestBodySpec).bodyValue(any());
+        doReturn(responseSpec).when(requestHeadersSpec).retrieve();
+        doReturn(Mono.just(aiResponse)).when(responseSpec).bodyToMono(any(ParameterizedTypeReference.class));
 
         GeneratedContent savedEntity = GeneratedContent.builder()
                 .id(UUID.randomUUID())
@@ -168,7 +176,6 @@ public class GenerationServiceTest {
         assertThat(response.getContentData()).isNotNull();
 
         // Verify entity persistence
-        ArgumentCaptor<GeneratedContent> contentCaptor = ArgumentCaptor.forClass(GeneratedContent.class);
         verify(generatedContentRepository).save(contentCaptor.capture());
         GeneratedContent captured = contentCaptor.getValue();
         assertThat(captured.getWorkspaceId()).isEqualTo(workspaceId);
@@ -180,7 +187,6 @@ public class GenerationServiceTest {
         assertThat(captured.getGenerationTimeMs()).isNotNull();
 
         // Verify citation persistence
-        ArgumentCaptor<List<ContentCitation>> citationsCaptor = ArgumentCaptor.forClass(List.class);
         verify(contentCitationRepository).saveAll(citationsCaptor.capture());
         List<ContentCitation> capturedCitations = citationsCaptor.getValue();
         assertThat(capturedCitations).hasSize(2);

@@ -27,14 +27,12 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -42,6 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class GenerationIntegrationTest {
 
     @Autowired
@@ -146,13 +145,13 @@ public class GenerationIntegrationTest {
         // Arrange
         WebClient.RequestBodyUriSpec requestBodyUriSpec = mock(WebClient.RequestBodyUriSpec.class);
         WebClient.RequestBodySpec requestBodySpec = mock(WebClient.RequestBodySpec.class);
-        WebClient.RequestHeadersSpec requestHeadersSpec = mock(WebClient.RequestHeadersSpec.class);
+        WebClient.RequestHeadersSpec<?> requestHeadersSpec = mock(WebClient.RequestHeadersSpec.class);
         WebClient.ResponseSpec responseSpec = mock(WebClient.ResponseSpec.class);
 
-        when(aiServiceWebClient.post()).thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
-        when(requestBodySpec.bodyValue(any())).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+        doReturn(requestBodyUriSpec).when(aiServiceWebClient).post();
+        doReturn(requestBodySpec).when(requestBodyUriSpec).uri(anyString());
+        doReturn(requestHeadersSpec).when(requestBodySpec).bodyValue(any());
+        doReturn(responseSpec).when(requestHeadersSpec).retrieve();
 
         Map<String, Object> aiPlanData = Map.of(
                 "title", "Giáo án: Khái niệm Véc tơ",
@@ -175,7 +174,7 @@ public class GenerationIntegrationTest {
                 "data", aiPlanData
         );
 
-        when(responseSpec.bodyToMono(any(ParameterizedTypeReference.class))).thenReturn(Mono.just(aiResponse));
+        doReturn(Mono.just(aiResponse)).when(responseSpec).bodyToMono(any(ParameterizedTypeReference.class));
 
         GenerationRequestDto requestDto = GenerationRequestDto.builder()
                 .subject("Toán")
