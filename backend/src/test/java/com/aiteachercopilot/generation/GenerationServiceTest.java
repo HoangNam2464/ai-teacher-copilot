@@ -1,6 +1,7 @@
 package com.aiteachercopilot.generation;
 
 import com.aiteachercopilot.common.exception.ForbiddenException;
+import com.aiteachercopilot.common.exception.ResourceNotFoundException;
 import com.aiteachercopilot.document.DocumentChunk;
 import com.aiteachercopilot.document.DocumentChunkRepository;
 import com.aiteachercopilot.workspace.Workspace;
@@ -21,6 +22,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -215,5 +217,222 @@ public class GenerationServiceTest {
 
         verifyNoInteractions(aiServiceWebClient);
         verifyNoInteractions(generatedContentRepository);
+    }
+
+    @Test
+    @DisplayName("Should update lesson plan content and transition review status from DRAFT to REVIEWED [BE-021]")
+    void shouldUpdateLessonContentAndReviewStatusSuccessfully() {
+        UUID contentId = UUID.randomUUID();
+        Workspace workspace = Workspace.builder().id(workspaceId).ownerId(userId).build();
+        when(workspaceService.findAndAuthorize(workspaceId, userId)).thenReturn(workspace);
+
+        GeneratedContent existing = GeneratedContent.builder()
+                .id(contentId)
+                .workspaceId(workspaceId)
+                .createdBy(userId)
+                .title("Giáo án gốc")
+                .reviewStatus("DRAFT")
+                .contentData(Map.of("topic", "Cũ"))
+                .build();
+        when(generatedContentRepository.findById(contentId)).thenReturn(Optional.of(existing));
+        when(generatedContentRepository.save(any(GeneratedContent.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        UpdateLessonContentRequestDto request = UpdateLessonContentRequestDto.builder()
+                .title("Giáo án mới cập nhật")
+                .contentData(Map.of("topic", "Mới", "sections", List.of("Phần 1")))
+                .reviewStatus("REVIEWED")
+                .build();
+
+        GenerationResponseDto response = generationService.updateLessonContent(workspaceId, contentId, userId, request);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getTitle()).isEqualTo("Giáo án mới cập nhật");
+        assertThat(response.getReviewStatus()).isEqualTo("REVIEWED");
+        assertThat(response.getContentData()).containsEntry("topic", "Mới");
+
+        verify(generatedContentRepository).save(contentCaptor.capture());
+        GeneratedContent saved = contentCaptor.getValue();
+        assertThat(saved.getTitle()).isEqualTo("Giáo án mới cập nhật");
+        assertThat(saved.getReviewStatus()).isEqualTo("REVIEWED");
+        assertThat(saved.getContentData()).containsEntry("topic", "Mới");
+    }
+
+    @Test
+    @DisplayName("Should update review status to APPROVED [BE-021]")
+    void shouldUpdateReviewStatusToApprovedSuccessfully() {
+        UUID contentId = UUID.randomUUID();
+        Workspace workspace = Workspace.builder().id(workspaceId).ownerId(userId).build();
+        when(workspaceService.findAndAuthorize(workspaceId, userId)).thenReturn(workspace);
+
+        GeneratedContent existing = GeneratedContent.builder()
+                .id(contentId)
+                .workspaceId(workspaceId)
+                .createdBy(userId)
+                .reviewStatus("REVIEWED")
+                .build();
+        when(generatedContentRepository.findById(contentId)).thenReturn(Optional.of(existing));
+        when(generatedContentRepository.save(any(GeneratedContent.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        UpdateLessonContentRequestDto request = UpdateLessonContentRequestDto.builder()
+                .reviewStatus("APPROVED")
+                .build();
+
+        GenerationResponseDto response = generationService.updateLessonContent(workspaceId, contentId, userId, request);
+
+        assertThat(response.getReviewStatus()).isEqualTo("APPROVED");
+    }
+
+    @Test
+    @DisplayName("Should throw IllegalArgumentException when review status is invalid [BE-021]")
+    void shouldThrowIllegalArgumentWhenReviewStatusIsInvalid() {
+        UUID contentId = UUID.randomUUID();
+        Workspace workspace = Workspace.builder().id(workspaceId).ownerId(userId).build();
+        when(workspaceService.findAndAuthorize(workspaceId, userId)).thenReturn(workspace);
+
+        UpdateLessonContentRequestDto request = UpdateLessonContentRequestDto.builder()
+                .reviewStatus("INVALID_STATUS")
+                .build();
+
+        assertThatThrownBy(() -> generationService.updateLessonContent(workspaceId, contentId, userId, request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Invalid review status");
+
+        verify(generatedContentRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Should throw IllegalArgumentException when contentData is empty map [BE-021]")
+    void shouldThrowIllegalArgumentWhenContentDataIsEmpty() {
+        UUID contentId = UUID.randomUUID();
+        Workspace workspace = Workspace.builder().id(workspaceId).ownerId(userId).build();
+        when(workspaceService.findAndAuthorize(workspaceId, userId)).thenReturn(workspace);
+
+        UpdateLessonContentRequestDto request = UpdateLessonContentRequestDto.builder()
+                .contentData(Map.of())
+                .build();
+
+        assertThatThrownBy(() -> generationService.updateLessonContent(workspaceId, contentId, userId, request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("contentData cannot be empty");
+
+        verify(generatedContentRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Should throw IllegalArgumentException when request has no update fields [BE-021]")
+    void shouldThrowIllegalArgumentWhenRequestHasNoFields() {
+        UUID contentId = UUID.randomUUID();
+        Workspace workspace = Workspace.builder().id(workspaceId).ownerId(userId).build();
+        when(workspaceService.findAndAuthorize(workspaceId, userId)).thenReturn(workspace);
+
+        UpdateLessonContentRequestDto request = new UpdateLessonContentRequestDto();
+
+        assertThatThrownBy(() -> generationService.updateLessonContent(workspaceId, contentId, userId, request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("at least one field");
+    }
+
+    @Test
+    @DisplayName("Should throw ForbiddenException when user does not own content [BE-021]")
+    void shouldThrowForbiddenWhenUserDoesNotOwnContent() {
+        UUID contentId = UUID.randomUUID();
+        UUID otherUserId = UUID.randomUUID();
+        Workspace workspace = Workspace.builder().id(workspaceId).ownerId(otherUserId).build();
+        when(workspaceService.findAndAuthorize(workspaceId, userId)).thenReturn(workspace);
+
+        GeneratedContent existing = GeneratedContent.builder()
+                .id(contentId)
+                .workspaceId(workspaceId)
+                .createdBy(otherUserId)
+                .reviewStatus("DRAFT")
+                .build();
+        when(generatedContentRepository.findById(contentId)).thenReturn(Optional.of(existing));
+
+        UpdateLessonContentRequestDto request = UpdateLessonContentRequestDto.builder()
+                .reviewStatus("REVIEWED")
+                .build();
+
+        assertThatThrownBy(() -> generationService.updateLessonContent(workspaceId, contentId, userId, request))
+                .isInstanceOf(ForbiddenException.class)
+                .hasMessageContaining("Only the workspace owner or content creator");
+    }
+
+    @Test
+    @DisplayName("Should throw ForbiddenException on cross-workspace update [BE-021]")
+    void shouldThrowForbiddenWhenContentBelongsToDifferentWorkspace() {
+        UUID contentId = UUID.randomUUID();
+        UUID otherWorkspaceId = UUID.randomUUID();
+        Workspace workspace = Workspace.builder().id(workspaceId).ownerId(userId).build();
+        when(workspaceService.findAndAuthorize(workspaceId, userId)).thenReturn(workspace);
+
+        GeneratedContent existing = GeneratedContent.builder()
+                .id(contentId)
+                .workspaceId(otherWorkspaceId)
+                .createdBy(userId)
+                .build();
+        when(generatedContentRepository.findById(contentId)).thenReturn(Optional.of(existing));
+
+        UpdateLessonContentRequestDto request = UpdateLessonContentRequestDto.builder()
+                .reviewStatus("REVIEWED")
+                .build();
+
+        assertThatThrownBy(() -> generationService.updateLessonContent(workspaceId, contentId, userId, request))
+                .isInstanceOf(ForbiddenException.class)
+                .hasMessageContaining("Cross-workspace content modification is forbidden");
+    }
+
+    @Test
+    @DisplayName("Should throw ResourceNotFoundException when content does not exist [BE-021]")
+    void shouldThrowNotFoundWhenContentDoesNotExist() {
+        UUID contentId = UUID.randomUUID();
+        Workspace workspace = Workspace.builder().id(workspaceId).ownerId(userId).build();
+        when(workspaceService.findAndAuthorize(workspaceId, userId)).thenReturn(workspace);
+        when(generatedContentRepository.findById(contentId)).thenReturn(Optional.empty());
+
+        UpdateLessonContentRequestDto request = UpdateLessonContentRequestDto.builder()
+                .reviewStatus("REVIEWED")
+                .build();
+
+        assertThatThrownBy(() -> generationService.updateLessonContent(workspaceId, contentId, userId, request))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessageContaining("GeneratedContent");
+    }
+
+    @Test
+    @DisplayName("Should retrieve generated content by ID [BE-021]")
+    void shouldGetGeneratedContentByIdSuccessfully() {
+        UUID contentId = UUID.randomUUID();
+        Workspace workspace = Workspace.builder().id(workspaceId).ownerId(userId).build();
+        when(workspaceService.findAndAuthorize(workspaceId, userId)).thenReturn(workspace);
+
+        GeneratedContent existing = GeneratedContent.builder()
+                .id(contentId)
+                .workspaceId(workspaceId)
+                .createdBy(userId)
+                .title("Giáo án xem chi tiết")
+                .build();
+        when(generatedContentRepository.findById(contentId)).thenReturn(Optional.of(existing));
+
+        GenerationResponseDto response = generationService.getGeneratedContentById(workspaceId, contentId, userId);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getTitle()).isEqualTo("Giáo án xem chi tiết");
+    }
+
+    @Test
+    @DisplayName("Should retrieve workspace generation history [BE-021]")
+    void shouldGetWorkspaceGenerationHistorySuccessfully() {
+        Workspace workspace = Workspace.builder().id(workspaceId).ownerId(userId).build();
+        when(workspaceService.findAndAuthorize(workspaceId, userId)).thenReturn(workspace);
+
+        GeneratedContent c1 = GeneratedContent.builder().id(UUID.randomUUID()).workspaceId(workspaceId).title("Bài 1").build();
+        GeneratedContent c2 = GeneratedContent.builder().id(UUID.randomUUID()).workspaceId(workspaceId).title("Bài 2").build();
+        when(generatedContentRepository.findByWorkspaceIdOrderByCreatedAtDesc(workspaceId)).thenReturn(List.of(c1, c2));
+
+        List<GenerationResponseDto> history = generationService.getWorkspaceGenerationHistory(workspaceId, userId);
+
+        assertThat(history).hasSize(2);
+        assertThat(history.get(0).getTitle()).isEqualTo("Bài 1");
+        assertThat(history.get(1).getTitle()).isEqualTo("Bài 2");
     }
 }
