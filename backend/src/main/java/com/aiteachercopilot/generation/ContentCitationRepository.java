@@ -14,5 +14,9 @@ public interface ContentCitationRepository extends JpaRepository<ContentCitation
 
     List<ContentCitation> findByContentId(UUID contentId);
 
+    List<ContentCitation> findByDocumentId(UUID documentId);
+
+    List<ContentCitation> findByChunkId(UUID chunkId);
+
     void deleteByContentId(UUID contentId);
 }
