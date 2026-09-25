@@ -1015,7 +1015,7 @@ Trả về mã HTTP 422 với mã lỗi INSUFFICIENT_EVIDENCE thay vì để LLM
 - **Sprint:** Sprint 3 - RAG & Lesson
 - **Priority:** High
 - **Assignee Type:** QA Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-302
 
 **Description:**
