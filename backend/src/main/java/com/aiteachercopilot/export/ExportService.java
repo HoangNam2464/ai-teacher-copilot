@@ -8,7 +8,6 @@ import com.aiteachercopilot.generation.GeneratedContent;
 import com.aiteachercopilot.generation.GeneratedContentRepository;
 import com.aiteachercopilot.user.User;
 import com.aiteachercopilot.user.UserRepository;
-import com.aiteachercopilot.workspace.Workspace;
 import com.aiteachercopilot.workspace.WorkspaceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -60,7 +59,7 @@ public class ExportService {
                                        String format,
                                        ExportRequestDto request) {
         // 1. Authorize workspace
-        Workspace workspace = workspaceService.findAndAuthorize(workspaceId, userId);
+        workspaceService.findAndAuthorize(workspaceId, userId);
 
         // 2. Retrieve generated content
         GeneratedContent content = generatedContentRepository.findById(contentId)

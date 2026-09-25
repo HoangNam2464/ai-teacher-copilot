@@ -4,7 +4,13 @@ import com.aiteachercopilot.citation.CitationResolutionDto;
 import com.aiteachercopilot.generation.GeneratedContent;
 import com.aiteachercopilot.user.User;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.xwpf.usermodel.*;
+import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.apache.poi.xwpf.usermodel.XWPFParagraph;
+import org.apache.poi.xwpf.usermodel.XWPFRun;
+import org.apache.poi.xwpf.usermodel.XWPFTable;
+import org.apache.poi.xwpf.usermodel.XWPFTableCell;
+import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTPageMar;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTPageSz;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSectPr;
@@ -15,7 +21,11 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Engine for exporting AI-generated Lesson Plans into professional DOCX documents
@@ -592,7 +602,6 @@ public class DocxLessonExporter {
         return 45;
     }
 
-    @SuppressWarnings("unchecked")
     private List<String> extractStringList(Object obj) {
         if (obj == null) {
             return Collections.emptyList();
