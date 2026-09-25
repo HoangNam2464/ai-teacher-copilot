@@ -33,7 +33,9 @@ import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -251,5 +253,157 @@ public class GenerationIntegrationTest {
                         .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.success", is(false)));
+    }
+
+    @Test
+    @DisplayName("PUT /workspaces/{workspaceId}/generation/{id} updates lesson plan content and review status [BE-021]")
+    void shouldUpdateLessonContentAndReviewStatusSuccessfully() throws Exception {
+        GeneratedContent existing = generatedContentRepository.save(GeneratedContent.builder()
+                .workspaceId(workspaceA.getId())
+                .createdBy(teacherA.getId())
+                .title("Giáo án Hàm số sơ khai")
+                .contentType("LESSON_PLAN")
+                .reviewStatus("DRAFT")
+                .version(1)
+                .contentData(Map.of("topic", "Cũ", "sections", List.of("Phần mở đầu")))
+                .promptInput("Tạo giáo án")
+                .modelUsed("gemini-1.5-flash")
+                .generationTimeMs(1200)
+                .build());
+
+        UpdateLessonContentRequestDto updateDto = UpdateLessonContentRequestDto.builder()
+                .title("Giáo án Hàm số hoàn thiện")
+                .contentData(Map.of("topic", "Mới hoàn thiện", "sections", List.of("Khởi động", "Khám phá")))
+                .reviewStatus("REVIEWED")
+                .build();
+
+        mockMvc.perform(put("/workspaces/" + workspaceA.getId() + "/generation/" + existing.getId())
+                        .header("Authorization", "Bearer " + tokenA)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.data.id", is(existing.getId().toString())))
+                .andExpect(jsonPath("$.data.title", is("Giáo án Hàm số hoàn thiện")))
+                .andExpect(jsonPath("$.data.reviewStatus", is("REVIEWED")))
+                .andExpect(jsonPath("$.data.contentData.topic", is("Mới hoàn thiện")));
+
+        GeneratedContent reloaded = generatedContentRepository.findById(existing.getId()).orElseThrow();
+        assertThat(reloaded.getTitle()).isEqualTo("Giáo án Hàm số hoàn thiện");
+        assertThat(reloaded.getReviewStatus()).isEqualTo("REVIEWED");
+        assertThat(reloaded.getContentData()).containsEntry("topic", "Mới hoàn thiện");
+    }
+
+    @Test
+    @DisplayName("PUT /workspaces/{workspaceId}/generations/{id} rejects invalid review status with 400 Bad Request [BE-021]")
+    void shouldRejectInvalidReviewStatus() throws Exception {
+        GeneratedContent existing = generatedContentRepository.save(GeneratedContent.builder()
+                .workspaceId(workspaceA.getId())
+                .createdBy(teacherA.getId())
+                .title("Giáo án Hàm số")
+                .contentType("LESSON_PLAN")
+                .reviewStatus("DRAFT")
+                .contentData(Map.of("topic", "Test"))
+                .build());
+
+        UpdateLessonContentRequestDto updateDto = UpdateLessonContentRequestDto.builder()
+                .reviewStatus("INVALID_STATUS")
+                .build();
+
+        mockMvc.perform(put("/workspaces/" + workspaceA.getId() + "/generations/" + existing.getId())
+                        .header("Authorization", "Bearer " + tokenA)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success", is(false)))
+                .andExpect(jsonPath("$.error", containsString("Invalid review status")));
+    }
+
+    @Test
+    @DisplayName("PUT /workspaces/{workspaceId}/generation/{id} rejects empty contentData with 400 Bad Request [BE-021]")
+    void shouldRejectEmptyContentData() throws Exception {
+        GeneratedContent existing = generatedContentRepository.save(GeneratedContent.builder()
+                .workspaceId(workspaceA.getId())
+                .createdBy(teacherA.getId())
+                .title("Giáo án Hàm số")
+                .contentType("LESSON_PLAN")
+                .reviewStatus("DRAFT")
+                .contentData(Map.of("topic", "Test"))
+                .build());
+
+        UpdateLessonContentRequestDto updateDto = UpdateLessonContentRequestDto.builder()
+                .contentData(Map.of())
+                .build();
+
+        mockMvc.perform(put("/workspaces/" + workspaceA.getId() + "/generation/" + existing.getId())
+                        .header("Authorization", "Bearer " + tokenA)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success", is(false)))
+                .andExpect(jsonPath("$.error", containsString("contentData cannot be empty")));
+    }
+
+    @Test
+    @DisplayName("PUT /workspaces/{workspaceId}/generation/{id} rejects non-owner with 403 Forbidden [BE-021]")
+    void shouldRejectNonOwnerUpdateWithForbidden() throws Exception {
+        GeneratedContent existing = generatedContentRepository.save(GeneratedContent.builder()
+                .workspaceId(workspaceA.getId())
+                .createdBy(teacherA.getId())
+                .title("Giáo án của Teacher A")
+                .contentType("LESSON_PLAN")
+                .reviewStatus("DRAFT")
+                .contentData(Map.of("topic", "Test"))
+                .build());
+
+        UpdateLessonContentRequestDto updateDto = UpdateLessonContentRequestDto.builder()
+                .reviewStatus("REVIEWED")
+                .build();
+
+        // Teacher B attempts to update Teacher A's content
+        mockMvc.perform(put("/workspaces/" + workspaceA.getId() + "/generation/" + existing.getId())
+                        .header("Authorization", "Bearer " + tokenB)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateDto)))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.success", is(false)));
+    }
+
+    @Test
+    @DisplayName("GET /workspaces/{workspaceId}/generation/{id} retrieves generated content successfully [BE-021]")
+    void shouldGetGeneratedContentByIdSuccessfully() throws Exception {
+        GeneratedContent existing = generatedContentRepository.save(GeneratedContent.builder()
+                .workspaceId(workspaceA.getId())
+                .createdBy(teacherA.getId())
+                .title("Giáo án tra cứu")
+                .contentType("LESSON_PLAN")
+                .reviewStatus("DRAFT")
+                .contentData(Map.of("topic", "Test"))
+                .build());
+
+        mockMvc.perform(get("/workspaces/" + workspaceA.getId() + "/generation/" + existing.getId())
+                        .header("Authorization", "Bearer " + tokenA))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.data.title", is("Giáo án tra cứu")));
+    }
+
+    @Test
+    @DisplayName("GET /workspaces/{workspaceId}/generation/history retrieves generation history list [BE-021]")
+    void shouldGetGenerationHistorySuccessfully() throws Exception {
+        generatedContentRepository.save(GeneratedContent.builder()
+                .workspaceId(workspaceA.getId())
+                .createdBy(teacherA.getId())
+                .title("Bài 1")
+                .contentType("LESSON_PLAN")
+                .reviewStatus("DRAFT")
+                .contentData(Map.of("topic", "Test 1"))
+                .build());
+
+        mockMvc.perform(get("/workspaces/" + workspaceA.getId() + "/generation/history")
+                        .header("Authorization", "Bearer " + tokenA))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.data", hasSize(1)));
     }
 }

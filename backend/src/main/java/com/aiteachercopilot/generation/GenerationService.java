@@ -1,7 +1,10 @@
 package com.aiteachercopilot.generation;
 
+import com.aiteachercopilot.common.exception.ForbiddenException;
+import com.aiteachercopilot.common.exception.ResourceNotFoundException;
 import com.aiteachercopilot.document.DocumentChunk;
 import com.aiteachercopilot.document.DocumentChunkRepository;
+import com.aiteachercopilot.workspace.Workspace;
 import com.aiteachercopilot.workspace.WorkspaceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -182,5 +185,93 @@ public class GenerationService {
                 .retrieve()
                 .bodyToMono(Object.class)
                 .block();
+    }
+
+    /**
+     * Updates lesson plan content, review status, and/or title directly without invoking LLM (BE-021).
+     * Enforces teacher authority and workspace ownership.
+     */
+    @Transactional
+    public GenerationResponseDto updateLessonContent(UUID workspaceId, UUID contentId, UUID userId, UpdateLessonContentRequestDto req) {
+        Workspace workspace = workspaceService.findAndAuthorize(workspaceId, userId);
+
+        if (req == null) {
+            throw new IllegalArgumentException("Update request cannot be null");
+        }
+
+        boolean hasContentData = req.getContentData() != null;
+        boolean hasReviewStatus = req.getReviewStatus() != null && !req.getReviewStatus().isBlank();
+        boolean hasTitle = req.getTitle() != null && !req.getTitle().isBlank();
+
+        if (!hasContentData && !hasReviewStatus && !hasTitle) {
+            throw new IllegalArgumentException("Update request must specify at least one field to update (contentData, reviewStatus, title)");
+        }
+
+        if (hasContentData && req.getContentData().isEmpty()) {
+            throw new IllegalArgumentException("contentData cannot be empty");
+        }
+
+        if (hasReviewStatus && !ReviewStatus.isValid(req.getReviewStatus())) {
+            throw new IllegalArgumentException("Invalid review status: " + req.getReviewStatus() + ". Allowed values: DRAFT, REVIEWED, APPROVED");
+        }
+
+        GeneratedContent content = generatedContentRepository.findById(contentId)
+                .orElseThrow(() -> new ResourceNotFoundException("GeneratedContent", contentId));
+
+        if (!workspaceId.equals(content.getWorkspaceId())) {
+            log.warn("Cross-workspace update attempted: content {} belongs to workspace {}, requested for workspace {}",
+                    contentId, content.getWorkspaceId(), workspaceId);
+            throw new ForbiddenException("Cross-workspace content modification is forbidden");
+        }
+
+        if (content.getCreatedBy() != null && !content.getCreatedBy().equals(userId) && !workspace.getOwnerId().equals(userId)) {
+            log.warn("Unauthorized content edit attempted: content {} created by {}, requested by {}",
+                    contentId, content.getCreatedBy(), userId);
+            throw new ForbiddenException("Only the workspace owner or content creator can modify this lesson plan");
+        }
+
+        if (hasContentData) {
+            content.setContentData(req.getContentData());
+        }
+        if (hasReviewStatus) {
+            content.setReviewStatus(req.getReviewStatus().trim().toUpperCase());
+        }
+        if (hasTitle) {
+            content.setTitle(req.getTitle().trim());
+        }
+
+        content = generatedContentRepository.save(content);
+        log.info("Updated generated content {} (reviewStatus={}) in workspace {} by user {}",
+                contentId, content.getReviewStatus(), workspaceId, userId);
+
+        return GenerationResponseDto.fromEntity(content);
+    }
+
+    /**
+     * Retrieves a generated content record by ID, ensuring workspace isolation.
+     */
+    @Transactional(readOnly = true)
+    public GenerationResponseDto getGeneratedContentById(UUID workspaceId, UUID contentId, UUID userId) {
+        workspaceService.findAndAuthorize(workspaceId, userId);
+
+        GeneratedContent content = generatedContentRepository.findById(contentId)
+                .orElseThrow(() -> new ResourceNotFoundException("GeneratedContent", contentId));
+
+        if (!workspaceId.equals(content.getWorkspaceId())) {
+            throw new ForbiddenException("Cross-workspace content access is forbidden");
+        }
+
+        return GenerationResponseDto.fromEntity(content);
+    }
+
+    /**
+     * Lists generation history for a workspace, ordered by newest first.
+     */
+    @Transactional(readOnly = true)
+    public List<GenerationResponseDto> getWorkspaceGenerationHistory(UUID workspaceId, UUID userId) {
+        workspaceService.findAndAuthorize(workspaceId, userId);
+
+        List<GeneratedContent> list = generatedContentRepository.findByWorkspaceIdOrderByCreatedAtDesc(workspaceId);
+        return list.stream().map(GenerationResponseDto::fromEntity).toList();
     }
 }
