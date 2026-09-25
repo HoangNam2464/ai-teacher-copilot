@@ -1110,7 +1110,7 @@ Giáo án được lưu với content_type='LESSON_PLAN', version=1 và liên k�
 - **Sprint:** Sprint 3 - RAG & Lesson
 - **Priority:** High
 - **Assignee Type:** QA Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-303
 
 **Description:**
