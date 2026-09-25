@@ -263,6 +263,55 @@ public class ExportIntegrationTest {
     }
 
     @Test
+    @DisplayName("POST /workspaces/{id}/export/{id}?format=PDF - returns 200 OK with valid PDF binary stream [BE-023]")
+    void testExportPdfPost_Success() throws Exception {
+        ExportRequestDto req = ExportRequestDto.builder()
+                .includeCitations(true)
+                .build();
+
+        MvcResult result = mockMvc.perform(post("/workspaces/{workspaceId}/export/{generationId}",
+                        workspaceA.getId(), lessonContentA.getId())
+                        .header("Authorization", "Bearer " + tokenA)
+                        .param("format", "PDF")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, ExportService.PDF_MIME_TYPE))
+                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, containsString("attachment;")))
+                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, containsString(".pdf")))
+                .andReturn();
+
+        byte[] body = result.getResponse().getContentAsByteArray();
+        assertThat(body).isNotNull();
+        assertThat(body.length).isGreaterThan(1000);
+
+        String pdfHeader = new String(body, 0, Math.min(8, body.length), java.nio.charset.StandardCharsets.US_ASCII);
+        assertThat(pdfHeader).startsWith("%PDF-");
+    }
+
+    @Test
+    @DisplayName("GET /workspaces/{id}/export/{id}?format=PDF - returns 200 OK with valid PDF [BE-023]")
+    void testExportPdfGet_Success() throws Exception {
+        MvcResult result = mockMvc.perform(get("/workspaces/{workspaceId}/export/{generationId}",
+                        workspaceA.getId(), lessonContentA.getId())
+                        .header("Authorization", "Bearer " + tokenA)
+                        .param("format", "PDF")
+                        .param("includeCitations", "true"))
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, ExportService.PDF_MIME_TYPE))
+                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, containsString("attachment;")))
+                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, containsString(".pdf")))
+                .andReturn();
+
+        byte[] body = result.getResponse().getContentAsByteArray();
+        assertThat(body).isNotNull();
+        assertThat(body.length).isGreaterThan(1000);
+
+        String pdfHeader = new String(body, 0, Math.min(8, body.length), java.nio.charset.StandardCharsets.US_ASCII);
+        assertThat(pdfHeader).startsWith("%PDF-");
+    }
+
+    @Test
     @DisplayName("POST /workspaces/{id}/export/{id} - cross-workspace access by unauthorized teacher returns 403 Forbidden")
     void testExportPost_CrossWorkspace_Returns403() throws Exception {
         // Teacher B attempts to export Teacher A's content in Workspace A

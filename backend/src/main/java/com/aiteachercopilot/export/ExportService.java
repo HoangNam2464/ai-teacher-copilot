@@ -35,6 +35,7 @@ public class ExportService {
 
     public static final String DOCX_MIME_TYPE =
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    public static final String PDF_MIME_TYPE = "application/pdf";
 
     private static final DateTimeFormatter TIMESTAMP_FORMATTER =
             DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss").withZone(ZoneId.of("Asia/Ho_Chi_Minh"));
@@ -46,10 +47,11 @@ public class ExportService {
     private final GeneratedContentRepository generatedContentRepository;
     private final CitationService citationService;
     private final DocxLessonExporter docxLessonExporter;
+    private final PdfLessonExporter pdfLessonExporter;
     private final UserRepository userRepository;
 
     /**
-     * Exports a generated document to DOCX format with citation footnotes and professional styling.
+     * Exports a generated document to DOCX or PDF format with citation footnotes and professional styling.
      * Enforces strict workspace multi-tenant authorization.
      */
     @Transactional(readOnly = true)
@@ -74,8 +76,8 @@ public class ExportService {
 
         // 4. Validate export format
         String targetFormat = (format != null && !format.isBlank()) ? format.trim().toUpperCase() : "DOCX";
-        if (!"DOCX".equals(targetFormat)) {
-            throw new IllegalArgumentException("Unsupported export format: " + targetFormat + ". Currently supported: DOCX");
+        if (!"DOCX".equals(targetFormat) && !"PDF".equals(targetFormat)) {
+            throw new IllegalArgumentException("Unsupported export format: " + targetFormat + ". Currently supported: DOCX, PDF");
         }
 
         // 5. Citations resolution
@@ -98,33 +100,48 @@ public class ExportService {
             teacher = userRepository.findById(userId).orElse(null);
         }
 
-        // 7. Determine output file name
-        String fileName = resolveFileName(request, content);
+        // 7. Render document binary based on requested format
+        String extension = targetFormat.toLowerCase();
+        String fileName = resolveFileName(request, content, extension);
+        byte[] exportBytes;
+        String mimeType;
 
-        // 8. Render DOCX binary
-        byte[] docxBytes = docxLessonExporter.exportLessonPlan(
-                content,
-                request != null ? request.getContentData() : null,
-                citations,
-                includeCitations,
-                teacher
-        );
-
-        log.info("Successfully exported lesson plan {} to DOCX ({} bytes) in workspace {}",
-                contentId, docxBytes.length, workspaceId);
+        if ("PDF".equals(targetFormat)) {
+            exportBytes = pdfLessonExporter.exportLessonPlan(
+                    content,
+                    request != null ? request.getContentData() : null,
+                    citations,
+                    includeCitations,
+                    teacher
+            );
+            mimeType = PDF_MIME_TYPE;
+            log.info("Successfully exported lesson plan {} to PDF ({} bytes) in workspace {}",
+                    contentId, exportBytes.length, workspaceId);
+        } else {
+            exportBytes = docxLessonExporter.exportLessonPlan(
+                    content,
+                    request != null ? request.getContentData() : null,
+                    citations,
+                    includeCitations,
+                    teacher
+            );
+            mimeType = DOCX_MIME_TYPE;
+            log.info("Successfully exported lesson plan {} to DOCX ({} bytes) in workspace {}",
+                    contentId, exportBytes.length, workspaceId);
+        }
 
         return ExportResult.builder()
-                .data(docxBytes)
+                .data(exportBytes)
                 .fileName(fileName)
-                .contentType(DOCX_MIME_TYPE)
+                .contentType(mimeType)
                 .build();
     }
 
-    private String resolveFileName(ExportRequestDto request, GeneratedContent content) {
+    private String resolveFileName(ExportRequestDto request, GeneratedContent content, String extension) {
         if (request != null && request.getFileName() != null && !request.getFileName().isBlank()) {
             String clientName = request.getFileName().trim();
-            if (!clientName.toLowerCase().endsWith(".docx")) {
-                clientName += ".docx";
+            if (!clientName.toLowerCase().endsWith("." + extension)) {
+                clientName += "." + extension;
             }
             return sanitizeFileName(clientName);
         }
@@ -142,7 +159,7 @@ public class ExportService {
         }
 
         String timestamp = TIMESTAMP_FORMATTER.format(Instant.now());
-        return String.format("%s_%s_%s.docx", contentTypePrefix, topicSlug, timestamp);
+        return String.format("%s_%s_%s.%s", contentTypePrefix, topicSlug, timestamp, extension);
     }
 
     public static String slugify(String input) {

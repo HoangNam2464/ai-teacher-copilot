@@ -27,7 +27,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ExportServiceTest {
@@ -43,6 +46,9 @@ class ExportServiceTest {
 
     @Mock
     private DocxLessonExporter docxLessonExporter;
+
+    @Mock
+    private PdfLessonExporter pdfLessonExporter;
 
     @Mock
     private UserRepository userRepository;
@@ -177,6 +183,38 @@ class ExportServiceTest {
         // Act & Assert
         assertThatThrownBy(() -> exportService.exportDocument(workspaceId, contentId, userId, "DOCX", null))
                 .isInstanceOf(ResourceNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("Export document to PDF succeeds and delegates to PdfLessonExporter [BE-023]")
+    void shouldExportDocumentToPdfSuccessfully() {
+        // Arrange
+        byte[] fakePdfBytes = new byte[]{37, 80, 68, 70}; // %PDF
+        when(workspaceService.findAndAuthorize(workspaceId, userId)).thenReturn(workspace);
+        when(generatedContentRepository.findById(contentId)).thenReturn(Optional.of(content));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(teacher));
+        when(citationService.resolveByContentId(workspaceId, userId, contentId)).thenReturn(List.of(
+                CitationResolutionDto.builder().fileName("SGK.pdf").build()
+        ));
+        when(pdfLessonExporter.exportLessonPlan(eq(content), any(), any(), eq(true), eq(teacher)))
+                .thenReturn(fakePdfBytes);
+
+        ExportRequestDto request = ExportRequestDto.builder()
+                .includeCitations(true)
+                .build();
+
+        // Act
+        ExportResult result = exportService.exportDocument(workspaceId, contentId, userId, "PDF", request);
+
+        // Assert
+        assertThat(result).isNotNull();
+        assertThat(result.getData()).isEqualTo(fakePdfBytes);
+        assertThat(result.getContentType()).isEqualTo(ExportService.PDF_MIME_TYPE);
+        assertThat(result.getFileName()).startsWith("lesson-plan_tich-vo-huong_");
+        assertThat(result.getFileName()).endsWith(".pdf");
+
+        verify(pdfLessonExporter).exportLessonPlan(eq(content), any(), any(), eq(true), eq(teacher));
+        verify(docxLessonExporter, never()).exportLessonPlan(any(), any(), any(), anyBoolean(), any());
     }
 
     @Test
