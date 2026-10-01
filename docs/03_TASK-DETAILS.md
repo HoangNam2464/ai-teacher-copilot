@@ -1357,7 +1357,7 @@ Tạo file .pdf chuẩn trang in A4, có header/footer và đánh số trang.
 - **Sprint:** Sprint 3 - RAG & Lesson
 - **Priority:** High
 - **Assignee Type:** QA Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-306
 
 **Description:**
@@ -1366,7 +1366,7 @@ Kiểm thử tải và mở file DOCX/PDF trên Microsoft Word và Adobe Acrobat
 **Acceptance Criteria:**
 File mở không bị lỗi format; bảng biểu và trích dẫn hiển thị rõ ràng.
 
-**Deliverable:** Export Quality Test Report
+**Deliverable:** [Export Quality Test Report](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/docs/4.Test_Case/TC_QA-022_DOCX_PDF_Lesson_Export_Formatting_Citations.md)
 
 ---
 
