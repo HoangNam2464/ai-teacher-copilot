@@ -1186,7 +1186,7 @@ Truy vấn trả về đầy đủ metadata nguồn gốc từ bảng document_c
 - **Sprint:** Sprint 3 - RAG & Lesson
 - **Priority:** High
 - **Assignee Type:** QA Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-304
 
 **Description:**
@@ -1195,7 +1195,7 @@ Kiểm thử đối chiếu dữ liệu trích dẫn từ giao diện ngược v
 **Acceptance Criteria:**
 100% trích dẫn trỏ đúng tài liệu và vị trí trang đã tải lên.
 
-**Deliverable:** Citation Traceability Test Report
+**Deliverable:** [Citation Traceability Test Report](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/docs/4.Test_Case/TC_QA-020_Citation_Provenance_Resolution_Page_Chunk.md)
 
 ---
 
