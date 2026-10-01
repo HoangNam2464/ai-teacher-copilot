@@ -958,7 +958,7 @@ Trả về Top-K (5-8) chunks phù hợp nhất; bắt buộc lọc workspace_id
 - **Sprint:** Sprint 3 - RAG & Lesson
 - **Priority:** High
 - **Assignee Type:** QA Engineer
-- **Status:** IN PROGRESS
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-301
 
 **Description:**
@@ -967,7 +967,7 @@ Kiểm thử truy vấn vector bảo đảm không rò rỉ dữ liệu chunk gi
 **Acceptance Criteria:**
 Truy vấn từ Workspace A không bao giờ trả về chunk thuộc Workspace B.
 
-**Deliverable:** Retrieval Isolation Test Report
+**Deliverable:** [TC_QA-017_TopK_Vector_Retrieval_Workspace_Data_Isolation.md](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/docs/4.Test_Case/TC_QA-017_TopK_Vector_Retrieval_Workspace_Data_Isolation.md)
 
 ---
 
