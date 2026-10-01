@@ -920,7 +920,7 @@ Hỗ trợ chuyển đổi qua biến môi trường AI_PROVIDER mà không cầ
 - **Sprint:** Sprint 3 - RAG & Lesson
 - **Priority:** High
 - **Assignee Type:** QA Engineer
-- **Status:** IN PROGRESS
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-207
 
 **Description:**
@@ -929,7 +929,7 @@ Kiểm thử chuyển đổi linh hoạt giữa Gemini và OpenAI; xử lý time
 **Acceptance Criteria:**
 Hệ thống tự động bắt lỗi API provider và trả về mã lỗi nội bộ thích hợp.
 
-**Deliverable:** Provider Test Report
+**Deliverable:** [TC_QA-016_AI_Provider_Switching_API_Error_Fallback.md](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/docs/4.Test_Case/TC_QA-016_AI_Provider_Switching_API_Error_Fallback.md)
 
 ---
 
