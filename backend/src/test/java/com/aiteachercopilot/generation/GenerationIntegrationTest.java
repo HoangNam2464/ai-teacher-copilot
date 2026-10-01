@@ -399,11 +399,128 @@ public class GenerationIntegrationTest {
                 .reviewStatus("DRAFT")
                 .contentData(Map.of("topic", "Test 1"))
                 .build());
-
         mockMvc.perform(get("/workspaces/" + workspaceA.getId() + "/generation/history")
                         .header("Authorization", "Bearer " + tokenA))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success", is(true)))
                 .andExpect(jsonPath("$.data", hasSize(1)));
+    }
+
+    @Test
+    @DisplayName("PUT /workspaces/{workspaceId}/generation/{id} transitions review status DRAFT -> REVIEWED -> APPROVED [QA-021]")
+    void shouldTransitionReviewStatusDraftToReviewedToApproved() throws Exception {
+        GeneratedContent content = generatedContentRepository.save(GeneratedContent.builder()
+                .workspaceId(workspaceA.getId())
+                .createdBy(teacherA.getId())
+                .title("Giáo án Chu trình Sinh học")
+                .contentType("LESSON_PLAN")
+                .reviewStatus("DRAFT")
+                .contentData(Map.of("topic", "Quang hợp"))
+                .build());
+
+        // 1. Transition DRAFT -> REVIEWED
+        UpdateLessonContentRequestDto toReviewed = UpdateLessonContentRequestDto.builder()
+                .reviewStatus("REVIEWED")
+                .build();
+
+        mockMvc.perform(put("/workspaces/" + workspaceA.getId() + "/generation/" + content.getId())
+                        .header("Authorization", "Bearer " + tokenA)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(toReviewed)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.reviewStatus", is("REVIEWED")));
+
+        // 2. Transition REVIEWED -> APPROVED
+        UpdateLessonContentRequestDto toApproved = UpdateLessonContentRequestDto.builder()
+                .reviewStatus("APPROVED")
+                .build();
+
+        mockMvc.perform(put("/workspaces/" + workspaceA.getId() + "/generation/" + content.getId())
+                        .header("Authorization", "Bearer " + tokenA)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(toApproved)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.reviewStatus", is("APPROVED")));
+
+        GeneratedContent finalEntity = generatedContentRepository.findById(content.getId()).orElseThrow();
+        assertThat(finalEntity.getReviewStatus()).isEqualTo("APPROVED");
+    }
+
+    @Test
+    @DisplayName("PUT /workspaces/{workspaceId}/generation/{id} auto-saves complex contentData without data loss [QA-021]")
+    void shouldAutoSaveContentDataWithoutDataLoss() throws Exception {
+        GeneratedContent content = generatedContentRepository.save(GeneratedContent.builder()
+                .workspaceId(workspaceA.getId())
+                .createdBy(teacherA.getId())
+                .title("Giáo án Khảo sát Hàm số 12")
+                .contentType("LESSON_PLAN")
+                .reviewStatus("DRAFT")
+                .contentData(Map.of("topic", "Ban đầu"))
+                .build());
+
+        Map<String, Object> complexAutoSaveData = Map.of(
+                "title", "Giáo án Khảo sát Hàm số Bậc Ba Nâng Cao",
+                "duration_minutes", 45,
+                "objectives", List.of("Hiểu tính đơn điệu", "Vẽ đồ thị chính xác"),
+                "materials_needed", List.of("Thước kẻ", "Máy tính cầm tay"),
+                "sections", List.of(
+                        Map.of("title", "Khởi động", "duration_minutes", 10, "content", "Nhắc lại lý thuyết"),
+                        Map.of("title", "Khám phá", "duration_minutes", 20, "content", "Lập bảng biến thiên"),
+                        Map.of("title", "Luyện tập", "duration_minutes", 15, "content", "Bài tập củng cố")
+                )
+        );
+
+        UpdateLessonContentRequestDto autoSaveDto = UpdateLessonContentRequestDto.builder()
+                .contentData(complexAutoSaveData)
+                .build();
+
+        mockMvc.perform(put("/workspaces/" + workspaceA.getId() + "/generation/" + content.getId())
+                        .header("Authorization", "Bearer " + tokenA)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(autoSaveDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.data.contentData.title", is("Giáo án Khảo sát Hàm số Bậc Ba Nâng Cao")))
+                .andExpect(jsonPath("$.data.contentData.duration_minutes", is(45)))
+                .andExpect(jsonPath("$.data.contentData.objectives", hasSize(2)))
+                .andExpect(jsonPath("$.data.contentData.sections", hasSize(3)));
+
+        GeneratedContent saved = generatedContentRepository.findById(content.getId()).orElseThrow();
+        assertThat(saved.getContentData()).containsEntry("title", "Giáo án Khảo sát Hàm số Bậc Ba Nâng Cao");
+        assertThat(saved.getContentData()).containsEntry("duration_minutes", 45);
+        assertThat(saved.getReviewStatus()).isEqualTo("DRAFT"); // Status preserved
+    }
+
+    @Test
+    @DisplayName("PUT /workspaces/{workspaceId}/generation/{id} rejects cross-workspace update with 403 Forbidden [QA-021]")
+    void shouldRejectCrossWorkspaceContentUpdateWithForbidden() throws Exception {
+        GeneratedContent contentInA = generatedContentRepository.save(GeneratedContent.builder()
+                .workspaceId(workspaceA.getId())
+                .createdBy(teacherA.getId())
+                .title("Giáo án thuộc Không gian A")
+                .contentType("LESSON_PLAN")
+                .reviewStatus("DRAFT")
+                .contentData(Map.of("topic", "Nội dung Không gian A"))
+                .build());
+
+        UpdateLessonContentRequestDto updateDto = UpdateLessonContentRequestDto.builder()
+                .title("Cố ý sửa từ Không gian B")
+                .build();
+
+        Workspace workspaceB = workspaceRepository.save(Workspace.builder()
+                .name("Toán 11 KNTT")
+                .ownerId(teacherB.getId())
+                .subject("Toán")
+                .gradeLevel("11")
+                .build());
+
+        // Attempting to update contentInA via workspaceB URL with teacherB's token
+        mockMvc.perform(put("/workspaces/" + workspaceB.getId() + "/generation/" + contentInA.getId())
+                        .header("Authorization", "Bearer " + tokenB)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateDto)))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.success", is(false)))
+                .andExpect(jsonPath("$.error", containsString("Cross-workspace content modification is forbidden")));
     }
 }

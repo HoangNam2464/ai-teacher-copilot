@@ -1262,7 +1262,7 @@ Cập nhật thành công nội dung bài giảng và chuyển trạng thái DRA
 - **Sprint:** Sprint 3 - RAG & Lesson
 - **Priority:** High
 - **Assignee Type:** QA Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-304
 
 **Description:**
@@ -1271,7 +1271,7 @@ Kiểm thử lưu nội dung chỉnh sửa, cập nhật trạng thái và bảo
 **Acceptance Criteria:**
 Dữ liệu chỉnh sửa được lưu chính xác vào DB mà không làm hỏng cấu trúc schema.
 
-**Deliverable:** Review Edit Test Report
+**Deliverable:** [Review Edit Test Report](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/docs/4.Test_Case/TC_QA-021_Inline_Content_Editing_Review_Status_Transitions.md)
 
 ---
 
