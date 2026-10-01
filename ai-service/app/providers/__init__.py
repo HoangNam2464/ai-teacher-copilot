@@ -15,6 +15,7 @@ from app.providers.factory import (
 from app.providers.gemini_provider import GeminiProvider
 from app.providers.openai_provider import OpenAIProvider
 from app.providers.mock_provider import MockAIProvider
+from app.providers.fallback_provider import FallbackAIProvider
 
 __all__ = [
     "BaseAIProvider",
@@ -25,6 +26,7 @@ __all__ = [
     "GeminiProvider",
     "OpenAIProvider",
     "MockAIProvider",
+    "FallbackAIProvider",
     "AIProviderError",
     "AuthenticationError",
     "RateLimitError",

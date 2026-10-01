@@ -29,6 +29,7 @@ class Settings(BaseSettings):
 
     # --- AI Providers ---
     AI_PROVIDER: str = "gemini"
+    AI_FALLBACK_PROVIDER: str = ""
     OPENAI_API_KEY: str = ""
     GEMINI_API_KEY: str = ""
     GEMINI_MODEL: str = "gemini-1.5-flash"

@@ -4,6 +4,7 @@ from app.providers.base import BaseAIProvider
 from app.providers.gemini_provider import GeminiProvider
 from app.providers.openai_provider import OpenAIProvider
 from app.providers.mock_provider import MockAIProvider
+from app.providers.fallback_provider import FallbackAIProvider
 
 class UnsupportedProviderError(ValueError):
     """Raised when an unrecognized AI provider is requested."""
@@ -74,6 +75,22 @@ class AIProviderFactory:
         self._instances[target] = instance
         return instance
 
+    def create_fallback_provider(
+        self,
+        primary_name: Optional[str] = None,
+        fallback_name: Optional[str] = None,
+    ) -> FallbackAIProvider:
+        """
+        Create a FallbackAIProvider combining a primary and secondary provider.
+        Enables transparent error fallback if the primary provider encounters an AIProviderError.
+        """
+        primary = self.resolve(primary_name or settings.AI_PROVIDER)
+        fb_target = fallback_name or getattr(settings, "AI_FALLBACK_PROVIDER", None)
+        if not fb_target:
+            fb_target = "openai" if (primary_name or settings.AI_PROVIDER).lower() == "gemini" else "gemini"
+        fallback = self.resolve(fb_target)
+        return FallbackAIProvider(primary=primary, fallback=fallback)
+
     def list_supported_providers(self) -> List[str]:
         """Return list of all registered provider names."""
         return list(self._registry.keys())
@@ -88,6 +105,12 @@ provider_factory = AIProviderFactory()
 def get_ai_provider(provider_name: Optional[str] = None) -> BaseAIProvider:
     """
     Convenience resolver function for services, ingestion, retrieval, and route handlers.
-    Resolves provider from config or explicit parameter.
+    Resolves provider from config or explicit parameter. If AI_FALLBACK_PROVIDER is set
+    and no explicit provider is requested, automatically returns a FallbackAIProvider.
     """
+    if provider_name is None and getattr(settings, "AI_FALLBACK_PROVIDER", "").strip():
+        return provider_factory.create_fallback_provider(
+            primary_name=settings.AI_PROVIDER,
+            fallback_name=settings.AI_FALLBACK_PROVIDER.strip(),
+        )
     return provider_factory.resolve(provider_name)
