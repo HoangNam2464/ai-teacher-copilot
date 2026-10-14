@@ -94,4 +94,29 @@ public class GenerationController {
                 workspaceId, user.getId());
         return ResponseEntity.ok(ApiResponse.success(history));
     }
+
+    @PostMapping("/{id}/regenerate")
+    public ResponseEntity<ApiResponse<GenerationResponseDto>> regenerateContent(
+            @AuthenticationPrincipal User user,
+            @PathVariable UUID workspaceId,
+            @PathVariable UUID id,
+            @RequestBody(required = false) RegenerateRequestDto request) {
+
+        String instructions = request != null ? request.getInstructions() : null;
+        GenerationResponseDto result = generationService.regenerateContent(
+                workspaceId, id, user.getId(), instructions);
+        return ResponseEntity.status(org.springframework.http.HttpStatus.CREATED)
+                .body(ApiResponse.success(result));
+    }
+
+    @GetMapping("/{id}/versions")
+    public ResponseEntity<ApiResponse<List<GenerationResponseDto>>> getContentVersions(
+            @AuthenticationPrincipal User user,
+            @PathVariable UUID workspaceId,
+            @PathVariable UUID id) {
+
+        List<GenerationResponseDto> versions = generationService.getContentVersions(
+                workspaceId, id, user.getId());
+        return ResponseEntity.ok(ApiResponse.success(versions));
+    }
 }

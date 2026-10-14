@@ -12,6 +12,8 @@ import { BloomFilterBar } from '@/components/quiz/BloomFilterBar';
 import { CitationBadge } from '@/components/citation/CitationBadge';
 import { CitationDrawer } from '@/components/citation/CitationDrawer';
 import { ExportDropdown } from '@/components/export/ExportDropdown';
+import { RegenerationModal } from '@/components/generation/RegenerationModal';
+import { VersionSelector } from '@/components/generation/VersionSelector';
 import { PATHS } from '@/routes/paths';
 import {
   FileQuestion,
@@ -44,6 +46,12 @@ export function QuizGeneratorPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [result, setResult] = useState(null);
+
+  // Versioning & Regeneration State (FE-016 / ATC-403)
+  const [versions, setVersions] = useState([]);
+  const [currentVersion, setCurrentVersion] = useState(1);
+  const [isRegenerateModalOpen, setIsRegenerateModalOpen] = useState(false);
+  const [isRegenerating, setIsRegenerating] = useState(false);
 
   // Bloom's Taxonomy filter state: 'ALL' or a normalized Bloom level ('remember', 'understand', etc.)
   const [bloomFilter, setBloomFilter] = useState('ALL');
@@ -92,6 +100,19 @@ export function QuizGeneratorPage() {
       const quizData = res?.data?.data || res?.data || res;
       setResult(quizData);
       setBloomFilter('ALL');
+
+      // Initialize version history with v1 (FE-016)
+      const initialVer = Number(quizData?.version) || 1;
+      const initialEntry = {
+        id: quizData?.id || 'v1',
+        version: initialVer,
+        data: quizData,
+        instructions: instructions.trim() || '',
+        createdAt: quizData?.createdAt || new Date().toISOString(),
+      };
+      setVersions([initialEntry]);
+      setCurrentVersion(initialVer);
+
       toast.success(t('common.success', 'Đã tạo bộ câu hỏi kiểm tra thành công!'));
     } catch (err) {
       console.error('Quiz generation failed:', err);
@@ -112,11 +133,102 @@ export function QuizGeneratorPage() {
     }
   };
 
+  // Switch between existing versions without mutating or losing history
+  const handleSelectVersion = (versionObj) => {
+    if (!versionObj) return;
+    setCurrentVersion(versionObj.version);
+    setResult(versionObj.data);
+    setBloomFilter('ALL');
+  };
+
+  // Trigger instruction-based refinement and create a new versioned entry
+  const handleRegenerate = async (refinementInstructions) => {
+    if (!activeWorkspace?.id) return;
+
+    try {
+      setIsRegenerating(true);
+      let newResult = null;
+
+      // Call backend regenerate endpoint if an existing content ID is present
+      if (result?.id) {
+        try {
+          const res = await quizApi.regenerateQuiz(activeWorkspace.id, result.id, {
+            instructions: refinementInstructions,
+          });
+          newResult = res?.data?.data || res?.data || res;
+        } catch (apiErr) {
+          console.warn('Backend regenerate endpoint error, falling back to generateQuiz:', apiErr);
+        }
+      }
+
+      // Fallback: generate new quiz with combined refinement instructions
+      if (!newResult) {
+        const combined = [instructions, refinementInstructions].filter(Boolean).join('. ');
+        const payload = {
+          subject: subject.trim() || activeWorkspace.subject || t('common.defaultSubject', 'Toán học'),
+          gradeLevel: gradeLevel.trim() || activeWorkspace.gradeLevel || t('common.defaultGrade', 'Lớp 10'),
+          topic: topic.trim(),
+          numQuestions: Number(questionCount),
+          questionCount: Number(questionCount),
+          difficulty,
+          targetBloomLevel,
+          instructions: combined,
+        };
+        const res = await quizApi.generateQuiz(activeWorkspace.id, payload);
+        newResult = res?.data?.data || res?.data || res;
+      }
+
+      const nextVerNum = (Number(currentVersion) || versions.length || 1) + 1;
+      const versionedResult = {
+        ...newResult,
+        version: newResult?.version || nextVerNum,
+      };
+
+      const newVersionEntry = {
+        id: versionedResult?.id || `v${nextVerNum}`,
+        version: nextVerNum,
+        data: versionedResult,
+        instructions: refinementInstructions,
+        createdAt: versionedResult?.createdAt || new Date().toISOString(),
+      };
+
+      setVersions((prev) => [...prev, newVersionEntry]);
+      setCurrentVersion(nextVerNum);
+      setResult(versionedResult);
+      setBloomFilter('ALL');
+      setIsRegenerateModalOpen(false);
+      toast.success(
+        t('generation.regenerateSuccess', `Đã tạo thành công phiên bản v${nextVerNum}!`, { version: nextVerNum })
+      );
+    } catch (err) {
+      console.error('Quiz regeneration failed:', err);
+      toast.error(
+        err.response?.data?.message ||
+          t('generation.regenerateFailed', 'Tạo lại nội dung thất bại. Vui lòng thử lại.')
+      );
+    } finally {
+      setIsRegenerating(false);
+    }
+  };
+
   // Resolve actual quiz object safely
-  const quiz =
-    result?.questions ? result :
-    result?.data?.questions ? result.data :
-    result?.contentData || result?.quiz;
+  const quiz = useMemo(() => {
+    if (!result) return null;
+    let data = result;
+    if (typeof data.contentData === 'string') {
+      try {
+        data = { ...data, contentData: JSON.parse(data.contentData) };
+      } catch (e) {
+        // ignore parse error
+      }
+    }
+    return (
+      data.questions ? data :
+      data.data?.questions ? data.data :
+      data.contentData?.questions ? data.contentData :
+      data.contentData || data.quiz
+    );
+  }, [result]);
 
   // Stable normalized list with original question indices
   const allQuestions = useMemo(() => {
@@ -363,7 +475,7 @@ export function QuizGeneratorPage() {
           <div className="h-fit">
             <Card className="overflow-hidden border-orange-500/20 shadow-md shadow-orange-500/5">
               <CardHeader className="bg-orange-50/60 dark:bg-orange-950/20 border-b border-border pb-4">
-                <div className="flex justify-between items-start gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                   <div className="space-y-1">
                     <CardTitle className="text-xl text-orange-800 dark:text-orange-400 font-bold">
                       {quiz.title || topic}
@@ -374,11 +486,19 @@ export function QuizGeneratorPage() {
                       <span>{t('quizGenerator.difficulty', 'Độ khó')}: <strong className="text-foreground">{difficulty}</strong></span>
                     </p>
                   </div>
-                  <ExportDropdown
-                    workspaceId={activeWorkspace?.id}
-                    generationId={result.id || 'current'}
-                    defaultFileName={`de-thi-${topic || 'trac-nghiem'}`}
-                  />
+                  <div className="flex items-center gap-2 flex-wrap shrink-0">
+                    <VersionSelector
+                      versions={versions}
+                      currentVersion={currentVersion}
+                      onSelectVersion={handleSelectVersion}
+                      onOpenRegenerate={() => setIsRegenerateModalOpen(true)}
+                    />
+                    <ExportDropdown
+                      workspaceId={activeWorkspace?.id}
+                      generationId={result.id || 'current'}
+                      defaultFileName={`de-thi-${topic || 'trac-nghiem'}-v${currentVersion}`}
+                    />
+                  </div>
                 </div>
               </CardHeader>
 
@@ -567,6 +687,15 @@ export function QuizGeneratorPage() {
           </div>
         )}
       </div>
+
+      <RegenerationModal
+        isOpen={isRegenerateModalOpen}
+        onClose={() => setIsRegenerateModalOpen(false)}
+        onRegenerate={handleRegenerate}
+        currentVersion={currentVersion}
+        contentType="QUIZ"
+        isLoading={isRegenerating}
+      />
     </div>
   );
 }
