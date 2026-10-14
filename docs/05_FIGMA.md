@@ -7,7 +7,7 @@
 - **ATC-202** ➔ **[DES-003] Design Teacher Login Screen in Figma** | Deliverable: *Figma Login Screen* — Status: *DONE*
 - **ATC-204** ➔ **[DES-004] Design Workspace Dashboard and Creation Modal in Figma** | Deliverable: *Figma Workspace Screens* — Status: *DONE*
 - **ATC-205** ➔ **[DES-005] Design Document Upload Drag-and-Drop and File List in Figma** | Deliverable: *Figma Document Screens* — Status: *DONE*
-- **ATC-304** ➔ **[DES-006] Design Lesson Planner Input Form and Output View in Figma** | Deliverable: *Figma Lesson Planner Screens* — Status: *TO DO*
+- **ATC-304** ➔ **[DES-006] Design Lesson Planner Input Form and Output View in Figma** | Deliverable: *Figma Lesson Planner Screens* — Status: *DONE*
 - **ATC-305** ➔ **[DES-007] Design Citation Badges, Tooltips and Source Drawer in Figma** | Deliverable: *Figma Citation Components* — Status: *TO DO*
 - **ATC-306** ➔ **[DES-008] Design Lesson Plan Inline Editor and Review Status in Figma** | Deliverable: *Figma Inline Review Screen* — Status: *TO DO*
 - **ATC-307** ➔ **[DES-009] Design Document Export Modal and Layout Options in Figma** | Deliverable: *Figma Export Modal* — Status: *TO DO*

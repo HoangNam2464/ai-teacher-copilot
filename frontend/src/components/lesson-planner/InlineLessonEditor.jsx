@@ -21,6 +21,7 @@ import {
   Target,
   Package,
   Layers,
+  ClipboardCheck,
   FileCheck,
 } from 'lucide-react';
 
@@ -126,6 +127,12 @@ export function InlineLessonEditor({
   const handleRemoveSection = (index) => {
     const next = sectionsList.filter((_, i) => i !== index);
     updateField('sections', next);
+  };
+
+  // Assessment & Self-study handler
+  const assessmentText = plan.assessment || plan.evaluation || '';
+  const handleAssessmentChange = (value) => {
+    updateField('assessment', value);
   };
 
   // Format last saved time
@@ -592,6 +599,42 @@ export function InlineLessonEditor({
                   </Button>
                 )}
               </div>
+            )}
+          </div>
+        </div>
+
+        {/* 4. Assessment & Self-Study Guidance */}
+        <div>
+          <div className="flex items-center justify-between mb-2.5">
+            <h4 className="text-sm font-semibold flex items-center gap-2 text-foreground">
+              <ClipboardCheck className="w-4 h-4 text-emerald-600" />
+              <span>{t('lessonPlanner.assessmentTitle', 'Phương án đánh giá & Hướng dẫn tự học')}</span>
+            </h4>
+          </div>
+
+          <div className="p-3.5 rounded-xl bg-muted/30 border border-border">
+            {isEditMode ? (
+              <textarea
+                rows={3}
+                value={assessmentText}
+                onChange={(e) => handleAssessmentChange(e.target.value)}
+                placeholder={t(
+                  'lessonPlanner.assessmentPlaceholder',
+                  'Đánh giá thường xuyên qua quan sát, phiếu học tập hoặc hướng dẫn tự học ở nhà...'
+                )}
+                className="w-full text-xs sm:text-sm bg-background border border-border rounded-md p-3 focus:outline-none focus:ring-1 focus:ring-emerald-500 leading-relaxed font-sans"
+              />
+            ) : (
+              <p className="text-xs sm:text-sm text-foreground/90 whitespace-pre-line leading-relaxed">
+                {assessmentText || (
+                  <span className="italic text-muted-foreground">
+                    {t(
+                      'lessonPlanner.defaultAssessment',
+                      'Đánh giá thường xuyên qua sự tích cực tham gia thảo luận; Đánh giá kết quả qua sản phẩm phiếu học tập và câu hỏi củng cố cuối giờ.'
+                    )}
+                  </span>
+                )}
+              </p>
             )}
           </div>
         </div>

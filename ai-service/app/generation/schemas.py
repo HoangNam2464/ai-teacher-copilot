@@ -49,6 +49,10 @@ class LessonPlanSchema(BaseModel):
         default_factory=list,
         description="List of required equipment, textbooks, or instructional materials",
     )
+    assessment: Optional[str] = Field(
+        default=None,
+        description="Assessment methods, criteria, or self-study instructions",
+    )
     source_chunk_ids: List[str] = Field(
         default_factory=list,
         description="Provenance chunk IDs from pgvector used to ground this lesson plan",

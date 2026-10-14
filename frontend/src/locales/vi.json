@@ -4428,6 +4428,9 @@
     "reset": "Soạn bài mới",
     "stepAnalyzing": "Đang tra cứu tài liệu bài học...",
     "stepFormulating": "Đang xây dựng mục tiêu và tiến trình các hoạt động...",
+    "assessmentTitle": "Phương án đánh giá & Hướng dẫn tự học",
+    "assessmentPlaceholder": "Đánh giá thường xuyên qua quan sát, phiếu học tập hoặc hướng dẫn tự học ở nhà...",
+    "defaultAssessment": "Đánh giá thường xuyên qua sự tích cực tham gia thảo luận; Đánh giá kết quả qua sản phẩm phiếu học tập và câu hỏi củng cố cuối giờ.",
     "groundingNotice": "Nội dung bài dạy được đối chiếu từ tài liệu học tập trong không gian làm việc"
   },
   "quizGenerator": {
