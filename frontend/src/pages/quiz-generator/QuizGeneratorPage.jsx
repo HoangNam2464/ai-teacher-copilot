@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
@@ -7,7 +7,8 @@ import { useWorkspaceStore } from '@/stores/workspaceStore';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Spinner } from '@/components/ui/Spinner';
-import { BloomTaxonomyTag } from '@/components/ui/BloomTaxonomyTag';
+import { BloomTaxonomyTag, normalizeBloomLevel } from '@/components/ui/BloomTaxonomyTag';
+import { BloomFilterBar } from '@/components/quiz/BloomFilterBar';
 import { CitationBadge } from '@/components/citation/CitationBadge';
 import { CitationDrawer } from '@/components/citation/CitationDrawer';
 import { ExportDropdown } from '@/components/export/ExportDropdown';
@@ -24,6 +25,8 @@ import {
   Layers,
   Target,
   HelpCircle,
+  Filter,
+  RotateCcw,
 } from 'lucide-react';
 import { APP_CONFIG } from '@/config/appConfig';
 
@@ -41,6 +44,9 @@ export function QuizGeneratorPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [result, setResult] = useState(null);
+
+  // Bloom's Taxonomy filter state: 'ALL' or a normalized Bloom level ('remember', 'understand', etc.)
+  const [bloomFilter, setBloomFilter] = useState('ALL');
 
   // Citation Drawer State
   const [isCitationOpen, setIsCitationOpen] = useState(false);
@@ -85,6 +91,7 @@ export function QuizGeneratorPage() {
       const res = await quizApi.generateQuiz(activeWorkspace.id, payload);
       const quizData = res?.data?.data || res?.data || res;
       setResult(quizData);
+      setBloomFilter('ALL');
       toast.success(t('common.success', 'Đã tạo bộ câu hỏi kiểm tra thành công!'));
     } catch (err) {
       console.error('Quiz generation failed:', err);
@@ -110,6 +117,26 @@ export function QuizGeneratorPage() {
     result?.questions ? result :
     result?.data?.questions ? result.data :
     result?.contentData || result?.quiz;
+
+  // Stable normalized list with original question indices
+  const allQuestions = useMemo(() => {
+    const raw = quiz?.questions || [];
+    return raw.map((q, idx) => ({
+      ...q,
+      originalIndex: q.question_number || idx + 1,
+    }));
+  }, [quiz?.questions]);
+
+  // Derived filtered question list according to selected Bloom's level
+  const filteredQuestions = useMemo(() => {
+    if (bloomFilter === 'ALL') {
+      return allQuestions;
+    }
+    return allQuestions.filter((q) => {
+      const norm = normalizeBloomLevel(q?.bloom_taxonomy_level);
+      return norm === bloomFilter;
+    });
+  }, [allQuestions, bloomFilter]);
 
   // Initial loading spinner
   if (isWorkspaceLoading && !isInitialized) {
@@ -355,120 +382,165 @@ export function QuizGeneratorPage() {
                 </div>
               </CardHeader>
 
-              <CardContent className="p-6 overflow-y-auto max-h-[calc(100vh-16rem)] space-y-6">
-                {quiz.questions?.map((q, i) => {
-                  const correctIdx = q.correct_answer_index;
-                  const correctText =
-                    q.correct_answer ||
-                    q.correctAnswer ||
-                    (correctIdx !== undefined && q.options?.[correctIdx]
-                      ? `${optionLabels[correctIdx] || ''}. ${q.options[correctIdx]}`
-                      : '');
+              <CardContent className="p-6 overflow-y-auto max-h-[calc(100vh-16rem)] space-y-5">
+                {/* Bloom's Taxonomy Filter Bar */}
+                <BloomFilterBar
+                  questions={allQuestions}
+                  selectedFilter={bloomFilter}
+                  onSelectFilter={(newFilter) => setBloomFilter(newFilter)}
+                />
 
-                  return (
-                    <div
-                      key={i}
-                      className="p-5 rounded-xl bg-card border border-border/80 shadow-xs hover:border-orange-500/30 transition-all"
+                {filteredQuestions.length === 0 ? (
+                  <div className="py-12 px-4 text-center rounded-xl border border-dashed border-border bg-muted/20">
+                    <div className="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center mx-auto mb-3 text-orange-500">
+                      <Filter className="w-6 h-6" />
+                    </div>
+                    <h4 className="text-sm font-semibold text-foreground mb-1">
+                      {t('quizGenerator.filterEmptyTitle', 'Không có câu hỏi nào thuộc cấp độ này')}
+                    </h4>
+                    <p className="text-xs text-muted-foreground max-w-sm mx-auto mb-4">
+                      {t(
+                        'quizGenerator.filterEmptyDesc',
+                        'Thử chọn một cấp độ Bloom khác hoặc hiển thị lại toàn bộ câu hỏi.'
+                      )}
+                    </p>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setBloomFilter('ALL')}
+                      className="gap-1.5 text-xs border-orange-500/30 hover:bg-orange-50 dark:hover:bg-orange-950/20"
                     >
-                      {/* Question Header */}
-                      <div className="flex justify-between items-start mb-4 gap-3">
-                        <div className="flex items-start gap-2.5 flex-1">
-                          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-orange-100 text-orange-800 dark:bg-orange-950/60 dark:text-orange-300 text-xs font-bold shrink-0 mt-0.5">
-                            {q.question_number || i + 1}
-                          </span>
-                          <span className="text-sm font-semibold leading-relaxed text-foreground">
-                            {q.question_text || q.question}
-                          </span>
-                        </div>
-                        <div className="flex gap-2 flex-wrap justify-end shrink-0">
-                          {q.bloom_taxonomy_level && (
-                            <BloomTaxonomyTag level={q.bloom_taxonomy_level} />
-                          )}
-                          <CitationBadge
-                            count={q.source_chunk_ids?.length || 1}
-                            onClick={() => {
-                              setActiveCitations(
-                                q.source_chunk_ids?.map((id, idx) => ({
-                                  chunkId: String(id || idx),
-                                  fileName: `${activeWorkspace?.name || 'Tài liệu bài học'} (Mục ${idx + 1})`,
-                                  sourcePage: idx + 1,
-                                  excerpt: `Trích đoạn tham khảo phục vụ biên soạn câu hỏi #${i + 1}`,
-                                })) || [
-                                  {
-                                    chunkId: '1',
-                                    fileName: activeWorkspace?.name || 'Tài liệu học liệu',
-                                    sourcePage: 1,
-                                    excerpt: 'Trích đoạn tham khảo từ tài liệu bài học trong không gian làm việc.',
-                                  },
-                                ]
-                              );
-                              setIsCitationOpen(true);
-                            }}
-                          />
-                        </div>
-                      </div>
+                      <RotateCcw className="w-3.5 h-3.5 text-orange-500" />
+                      {t('quizGenerator.showAllQuestions', 'Xem tất cả câu hỏi')}
+                    </Button>
+                  </div>
+                ) : (
+                  filteredQuestions.map((q, i) => {
+                    const correctIdx = q.correct_answer_index;
+                    const correctText =
+                      q.correct_answer ||
+                      q.correctAnswer ||
+                      (correctIdx !== undefined && q.options?.[correctIdx]
+                        ? `${optionLabels[correctIdx] || ''}. ${q.options[correctIdx]}`
+                        : '');
 
-                      {/* Options Grid */}
-                      {q.options && Array.isArray(q.options) && (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-4">
-                          {q.options.map((opt, optIndex) => {
-                            const isCorrect =
-                              optIndex === correctIdx ||
-                              opt === q.correct_answer ||
-                              opt === q.correctAnswer;
-                            const label = optionLabels[optIndex] || String.fromCharCode(65 + optIndex);
-                            const text = typeof opt === 'string' ? opt : opt?.text || opt?.label;
+                    const qNum = q.originalIndex || q.question_number || i + 1;
+                    const isLevelActive = bloomFilter === normalizeBloomLevel(q.bloom_taxonomy_level);
 
-                            return (
-                              <div
-                                key={optIndex}
-                                className={`p-3 rounded-lg border text-xs flex items-start gap-2.5 transition-all ${
-                                  isCorrect
-                                    ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-950 dark:text-emerald-200 font-medium'
-                                    : 'bg-muted/20 border-border text-foreground'
-                                }`}
-                              >
-                                <span
-                                  className={`w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${
+                    return (
+                      <div
+                        key={q.id || qNum}
+                        className="p-5 rounded-xl bg-card border border-border/80 shadow-xs hover:border-orange-500/30 transition-all"
+                      >
+                        {/* Question Header */}
+                        <div className="flex justify-between items-start mb-4 gap-3">
+                          <div className="flex items-start gap-2.5 flex-1">
+                            <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-orange-100 text-orange-800 dark:bg-orange-950/60 dark:text-orange-300 text-xs font-bold shrink-0 mt-0.5">
+                              {qNum}
+                            </span>
+                            <span className="text-sm font-semibold leading-relaxed text-foreground">
+                              {q.question_text || q.question}
+                            </span>
+                          </div>
+                          <div className="flex gap-2 flex-wrap justify-end shrink-0">
+                            {q.bloom_taxonomy_level && (
+                              <BloomTaxonomyTag
+                                level={q.bloom_taxonomy_level}
+                                interactive={true}
+                                active={isLevelActive}
+                                onClick={() => {
+                                  const norm = normalizeBloomLevel(q.bloom_taxonomy_level);
+                                  setBloomFilter((prev) => (prev === norm ? 'ALL' : norm));
+                                }}
+                              />
+                            )}
+                            <CitationBadge
+                              count={q.source_chunk_ids?.length || 1}
+                              onClick={() => {
+                                setActiveCitations(
+                                  q.source_chunk_ids?.map((id, idx) => ({
+                                    chunkId: String(id || idx),
+                                    fileName: `${activeWorkspace?.name || 'Tài liệu bài học'} (Mục ${idx + 1})`,
+                                    sourcePage: idx + 1,
+                                    excerpt: `Trích đoạn tham khảo phục vụ biên soạn câu hỏi #${qNum}`,
+                                  })) || [
+                                    {
+                                      chunkId: '1',
+                                      fileName: activeWorkspace?.name || 'Tài liệu học liệu',
+                                      sourcePage: 1,
+                                      excerpt: 'Trích đoạn tham khảo từ tài liệu bài học trong không gian làm việc.',
+                                    },
+                                  ]
+                                );
+                                setIsCitationOpen(true);
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Options Grid */}
+                        {q.options && Array.isArray(q.options) && (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-4">
+                            {q.options.map((opt, optIndex) => {
+                              const isCorrect =
+                                optIndex === correctIdx ||
+                                opt === q.correct_answer ||
+                                opt === q.correctAnswer;
+                              const label = optionLabels[optIndex] || String.fromCharCode(65 + optIndex);
+                              const text = typeof opt === 'string' ? opt : opt?.text || opt?.label;
+
+                              return (
+                                <div
+                                  key={optIndex}
+                                  className={`p-3 rounded-lg border text-xs flex items-start gap-2.5 transition-all ${
                                     isCorrect
-                                      ? 'bg-emerald-600 text-white'
-                                      : 'bg-muted text-muted-foreground'
+                                      ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-950 dark:text-emerald-200 font-medium'
+                                      : 'bg-muted/20 border-border text-foreground'
                                   }`}
                                 >
-                                  {label}
-                                </span>
-                                <span className="leading-relaxed mt-0.5">{text}</span>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
+                                  <span
+                                    className={`w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${
+                                      isCorrect
+                                        ? 'bg-emerald-600 text-white'
+                                        : 'bg-muted text-muted-foreground'
+                                    }`}
+                                  >
+                                    {label}
+                                  </span>
+                                  <span className="leading-relaxed mt-0.5">{text}</span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
 
-                      {/* Explanation & Answer Key */}
-                      <div className="pt-3 border-t border-dashed border-border/80 text-xs space-y-2">
-                        {correctText && (
-                          <div className="text-emerald-700 dark:text-emerald-400 font-semibold flex items-center gap-1.5">
-                            <CheckCircle2 className="w-4 h-4 shrink-0" />
-                            <span>
-                              {t('quizGenerator.correctAnswer', 'Đáp án đúng')}: {correctText}
-                            </span>
-                          </div>
-                        )}
-                        {q.explanation && (
-                          <div className="text-muted-foreground flex items-start gap-1.5 leading-relaxed bg-muted/30 p-2.5 rounded-lg border border-border/40">
-                            <Lightbulb className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                            <span>
-                              <strong className="text-foreground font-medium">
-                                {t('quizGenerator.explanation', 'Lời giải chi tiết')}:
-                              </strong>{' '}
-                              {q.explanation}
-                            </span>
-                          </div>
-                        )}
+                        {/* Explanation & Answer Key */}
+                        <div className="pt-3 border-t border-dashed border-border/80 text-xs space-y-2">
+                          {correctText && (
+                            <div className="text-emerald-700 dark:text-emerald-400 font-semibold flex items-center gap-1.5">
+                              <CheckCircle2 className="w-4 h-4 shrink-0" />
+                              <span>
+                                {t('quizGenerator.correctAnswer', 'Đáp án đúng')}: {correctText}
+                              </span>
+                            </div>
+                          )}
+                          {q.explanation && (
+                            <div className="text-muted-foreground flex items-start gap-1.5 leading-relaxed bg-muted/30 p-2.5 rounded-lg border border-border/40">
+                              <Lightbulb className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                              <span>
+                                <strong className="text-foreground font-medium">
+                                  {t('quizGenerator.explanation', 'Lời giải chi tiết')}:
+                                </strong>{' '}
+                                {q.explanation}
+                              </span>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })
+                )}
               </CardContent>
             </Card>
 
