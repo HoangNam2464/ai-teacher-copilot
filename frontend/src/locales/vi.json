@@ -4724,6 +4724,20 @@
       "statsTotalVersions": "Tổng phiên bản",
       "previewModalTitle": "Xem chi tiết phiên bản",
       "noQuestionsData": "Không có dữ liệu câu hỏi chi tiết."
+    },
+    "rubric": {
+      "title": "Ma trận Rubric đánh giá",
+      "subtitle": "Thang đo đánh giá kết quả học tập và năng lực vận dụng kiến thức theo chuẩn K-12.",
+      "totalWeight": "Tổng trọng số",
+      "criteriaCol": "Tiêu chí đánh giá",
+      "points": "điểm",
+      "weight": "Trọng số",
+      "deleteCriterion": "Xóa tiêu chí này",
+      "addCriterion": "Thêm tiêu chí đánh giá",
+      "resetDefault": "Khôi phục mẫu chuẩn",
+      "saveSuccess": "Đã lưu ma trận Rubric đánh giá thành công!",
+      "pedagogicalTip": "Lưu ý sư phạm",
+      "tipContent": "Bảng Rubric định lượng hóa các mức độ thành thạo của học sinh giúp việc đánh giá công bằng, khách quan và minh bạch. Thầy/Cô có thể nhấp trực tiếp vào từng ô để điều chỉnh mức điểm và mô tả phù hợp với môn học."
     }
   }
 }

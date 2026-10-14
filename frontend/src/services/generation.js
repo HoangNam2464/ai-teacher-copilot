@@ -64,3 +64,17 @@ export const generationApi = {
     return response.data;
   },
 };
+
+export const rubricApi = {
+  async saveRubric(workspaceId, id, rubricData) {
+    const response = await api.put(`/workspaces/${workspaceId}/generations/${id}`, {
+      contentData: rubricData,
+    });
+    return response.data;
+  },
+
+  async getRubricById(workspaceId, id) {
+    const response = await api.get(`/workspaces/${workspaceId}/generations/${id}`);
+    return response.data;
+  },
+};

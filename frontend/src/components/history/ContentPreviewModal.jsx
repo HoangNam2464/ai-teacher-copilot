@@ -13,6 +13,7 @@ import {
 import { Button } from '@/components/ui/Button';
 import { ExportDropdown } from '@/components/export/ExportDropdown';
 import { BloomTaxonomyTag } from '@/components/ui/BloomTaxonomyTag';
+import { RubricTableView } from '@/components/rubric';
 import { formatDate } from '@/utils/formatters';
 
 /**
@@ -37,6 +38,7 @@ export function ContentPreviewModal({
     }
   }
 
+  const isRubric = item.contentType === 'RUBRIC' || Boolean(contentData?.criteria);
   const isQuiz = item.contentType === 'QUIZ';
   const questions =
     contentData?.questions ||
@@ -98,7 +100,12 @@ export function ContentPreviewModal({
 
         {/* Body Content */}
         <div className="p-6 overflow-y-auto space-y-4">
-          {isQuiz ? (
+          {isRubric ? (
+            <RubricTableView
+              rubricData={contentData?.criteria ? contentData : undefined}
+              readOnly={true}
+            />
+          ) : isQuiz ? (
             <div className="space-y-4">
               {questions.length === 0 ? (
                 <div className="p-6 text-center text-xs text-muted-foreground bg-muted/20 rounded-xl">
@@ -224,6 +231,15 @@ export function ContentPreviewModal({
                       ? contentData.assessment
                       : JSON.stringify(contentData.assessment, null, 2)}
                   </p>
+                </div>
+              )}
+
+              {contentData?.rubric && (
+                <div className="pt-2">
+                  <RubricTableView
+                    rubricData={contentData.rubric}
+                    readOnly={true}
+                  />
                 </div>
               )}
 

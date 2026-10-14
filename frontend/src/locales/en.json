@@ -4724,6 +4724,20 @@
       "statsTotalVersions": "Total Versions",
       "previewModalTitle": "Version Details Preview",
       "noQuestionsData": "No detailed question data available."
+    },
+    "rubric": {
+      "title": "Assessment Rubric Matrix",
+      "subtitle": "K-12 competency-based evaluation criteria and scoring performance matrix.",
+      "totalWeight": "Total Weight",
+      "criteriaCol": "Assessment Criteria",
+      "points": "pts",
+      "weight": "Weight",
+      "deleteCriterion": "Delete this criterion",
+      "addCriterion": "Add Assessment Criterion",
+      "resetDefault": "Reset to Standard Template",
+      "saveSuccess": "Assessment rubric matrix saved successfully!",
+      "pedagogicalTip": "Pedagogical Note",
+      "tipContent": "Rubric tables quantify student mastery levels to ensure fair, objective, and transparent assessment. Teachers can edit criteria descriptors and score weights inline to align with curriculum standards."
     }
   }
 }
