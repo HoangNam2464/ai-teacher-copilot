@@ -244,6 +244,13 @@ export function LessonPlannerPage() {
         });
       }
 
+      const assessContent = activePlan.assessment || activePlan.evaluation;
+      if (assessContent) {
+        lines.push('## Phương án đánh giá & Hướng dẫn tự học');
+        lines.push(assessContent);
+        lines.push('');
+      }
+
       await navigator.clipboard.writeText(lines.join('\n'));
       setCopied(true);
       toast.success(t('lessonPlanner.copySuccess', 'Đã sao chép nội dung giáo án vào bộ nhớ tạm'));

@@ -4428,6 +4428,9 @@
     "reset": "New Plan",
     "stepAnalyzing": "Searching lesson materials...",
     "stepFormulating": "Structuring objectives and learning activities...",
+    "assessmentTitle": "Assessment & Self-Study Guidance",
+    "assessmentPlaceholder": "Enter ongoing assessment criteria, student deliverables, or homework instructions...",
+    "defaultAssessment": "Ongoing formative assessment through classroom activities; Summative evaluation based on learning worksheets and wrap-up questions.",
     "groundingNotice": "Lesson plan content grounded in your workspace materials"
   },
   "quizGenerator": {

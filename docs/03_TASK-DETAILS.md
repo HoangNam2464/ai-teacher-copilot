@@ -1034,7 +1034,7 @@ Hệ thống từ chối tạo nội dung ảo giác khi thiếu tài liệu ngu
 - **Sprint:** Sprint 3 - RAG & Lesson
 - **Priority:** High
 - **Assignee Type:** Designer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-303
 
 **Description:**
