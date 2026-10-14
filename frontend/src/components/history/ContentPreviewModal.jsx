@@ -87,6 +87,10 @@ export function ContentPreviewModal({
               workspaceId={workspaceId}
               generationId={item.id}
               defaultFileName={`${isQuiz ? 'de-thi' : 'giao-an'}-${item.title || 'bai-soan'}-v${item.version || 1}`}
+              planData={item.contentData || item.content}
+              contentType={item.contentType}
+              subject={item.subject || ''}
+              gradeLevel={item.gradeLevel || ''}
             />
             <button
               type="button"

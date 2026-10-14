@@ -497,6 +497,18 @@ export function QuizGeneratorPage() {
                       workspaceId={activeWorkspace?.id}
                       generationId={result.id || 'current'}
                       defaultFileName={`de-thi-${topic || 'trac-nghiem'}-v${currentVersion}`}
+                      planData={
+                        quiz
+                          ? {
+                              ...quiz,
+                              title: topic ? `Đề kiểm tra: ${topic}` : quiz.title,
+                              questions: allQuestions,
+                            }
+                          : result
+                      }
+                      subject={subject || activeWorkspace?.subject || ''}
+                      gradeLevel={gradeLevel || activeWorkspace?.gradeLevel || ''}
+                      contentType="QUIZ"
                     />
                   </div>
                 </div>

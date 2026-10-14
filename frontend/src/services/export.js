@@ -1,10 +1,14 @@
 import api from './api';
 import { downloadBlob } from '@/utils/downloadHelper';
-import { generateFormattedDocumentBlob } from '@/utils/documentGenerator';
+import {
+  generateFormattedDocumentBlob,
+  generateFormattedQuizBlob,
+} from '@/utils/documentGenerator';
 
 export const exportService = {
   /**
    * Export a generated document (Lesson Plan or Quiz) as DOCX or PDF.
+   * Supports Student Exam Sheet and Teacher Answer Key modes (FE-019 / ATC-406).
    *
    * @param {Object} params
    * @param {string} params.workspaceId - ID of active workspace
@@ -12,9 +16,11 @@ export const exportService = {
    * @param {string} [params.format='DOCX'] - 'DOCX' | 'PDF'
    * @param {string} [params.defaultFileName='tai-lieu'] - Base file name
    * @param {boolean} [params.includeCitations=true] - Whether to include citations appendix
-   * @param {Object} [params.planData=null] - Lesson plan data for content grounding and client fallback
+   * @param {Object} [params.planData=null] - Document / Quiz data for content grounding and client fallback
    * @param {string} [params.subject=''] - Subject name
    * @param {string} [params.gradeLevel=''] - Grade level
+   * @param {string} [params.exportMode='STUDENT_EXAM'] - 'STUDENT_EXAM' | 'TEACHER_KEY' | 'BOTH'
+   * @param {string} [params.contentType=''] - 'QUIZ' | 'LESSON_PLAN'
    * @returns {Promise<boolean>}
    */
   async exportDocument({
@@ -26,6 +32,8 @@ export const exportService = {
     planData = null,
     subject = '',
     gradeLevel = '',
+    exportMode = 'STUDENT_EXAM',
+    contentType = '',
   }) {
     const mimeTypes = {
       PDF: 'application/pdf',
@@ -38,8 +46,52 @@ export const exportService = {
       ? defaultFileName
       : `${defaultFileName}.${extension}`;
 
-    // 1. Send export request to backend following the official API contract:
-    //    POST /api/workspaces/{workspaceId}/export/{generationId}?format={format}
+    // Detect if content is a Quiz
+    const isQuiz =
+      contentType === 'QUIZ' ||
+      Boolean(planData?.questions) ||
+      Boolean(planData?.contentData?.questions) ||
+      Boolean(planData?.data?.questions) ||
+      Array.isArray(planData) ||
+      defaultFileName.toLowerCase().includes('de-thi') ||
+      defaultFileName.toLowerCase().includes('dap-an');
+
+    // For Quiz documents, generate using client-side high-fidelity Quiz generator
+    // strictly adhering to Student Exam Sheet vs Teacher Answer Key (FE-019)
+    if (isQuiz && planData) {
+      try {
+        const clientBlob = generateFormattedQuizBlob({
+          quiz: planData,
+          title: planData.title || defaultFileName,
+          subject,
+          gradeLevel,
+          exportMode,
+          includeCitations: exportMode === 'STUDENT_EXAM' ? false : includeCitations,
+          format: targetFormat,
+        });
+
+        if (targetFormat === 'PDF') {
+          const blobUrl = URL.createObjectURL(clientBlob);
+          const printWindow = window.open(blobUrl, '_blank');
+          if (printWindow) {
+            printWindow.onload = () => {
+              printWindow.print();
+            };
+          } else {
+            downloadBlob(clientBlob, `${cleanFileName}.html`, 'text/html');
+          }
+        } else {
+          downloadBlob(clientBlob, cleanFileName, 'application/msword');
+        }
+        return true;
+      } catch (genErr) {
+        console.error('Quiz client export failed:', genErr);
+        throw new Error('Không thể khởi tạo tệp đề kiểm tra trên thiết bị. Vui lòng thử lại.');
+      }
+    }
+
+    // Otherwise send export request to backend for Lesson Plans:
+    // POST /api/workspaces/{workspaceId}/export/{generationId}?format={format}
     try {
       const response = await api.post(
         `/workspaces/${workspaceId}/export/${generationId}?format=${targetFormat}`,
@@ -47,6 +99,8 @@ export const exportService = {
           includeCitations,
           fileName: cleanFileName,
           contentData: planData,
+          exportMode,
+          contentType,
         },
         { responseType: 'blob' }
       );
@@ -84,22 +138,31 @@ export const exportService = {
         );
       }
 
-      // If endpoint is not yet mounted in backend (404) and we have planData available,
-      // generate a high-fidelity client document so the teacher's work can be downloaded immediately
+      // Fallback: If endpoint is not yet mounted in backend (404) and we have planData available,
+      // generate a high-fidelity client document
       if ((status === 404 || !status) && planData) {
         try {
-          const clientBlob = generateFormattedDocumentBlob({
-            plan: planData,
-            title: planData.title || defaultFileName,
-            subject,
-            gradeLevel,
-            durationMinutes: planData.duration_minutes,
-            includeCitations,
-            format: targetFormat,
-          });
+          const clientBlob = isQuiz
+            ? generateFormattedQuizBlob({
+                quiz: planData,
+                title: planData.title || defaultFileName,
+                subject,
+                gradeLevel,
+                exportMode,
+                includeCitations,
+                format: targetFormat,
+              })
+            : generateFormattedDocumentBlob({
+                plan: planData,
+                title: planData.title || defaultFileName,
+                subject,
+                gradeLevel,
+                durationMinutes: planData.duration_minutes,
+                includeCitations,
+                format: targetFormat,
+              });
 
           if (targetFormat === 'PDF') {
-            // For PDF with HTML blob, open printable view or download
             const blobUrl = URL.createObjectURL(clientBlob);
             const printWindow = window.open(blobUrl, '_blank');
             if (printWindow) {
@@ -110,7 +173,6 @@ export const exportService = {
               downloadBlob(clientBlob, `${cleanFileName}.html`, 'text/html');
             }
           } else {
-            // For Word (.docx / .doc), download directly
             downloadBlob(clientBlob, cleanFileName, 'application/msword');
           }
           return true;

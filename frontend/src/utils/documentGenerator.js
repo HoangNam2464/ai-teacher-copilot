@@ -222,6 +222,372 @@ export function generateFormattedDocumentBlob({
   });
 }
 
+/**
+ * Client-side document formatter for Quiz / Exams (FE-019 / ATC-406).
+ * Formats either Student Exam Sheet (strictly no answers/explanations)
+ * or Teacher Answer Key (complete answers, explanations, and Bloom tagging).
+ */
+export function generateFormattedQuizBlob({
+  quiz,
+  title = 'Đề Kiểm Tra',
+  subject = '',
+  gradeLevel = '',
+  exportMode = 'STUDENT_EXAM', // 'STUDENT_EXAM' | 'TEACHER_KEY'
+  includeCitations = true,
+  format = 'DOCX',
+}) {
+  let quizObj = quiz;
+  if (typeof quizObj === 'string') {
+    try {
+      quizObj = JSON.parse(quizObj);
+    } catch {
+      // ignore
+    }
+  }
+
+  const rawQuestions =
+    quizObj?.questions ||
+    quizObj?.contentData?.questions ||
+    (Array.isArray(quizObj) ? quizObj : []);
+
+  const safeTitle = quizObj?.title || title || 'Đề Kiểm Tra Trắc Nghiệm';
+  const optionLabels = ['A', 'B', 'C', 'D'];
+  const isStudent = exportMode === 'STUDENT_EXAM';
+
+  const htmlContent = `
+<!DOCTYPE html>
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head>
+  <meta charset='utf-8'>
+  <title>${escapeHtml(safeTitle)} - ${isStudent ? 'Đề Thi Học Sinh' : 'Đáp Án Giáo Viên'}</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 15mm 20mm;
+    }
+    body {
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 12.5pt;
+      line-height: 1.5;
+      color: #111827;
+      margin: 0;
+      padding: 10px;
+    }
+    .header-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      border-bottom: 2px solid ${isStudent ? '#2563eb' : '#059669'};
+      padding-bottom: 12px;
+    }
+    .header-table td {
+      vertical-align: top;
+      padding: 4px;
+    }
+    .main-title {
+      text-align: center;
+      font-size: 16pt;
+      font-weight: bold;
+      text-transform: uppercase;
+      color: ${isStudent ? '#1e40af' : '#065f46'};
+      margin: 14px 0 6px 0;
+    }
+    .sub-title {
+      text-align: center;
+      font-size: 11pt;
+      font-style: italic;
+      color: #4b5563;
+      margin-bottom: 16px;
+    }
+    .student-info-box {
+      border: 1px solid #9ca3af;
+      padding: 8px 14px;
+      margin-bottom: 20px;
+      font-size: 11pt;
+      background-color: #f9fafb;
+    }
+    .question-block {
+      margin-bottom: 18px;
+      page-break-inside: avoid;
+    }
+    .question-title {
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #111827;
+    }
+    .options-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-left: 12px;
+      margin-bottom: 8px;
+    }
+    .options-table td {
+      padding: 4px 8px;
+      vertical-align: top;
+      font-size: 12pt;
+    }
+    .answer-key-box {
+      margin-top: 6px;
+      padding: 6px 12px;
+      background-color: #ecfdf5;
+      border-left: 4px solid #10b981;
+      font-size: 11pt;
+    }
+    .explanation-box {
+      margin-top: 4px;
+      padding: 6px 12px;
+      background-color: #f3f4f6;
+      border-left: 4px solid #f59e0b;
+      font-size: 10.5pt;
+      color: #374151;
+      font-style: italic;
+    }
+    .quick-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0 24px 0;
+      text-align: center;
+    }
+    .quick-table th, .quick-table td {
+      border: 1px solid #d1d5db;
+      padding: 6px 8px;
+      font-size: 11pt;
+    }
+    .quick-table th {
+      background-color: #f3f4f6;
+      font-weight: bold;
+    }
+    .sheet-grid {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 24px;
+      page-break-before: auto;
+    }
+    .sheet-grid th, .sheet-grid td {
+      border: 1px solid #9ca3af;
+      padding: 6px;
+      text-align: center;
+      font-size: 10pt;
+    }
+    .bubble {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      line-height: 18px;
+      border: 1px solid #4b5563;
+      border-radius: 50%;
+      text-align: center;
+      font-size: 9pt;
+      margin: 0 3px;
+    }
+    .footer-note {
+      text-align: center;
+      font-size: 9.5pt;
+      color: #9ca3af;
+      margin-top: 30px;
+      border-top: 1px dashed #d1d5db;
+      padding-top: 10px;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top School / Exam Header -->
+  <table class="header-table">
+    <tr>
+      <td style="width: 50%;">
+        <strong>SỞ GIÁO DỤC VÀ ĐÀO TẠO</strong><br>
+        <strong>TRƯỜNG THPT: .......................................</strong>
+      </td>
+      <td style="width: 50%; text-align: right;">
+        <strong>KỲ THI / KIỂM TRA ĐỊNH KỲ</strong><br>
+        ${subject ? `Môn: <strong>${escapeHtml(subject)}</strong> | ` : ''}
+        ${gradeLevel ? `Khối: <strong>${escapeHtml(gradeLevel)}</strong>` : ''}<br>
+        <em>Thời gian làm bài: 45 phút (không kể thời gian giao đề)</em>
+      </td>
+    </tr>
+  </table>
+
+  <div class="main-title">
+    ${escapeHtml(safeTitle)}
+  </div>
+  <div class="sub-title">
+    ${isStudent ? '— ĐỀ THI CHÍNH THỨC (Dành cho học sinh) —' : '— ĐÁP ÁN & HƯỚNG DẪN CHẤM (Bản giáo viên) —'}
+  </div>
+
+  ${
+    isStudent
+      ? `
+    <!-- Student Identification Box -->
+    <div class="student-info-box">
+      Họ và tên thí sinh: .................................................................... Lớp: ................. SBD: ....................<br>
+      <em>(Thí sinh không được sử dụng tài liệu. Cán bộ coi thi không giải thích gì thêm)</em>
+    </div>
+  `
+      : ''
+  }
+
+  ${
+    !isStudent && rawQuestions.length > 0
+      ? `
+    <!-- Quick Answer Key Table for Teacher -->
+    <h3 style="color: #065f46; border-bottom: 1px solid #10b981; padding-bottom: 4px;">
+      I. BẢNG ĐÁP ÁN NHANH
+    </h3>
+    <table class="quick-table">
+      <tr>
+        ${rawQuestions.map((_, i) => `<th>Câu ${i + 1}</th>`).join('')}
+      </tr>
+      <tr>
+        ${rawQuestions
+          .map((q) => {
+            const correctIdx = q.correct_answer_index;
+            let ans =
+              correctIdx !== undefined && optionLabels[correctIdx]
+                ? optionLabels[correctIdx]
+                : q.correct_answer || q.correctAnswer || '—';
+            return `<td style="font-weight: bold; color: #047857;">${escapeHtml(ans)}</td>`;
+          })
+          .join('')}
+      </tr>
+    </table>
+    <h3 style="color: #065f46; border-bottom: 1px solid #10b981; padding-bottom: 4px; margin-top: 24px;">
+      II. HƯỚNG DẪN CHẤM & LỜI GIẢI CHI TIẾT
+    </h3>
+  `
+      : ''
+  }
+
+  <!-- Questions Body -->
+  <div class="questions-container">
+    ${rawQuestions
+      .map((q, idx) => {
+        const correctIdx = q.correct_answer_index;
+        const correctText =
+          q.correct_answer ||
+          q.correctAnswer ||
+          (correctIdx !== undefined && q.options?.[correctIdx]
+            ? `${optionLabels[correctIdx] || ''}. ${q.options[correctIdx]}`
+            : '');
+
+        const optA = q.options?.[0] ? escapeHtml(q.options[0]) : '';
+        const optB = q.options?.[1] ? escapeHtml(q.options[1]) : '';
+        const optC = q.options?.[2] ? escapeHtml(q.options[2]) : '';
+        const optD = q.options?.[3] ? escapeHtml(q.options[3]) : '';
+
+        return `
+      <div class="question-block">
+        <div class="question-title">
+          Câu ${idx + 1}: ${escapeHtml(q.question_text || q.question || '')}
+          ${!isStudent && q.bloom_taxonomy_level ? ` <span style="font-size: 9.5pt; font-weight: normal; color: #6b7280;">[Chuẩn Bloom: ${escapeHtml(q.bloom_taxonomy_level)}]</span>` : ''}
+        </div>
+
+        <table class="options-table">
+          <tr>
+            <td style="width: 50%;"><strong>A.</strong> ${optA}</td>
+            <td style="width: 50%;"><strong>B.</strong> ${optB}</td>
+          </tr>
+          <tr>
+            <td style="width: 50%;"><strong>C.</strong> ${optC}</td>
+            <td style="width: 50%;"><strong>D.</strong> ${optD}</td>
+          </tr>
+        </table>
+
+        ${
+          !isStudent
+            ? `
+          ${
+            correctText
+              ? `<div class="answer-key-box"><strong>✓ Đáp án đúng:</strong> ${escapeHtml(correctText)}</div>`
+              : ''
+          }
+          ${
+            q.explanation
+              ? `<div class="explanation-box"><strong>💡 Lời giải chi tiết:</strong> ${escapeHtml(q.explanation)}</div>`
+              : ''
+          }
+        `
+            : ''
+        }
+      </div>
+    `;
+      })
+      .join('')}
+  </div>
+
+  ${
+    isStudent && rawQuestions.length > 0
+      ? `
+    <!-- Student Answer Bubbles Form -->
+    <div style="margin-top: 30px; border-top: 2px dashed #9ca3af; padding-top: 14px;">
+      <h4 style="text-align: center; margin: 0 0 10px 0; text-transform: uppercase;">
+        PHIẾU TÔ ĐÁP ÁN TRẮC NGHIỆM CỦA THÍ SINH
+      </h4>
+      <table class="sheet-grid">
+        <tr>
+          <th>Câu</th>
+          <th>Phương án chọn</th>
+          <th>Câu</th>
+          <th>Phương án chọn</th>
+        </tr>
+        ${Array.from({ length: Math.ceil(rawQuestions.length / 2) })
+          .map((_, rowIdx) => {
+            const q1 = rowIdx + 1;
+            const q2 = rowIdx + 1 + Math.ceil(rawQuestions.length / 2);
+
+            return `
+            <tr>
+              <td style="font-weight: bold;">Câu ${q1}</td>
+              <td>
+                <span class="bubble">A</span>
+                <span class="bubble">B</span>
+                <span class="bubble">C</span>
+                <span class="bubble">D</span>
+              </td>
+              ${
+                q2 <= rawQuestions.length
+                  ? `
+                <td style="font-weight: bold;">Câu ${q2}</td>
+                <td>
+                  <span class="bubble">A</span>
+                  <span class="bubble">B</span>
+                  <span class="bubble">C</span>
+                  <span class="bubble">D</span>
+                </td>
+              `
+                  : '<td></td><td></td>'
+              }
+            </tr>
+          `;
+          })
+          .join('')}
+      </table>
+    </div>
+  `
+      : ''
+  }
+
+  <div class="footer-note">
+    ${
+      isStudent
+        ? '— HẾT — (Cán bộ coi thi thu lại toàn bộ đề thi và phiếu làm bài)'
+        : 'Tài liệu đáp án và hướng dẫn chấm được tạo bởi AI Teacher Copilot.'
+    }
+  </div>
+</body>
+</html>
+  `.trim();
+
+  if (format === 'PDF') {
+    return new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+  }
+
+  return new Blob(['\ufeff', htmlContent], {
+    type: 'application/msword;charset=utf-8',
+  });
+}
+
 function escapeHtml(str) {
   if (!str) return '';
   return String(str)
@@ -231,3 +597,4 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
 }
+

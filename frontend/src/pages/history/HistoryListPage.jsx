@@ -549,6 +549,10 @@ export function HistoryListPage() {
                                 workspaceId={activeWorkspace.id}
                                 generationId={item.id}
                                 defaultFileName={`${item.contentType === 'QUIZ' ? 'de-thi' : 'giao-an'}-${item.title || 'bai-soan'}-v${item.version || 1}`}
+                                planData={item.contentData || item.content}
+                                contentType={item.contentType}
+                                subject={item.subject || activeWorkspace?.subject || ''}
+                                gradeLevel={item.gradeLevel || activeWorkspace?.gradeLevel || ''}
                               />
 
                               <Button

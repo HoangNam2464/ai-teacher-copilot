@@ -14,12 +14,18 @@ export function ExportDropdown({
   planData = null,
   subject = '',
   gradeLevel = '',
+  contentType = '',
   variant = 'outline',
   size = 'sm',
   className = '',
 }) {
   const { t } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const isQuiz =
+    contentType === 'QUIZ' ||
+    defaultFileName.toLowerCase().includes('de-thi') ||
+    Boolean(planData?.questions);
 
   return (
     <>
@@ -28,7 +34,11 @@ export function ExportDropdown({
         size={size}
         onClick={() => setIsModalOpen(true)}
         className={`flex items-center gap-1.5 text-xs font-medium border-border hover:bg-muted ${className}`}
-        title={t('export.modalTitle', 'Xuất Tài Liệu Bài Dạy')}
+        title={
+          isQuiz
+            ? t('export.quizModalTitle', 'Xuất Đề Kiểm Tra & Đáp Án')
+            : t('export.modalTitle', 'Xuất Tài Liệu Bài Dạy')
+        }
       >
         <Download className="w-3.5 h-3.5 text-emerald-600" />
         <span>{t('export.button', 'Xuất tài liệu')}</span>
@@ -43,6 +53,7 @@ export function ExportDropdown({
         planData={planData}
         subject={subject}
         gradeLevel={gradeLevel}
+        contentType={contentType}
       />
     </>
   );
