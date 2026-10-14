@@ -23,7 +23,8 @@ import java.util.UUID;
 @RequestMapping({
         "/workspaces/{workspaceId}/generation",
         "/workspaces/{workspaceId}/generations",
-        "/workspaces/{workspaceId}/generate"
+        "/workspaces/{workspaceId}/generate",
+        "/workspaces/{workspaceId}/history"
 })
 @RequiredArgsConstructor
 public class GenerationController {
@@ -109,7 +110,7 @@ public class GenerationController {
                 .body(ApiResponse.success(result));
     }
 
-    @GetMapping("/{id}/versions")
+    @GetMapping({"/{id}/versions", "/{id}/lineage"})
     public ResponseEntity<ApiResponse<List<GenerationResponseDto>>> getContentVersions(
             @AuthenticationPrincipal User user,
             @PathVariable UUID workspaceId,
