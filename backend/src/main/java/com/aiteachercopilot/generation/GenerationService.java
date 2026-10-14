@@ -274,4 +274,79 @@ public class GenerationService {
         List<GeneratedContent> list = generatedContentRepository.findByWorkspaceIdOrderByCreatedAtDesc(workspaceId);
         return list.stream().map(GenerationResponseDto::fromEntity).toList();
     }
+
+    /**
+     * Regenerates content with user-provided refinement instructions (BE-027 / FE-016).
+     * Creates a new version record linked to the root parent without mutating prior versions.
+     */
+    @Transactional
+    public GenerationResponseDto regenerateContent(UUID workspaceId, UUID contentId, UUID userId, String instructions) {
+        workspaceService.findAndAuthorize(workspaceId, userId);
+
+        GeneratedContent parent = generatedContentRepository.findById(contentId)
+                .orElseThrow(() -> new ResourceNotFoundException("GeneratedContent", contentId));
+
+        if (!workspaceId.equals(parent.getWorkspaceId())) {
+            log.warn("Cross-workspace regeneration attempted: content {} in workspace {}, requested for workspace {}",
+                    contentId, parent.getWorkspaceId(), workspaceId);
+            throw new ForbiddenException("Cross-workspace content regeneration is forbidden");
+        }
+
+        int nextVersion = (parent.getVersion() != null ? parent.getVersion() : 1) + 1;
+        UUID rootParentId = parent.getParentId() != null ? parent.getParentId() : parent.getId();
+
+        String combinedInstructions = (parent.getPromptInput() != null ? parent.getPromptInput() : "")
+                + (instructions != null && !instructions.isBlank() ? "\n[Refinement]: " + instructions.trim() : "");
+
+        GeneratedContent newContent = GeneratedContent.builder()
+                .workspaceId(workspaceId)
+                .createdBy(userId)
+                .contentType(parent.getContentType())
+                .title(parent.getTitle())
+                .subject(parent.getSubject())
+                .gradeLevel(parent.getGradeLevel())
+                .topic(parent.getTopic())
+                .contentData(parent.getContentData() != null ? new HashMap<>(parent.getContentData()) : new HashMap<>())
+                .promptInput(combinedInstructions)
+                .reviewStatus("DRAFT")
+                .version(nextVersion)
+                .parentId(rootParentId)
+                .build();
+
+        newContent = generatedContentRepository.save(newContent);
+        log.info("Regenerated content {} creating version {} (parentId={}) in workspace {}",
+                contentId, nextVersion, rootParentId, workspaceId);
+
+        return GenerationResponseDto.fromEntity(newContent);
+    }
+
+    /**
+     * Retrieves all version lineage items for a given generated content record (BE-027).
+     */
+    @Transactional(readOnly = true)
+    public List<GenerationResponseDto> getContentVersions(UUID workspaceId, UUID contentId, UUID userId) {
+        workspaceService.findAndAuthorize(workspaceId, userId);
+
+        GeneratedContent target = generatedContentRepository.findById(contentId)
+                .orElseThrow(() -> new ResourceNotFoundException("GeneratedContent", contentId));
+
+        if (!workspaceId.equals(target.getWorkspaceId())) {
+            throw new ForbiddenException("Cross-workspace content access is forbidden");
+        }
+
+        UUID rootId = target.getParentId() != null ? target.getParentId() : target.getId();
+        GeneratedContent root = generatedContentRepository.findById(rootId).orElse(target);
+
+        List<GeneratedContent> children = generatedContentRepository.findByParentIdOrderByVersionAsc(rootId);
+        List<GeneratedContent> all = new ArrayList<>();
+        all.add(root);
+        for (GeneratedContent child : children) {
+            if (!child.getId().equals(root.getId())) {
+                all.add(child);
+            }
+        }
+        all.sort(java.util.Comparator.comparingInt(c -> c.getVersion() != null ? c.getVersion() : 1));
+
+        return all.stream().map(GenerationResponseDto::fromEntity).toList();
+    }
 }

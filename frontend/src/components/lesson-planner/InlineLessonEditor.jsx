@@ -23,6 +23,7 @@ import {
   Layers,
   FileCheck,
 } from 'lucide-react';
+import { RubricTableView, DEFAULT_RUBRIC_DATA } from '@/components/rubric';
 
 /**
  * Inline Lesson Plan Editor with Auto-Save status, full field editing,
@@ -594,6 +595,20 @@ export function InlineLessonEditor({
               </div>
             )}
           </div>
+        </div>
+
+        {/* Section IV: Assessment Rubric Matrix (FE-018) */}
+        <div className="pt-4 border-t border-border/70 space-y-3">
+          <RubricTableView
+            rubricData={plan.rubric || DEFAULT_RUBRIC_DATA}
+            onSave={(newRubric) => {
+              onChange({
+                ...plan,
+                rubric: newRubric,
+              });
+            }}
+            readOnly={!isEditMode}
+          />
         </div>
 
         {/* Footer Grounding Note */}
