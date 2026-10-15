@@ -1433,7 +1433,7 @@ Sinh đúng số lượng câu hỏi yêu cầu; câu trắc nghiệm có đủ 
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** High
 - **Assignee Type:** Backend Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-303, ATC-304
 
 **Description:**
@@ -1442,7 +1442,7 @@ Lưu đề thi vào bảng generated_contents với content_type='QUIZ'.
 **Acceptance Criteria:**
 Đề thi được lưu vào CSDL kèm metadata câu hỏi và mảng source_chunk_ids.
 
-**Deliverable:** QuizService.java in backend
+**Deliverable:** `GenerationService.java` & `GenerationController.java` in backend
 
 ---
 
@@ -1452,7 +1452,7 @@ Lưu đề thi vào bảng generated_contents với content_type='QUIZ'.
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** High
 - **Assignee Type:** QA Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-303, ATC-304
 
 **Description:**
@@ -1461,7 +1461,7 @@ Kiểm thử sinh đề thi với các mức số lượng câu hỏi (3 - 20 c�
 **Acceptance Criteria:**
 100% câu hỏi trắc nghiệm có đúng 1 đáp án chính xác và lời giải thích hợp lý.
 
-**Deliverable:** Quiz Generation Test Report
+**Deliverable:** [Quiz Generation Test Report](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/docs/4.Test_Case/TC_QA-023_Quiz_Question_Completeness_Options_Answer_Keys.md)
 
 ---
 
