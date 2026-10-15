@@ -3,13 +3,17 @@ Generation routes — AI Lesson Plan and Quiz generation (BE-018).
 Guarantees evidence grounding, schema enforcement, and maps failures to appropriate HTTP status codes.
 """
 
-from typing import Optional
+from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.core.security import verify_api_key
 from app.generation.evidence_validator import InsufficientEvidenceError
 from app.generation.lesson_planner import lesson_planner_pipeline
-from app.generation.schemas import LessonPlanGenerationRequest
+from app.generation.quiz_generator import QuizValidationError, quiz_generator_pipeline
+from app.generation.schemas import (
+    LessonPlanGenerationRequest,
+    QuizGenerationRequest,
+)
 from app.generation.service import generate_lesson_plan_service, generate_quiz_service
 from app.providers.exceptions import AIProviderError
 
@@ -76,32 +80,60 @@ async def generate_lesson_plan(
 
 @router.post("/quiz")
 async def generate_quiz(
-    workspace_id: str,
-    subject: str,
-    grade_level: str,
-    topic: str,
+    request: Optional[QuizGenerationRequest] = None,
+    workspace_id: Optional[str] = None,
+    subject: Optional[str] = None,
+    grade_level: Optional[str] = None,
+    topic: Optional[str] = None,
     num_questions: int = 5,
     instructions: Optional[str] = None,
+    difficulty: str = "MEDIUM",
+    target_bloom_level: Optional[str] = None,
     _api_key: str = Depends(verify_api_key),
 ):
+    """
+    Generate curriculum-grounded structured assessment quiz (MCQ and Short Answer) (BE-024).
+    Supports JSON body payload or query parameters.
+    """
     try:
-        quiz = await generate_quiz_service(
-            workspace_id=workspace_id,
-            subject=subject,
-            grade_level=grade_level,
-            topic=topic,
-            num_questions=num_questions,
-            instructions=instructions,
-        )
+        if request is not None:
+            quiz = await quiz_generator_pipeline.generate_quiz(request)
+        else:
+            if not workspace_id or not subject or not grade_level or not topic:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Missing required fields: workspace_id, subject, grade_level, topic",
+                )
+            quiz = await generate_quiz_service(
+                workspace_id=workspace_id,
+                subject=subject,
+                grade_level=grade_level,
+                topic=topic,
+                num_questions=num_questions,
+                instructions=instructions,
+                difficulty=difficulty,
+                target_bloom_level=target_bloom_level,
+            )
         return {
             "status": "success",
             "content_type": "quiz",
             "data": quiz.model_dump(),
         }
+    except HTTPException:
+        raise
     except InsufficientEvidenceError as e:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=e.to_dict(),
+        )
+    except QuizValidationError as e:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail={
+                "error_code": "QUIZ_VALIDATION_ERROR",
+                "message": e.message,
+                "details": e.details,
+            },
         )
     except AIProviderError as e:
         raise HTTPException(
