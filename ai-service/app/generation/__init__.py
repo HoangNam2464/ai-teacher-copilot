@@ -22,13 +22,21 @@ from app.generation.prompt_builder import (
     format_single_source,
     wrap_sources_boundary,
 )
+from app.generation.quiz_generator import (
+    QuizGeneratorPipeline,
+    QuizValidationError,
+    quiz_generator_pipeline,
+    validate_and_repair_quiz,
+)
 from app.generation.schemas import (
     LessonPlan,
     LessonPlanGenerationRequest,
     LessonPlanSchema,
     LessonSection,
     Quiz,
+    QuizGenerationRequest,
     QuizQuestion,
+    QuizSchema,
 )
 
 __all__ = [
@@ -39,7 +47,13 @@ __all__ = [
     "LessonPlannerPipeline",
     "lesson_planner_pipeline",
     "Quiz",
+    "QuizSchema",
     "QuizQuestion",
+    "QuizGenerationRequest",
+    "QuizGeneratorPipeline",
+    "quiz_generator_pipeline",
+    "QuizValidationError",
+    "validate_and_repair_quiz",
     "UNTRUSTED_SOURCES_SECURITY_DIRECTIVE",
     "DEFAULT_USER_FRIENDLY_MESSAGE",
     "InsufficientEvidenceError",

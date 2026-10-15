@@ -38,14 +38,52 @@ class MockAIProvider(BaseAIProvider):
             for field_name, field_info in response_schema.model_fields.items():
                 annotation = field_info.annotation
                 origin = getattr(annotation, "__origin__", None)
-                if origin is list or origin is List:
+                if field_name == "questions":
+                    mock_data[field_name] = [
+                        {
+                            "question_number": 1,
+                            "type": "MCQ",
+                            "question_text": "Định lý Cosin trong tam giác ABC có dạng như thế nào?",
+                            "options": [
+                                "a^2 = b^2 + c^2 - 2bc*cos(A)",
+                                "a^2 = b^2 + c^2 + 2bc*cos(A)",
+                                "a^2 = b^2 - c^2 - 2bc*cos(A)",
+                                "a^2 = (b + c)^2 - 2bc*cos(A)",
+                            ],
+                            "correct_answer": "A",
+                            "correct_answer_index": 0,
+                            "explanation": "Theo định lý Cosin trong tam giác ABC: a^2 = b^2 + c^2 - 2bc*cos(A).",
+                            "bloom_taxonomy_level": "Remember",
+                            "source_chunk_ids": ["mock-chunk-1"],
+                        },
+                        {
+                            "question_number": 2,
+                            "type": "SHORT_ANSWER",
+                            "question_text": "Phát biểu hệ quả của định lý Cosin dùng để tính góc A trong tam giác ABC.",
+                            "options": None,
+                            "correct_answer": "cos(A) = (b^2 + c^2 - a^2) / (2bc)",
+                            "correct_answer_index": None,
+                            "explanation": "Từ a^2 = b^2 + c^2 - 2bc*cos(A), suy ra cos(A) = (b^2 + c^2 - a^2) / (2bc).",
+                            "bloom_taxonomy_level": "Understand",
+                            "source_chunk_ids": ["mock-chunk-1"],
+                        },
+                    ]
+                elif field_name == "sections":
+                    mock_data[field_name] = [
+                        {"title": "Khởi động", "duration_minutes": 5, "content": "Nội dung khởi động mẫu"},
+                        {"title": "Hình thành kiến thức", "duration_minutes": 25, "content": "Nội dung kiến thức mẫu"},
+                        {"title": "Luyện tập & Vận dụng", "duration_minutes": 15, "content": "Nội dung luyện tập mẫu"},
+                    ]
+                elif origin is list or origin is List:
                     mock_data[field_name] = ["Mục tiêu mẫu 1", "Mục tiêu mẫu 2"]
                 elif annotation is int or annotation is Optional[int]:
                     mock_data[field_name] = 45
                 elif annotation is float or annotation is Optional[float]:
                     mock_data[field_name] = 1.0
                 elif annotation is bool:
-                    mock_data[field_name] = True
+                    mock_data[field_name] = False if field_name == "insufficient_evidence" else True
+                elif field_name == "difficulty":
+                    mock_data[field_name] = "MEDIUM"
                 else:
                     mock_data[field_name] = f"Nội dung mẫu cho {field_name}"
 
