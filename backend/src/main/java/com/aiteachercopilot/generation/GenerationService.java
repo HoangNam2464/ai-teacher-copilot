@@ -170,21 +170,171 @@ public class GenerationService {
         log.info("Persisted {} content citations for generated content {}", citations.size(), contentId);
     }
 
-    public Object generateQuiz(UUID workspaceId, UUID userId, GenerationRequestDto req) {
+    /**
+     * Generates a curriculum-grounded structured quiz via FastAPI,
+     * persists the draft in generated_contents, and records citation links (BE-025).
+     */
+    @Transactional
+    public GenerationResponseDto generateQuiz(UUID workspaceId, UUID userId, GenerationRequestDto req) {
         workspaceService.findAndAuthorize(workspaceId, userId);
 
-        return aiServiceWebClient.post()
-                .uri(builder -> builder.path("/generation/quiz")
-                        .queryParam("workspace_id", workspaceId)
-                        .queryParam("subject", req.getSubject())
-                        .queryParam("grade_level", req.getGradeLevel())
-                        .queryParam("topic", req.getTopic())
-                        .queryParam("instructions", req.getInstructions())
-                        .queryParam("num_questions", req.getNumQuestions())
-                        .build())
-                .retrieve()
-                .bodyToMono(Object.class)
-                .block();
+        Map<String, Object> aiRequest = new HashMap<>();
+        aiRequest.put("workspace_id", workspaceId.toString());
+        aiRequest.put("subject", req.getSubject());
+        aiRequest.put("grade_level", req.getGradeLevel());
+        aiRequest.put("topic", req.getTopic());
+        if (req.getNumQuestions() != null) {
+            aiRequest.put("num_questions", req.getNumQuestions());
+        }
+        if (req.getQuestionTypes() != null && !req.getQuestionTypes().isEmpty()) {
+            aiRequest.put("question_types", req.getQuestionTypes());
+        }
+        if (req.getDifficulty() != null && !req.getDifficulty().isBlank()) {
+            aiRequest.put("difficulty", req.getDifficulty());
+        }
+        if (req.getTargetBloomLevel() != null && !req.getTargetBloomLevel().isBlank()) {
+            aiRequest.put("target_bloom_level", req.getTargetBloomLevel());
+        }
+        if (req.getInstructions() != null && !req.getInstructions().isBlank()) {
+            aiRequest.put("instructions", req.getInstructions());
+        }
+        if (req.getDocumentIds() != null && !req.getDocumentIds().isEmpty()) {
+            aiRequest.put("document_ids", req.getDocumentIds().stream().map(UUID::toString).toList());
+        }
+
+        long startTime = System.currentTimeMillis();
+        Map<String, Object> responseBody;
+
+        try {
+            responseBody = aiServiceWebClient.post()
+                    .uri("/generation/quiz")
+                    .bodyValue(aiRequest)
+                    .retrieve()
+                    .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
+                    .block();
+        } catch (WebClientResponseException e) {
+            log.error("AI Service returned error status {} for quiz generation: {}", e.getStatusCode(), e.getResponseBodyAsString());
+            throw e;
+        } catch (Exception e) {
+            log.error("Failed to connect to AI Service for quiz generation: {}", e.getMessage(), e);
+            throw e;
+        }
+
+        long durationMs = System.currentTimeMillis() - startTime;
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> contentData = (responseBody != null && responseBody.get("data") instanceof Map)
+                ? (Map<String, Object>) responseBody.get("data")
+                : (responseBody != null ? responseBody : Collections.emptyMap());
+
+        String title = (contentData.get("title") != null && !contentData.get("title").toString().isBlank())
+                ? contentData.get("title").toString()
+                : req.getTopic();
+
+        GeneratedContent generatedContent = GeneratedContent.builder()
+                .workspaceId(workspaceId)
+                .createdBy(userId)
+                .contentType("QUIZ")
+                .title(title)
+                .subject(req.getSubject())
+                .gradeLevel(req.getGradeLevel())
+                .topic(req.getTopic())
+                .contentData(contentData)
+                .promptInput(req.getInstructions() != null && !req.getInstructions().isBlank()
+                        ? req.getInstructions()
+                        : req.getTopic())
+                .reviewStatus("DRAFT")
+                .version(1)
+                .modelUsed("gemini-1.5-flash")
+                .generationTimeMs((int) durationMs)
+                .build();
+
+        GeneratedContent savedContent = generatedContentRepository.save(generatedContent);
+        log.info("Persisted generated quiz {} for workspace {}", savedContent.getId(), workspaceId);
+
+        // Record citations from quiz-level and question-level source_chunk_ids
+        persistQuizCitations(savedContent.getId(), contentData);
+
+        return GenerationResponseDto.fromEntity(savedContent);
+    }
+
+    /**
+     * Persists citations from quiz content data, aggregating both quiz-level
+     * and per-question source_chunk_ids for complete citation traceability (BE-025).
+     */
+    private void persistQuizCitations(UUID contentId, Map<String, Object> contentData) {
+        if (contentData == null) {
+            return;
+        }
+
+        List<String> allChunkIdStrings = new ArrayList<>();
+
+        // Collect quiz-level source_chunk_ids
+        if (contentData.get("source_chunk_ids") instanceof List<?> quizLevelIds) {
+            for (Object item : quizLevelIds) {
+                if (item != null) {
+                    allChunkIdStrings.add(item.toString());
+                }
+            }
+        }
+
+        // Collect per-question source_chunk_ids
+        if (contentData.get("questions") instanceof List<?> questions) {
+            for (Object qObj : questions) {
+                if (qObj instanceof Map<?, ?> question) {
+                    Object qChunkIds = question.get("source_chunk_ids");
+                    if (qChunkIds instanceof List<?> questionChunkIds) {
+                        for (Object item : questionChunkIds) {
+                            if (item != null) {
+                                allChunkIdStrings.add(item.toString());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Deduplicate and convert to UUIDs
+        List<UUID> chunkUuids = allChunkIdStrings.stream()
+                .distinct()
+                .map(item -> {
+                    try {
+                        return UUID.fromString(item);
+                    } catch (Exception e) {
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .toList();
+
+        if (chunkUuids.isEmpty()) {
+            return;
+        }
+
+        List<DocumentChunk> chunks = documentChunkRepository.findAllById(chunkUuids);
+        if (chunks.isEmpty()) {
+            log.debug("No matching document_chunks found in DB for quiz chunk IDs {}", chunkUuids);
+            return;
+        }
+
+        List<ContentCitation> citations = new ArrayList<>();
+        for (DocumentChunk chunk : chunks) {
+            String excerpt = chunk.getContent();
+            if (excerpt != null && excerpt.length() > 200) {
+                excerpt = excerpt.substring(0, 200);
+            }
+
+            ContentCitation citation = ContentCitation.builder()
+                    .contentId(contentId)
+                    .chunkId(chunk.getId())
+                    .documentId(chunk.getDocumentId())
+                    .citationText(excerpt)
+                    .build();
+            citations.add(citation);
+        }
+
+        contentCitationRepository.saveAll(citations);
+        log.info("Persisted {} content citations for generated quiz {}", citations.size(), contentId);
     }
 
     /**

@@ -43,12 +43,12 @@ public class GenerationController {
     }
 
     @PostMapping("/quiz")
-    public ResponseEntity<ApiResponse<Object>> generateQuiz(
+    public ResponseEntity<ApiResponse<GenerationResponseDto>> generateQuiz(
             @AuthenticationPrincipal User user,
             @PathVariable UUID workspaceId,
-            @RequestBody GenerationRequestDto request) {
+            @Valid @RequestBody GenerationRequestDto request) {
 
-        Object result = generationService.generateQuiz(workspaceId, user.getId(), request);
+        GenerationResponseDto result = generationService.generateQuiz(workspaceId, user.getId(), request);
         return ResponseEntity.ok(ApiResponse.success(result));
     }
 
