@@ -650,5 +650,122 @@ public class GenerationIntegrationTest {
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.success", is(false)));
     }
+
+    // ===== [BE-027] Content Regeneration API with Version Lineage Integration Tests =====
+
+    @Test
+    @DisplayName("POST /workspaces/{workspaceId}/generation/{id}/regenerate creates v2 with parentId and preserves parent [BE-027]")
+    void shouldRegenerateContentAndPreserveParentLineage() throws Exception {
+        GeneratedContent v1 = generatedContentRepository.save(GeneratedContent.builder()
+                .workspaceId(workspaceA.getId())
+                .createdBy(teacherA.getId())
+                .title("Đề kiểm tra Đại số 10")
+                .subject("Toán")
+                .gradeLevel("10")
+                .topic("Hàm số bậc hai")
+                .contentType("QUIZ")
+                .contentData(Map.of("topic", "Hàm số bậc hai", "total_questions", 5))
+                .promptInput("Soạn đề 5 câu hỏi")
+                .reviewStatus("REVIEWED")
+                .version(1)
+                .build());
+
+        RegenerateRequestDto regenerateDto = new RegenerateRequestDto("Bổ sung thêm 3 câu vận dụng thực tế");
+
+        mockMvc.perform(post("/workspaces/" + workspaceA.getId() + "/generation/" + v1.getId() + "/regenerate")
+                        .header("Authorization", "Bearer " + tokenA)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(regenerateDto)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.data.id", notNullValue()))
+                .andExpect(jsonPath("$.data.version", is(2)))
+                .andExpect(jsonPath("$.data.parentId", is(v1.getId().toString())))
+                .andExpect(jsonPath("$.data.reviewStatus", is("DRAFT")))
+                .andExpect(jsonPath("$.data.contentType", is("QUIZ")));
+
+        // Verify parent in database remains unchanged
+        GeneratedContent original = generatedContentRepository.findById(v1.getId()).orElseThrow();
+        assertThat(original.getVersion()).isEqualTo(1);
+        assertThat(original.getParentId()).isNull();
+        assertThat(original.getReviewStatus()).isEqualTo("REVIEWED");
+        assertThat(original.getContentData()).containsEntry("topic", "Hàm số bậc hai");
+
+        // Verify child in database
+        List<GeneratedContent> children = generatedContentRepository.findByParentIdOrderByVersionAsc(v1.getId());
+        assertThat(children).hasSize(1);
+        GeneratedContent v2 = children.get(0);
+        assertThat(v2.getVersion()).isEqualTo(2);
+        assertThat(v2.getParentId()).isEqualTo(v1.getId());
+        assertThat(v2.getReviewStatus()).isEqualTo("DRAFT");
+        assertThat(v2.getPromptInput()).contains("[Refinement]: Bổ sung thêm 3 câu vận dụng thực tế");
+    }
+
+    @Test
+    @DisplayName("GET /workspaces/{workspaceId}/generation/{id}/versions returns sorted version lineage [BE-027]")
+    void shouldRetrieveContentVersionsLineageInAscendingOrder() throws Exception {
+        GeneratedContent v1 = generatedContentRepository.save(GeneratedContent.builder()
+                .workspaceId(workspaceA.getId())
+                .createdBy(teacherA.getId())
+                .title("Giáo án Vật lí 10")
+                .contentType("LESSON_PLAN")
+                .contentData(Map.of("topic", "Định luật Newton"))
+                .reviewStatus("REVIEWED")
+                .version(1)
+                .build());
+
+        GeneratedContent v2 = generatedContentRepository.save(GeneratedContent.builder()
+                .workspaceId(workspaceA.getId())
+                .createdBy(teacherA.getId())
+                .title("Giáo án Vật lí 10")
+                .contentType("LESSON_PLAN")
+                .contentData(Map.of("topic", "Định luật Newton v2"))
+                .reviewStatus("DRAFT")
+                .version(2)
+                .parentId(v1.getId())
+                .build());
+
+        mockMvc.perform(get("/workspaces/" + workspaceA.getId() + "/generation/" + v2.getId() + "/versions")
+                        .header("Authorization", "Bearer " + tokenA))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.data", hasSize(2)))
+                .andExpect(jsonPath("$.data[0].id", is(v1.getId().toString())))
+                .andExpect(jsonPath("$.data[0].version", is(1)))
+                .andExpect(jsonPath("$.data[1].id", is(v2.getId().toString())))
+                .andExpect(jsonPath("$.data[1].version", is(2)))
+                .andExpect(jsonPath("$.data[1].parentId", is(v1.getId().toString())));
+    }
+
+    @Test
+    @DisplayName("POST /workspaces/{workspaceId}/generation/{id}/regenerate rejects cross-workspace request with 403 Forbidden [BE-027]")
+    void shouldRejectCrossWorkspaceRegenerationWithForbidden() throws Exception {
+        GeneratedContent v1InA = generatedContentRepository.save(GeneratedContent.builder()
+                .workspaceId(workspaceA.getId())
+                .createdBy(teacherA.getId())
+                .title("Nội dung Workspace A")
+                .contentType("QUIZ")
+                .contentData(Map.of("topic", "Bảo mật"))
+                .version(1)
+                .build());
+
+        Workspace workspaceB = workspaceRepository.save(Workspace.builder()
+                .name("Không gian B")
+                .ownerId(teacherB.getId())
+                .subject("Hóa học")
+                .gradeLevel("10")
+                .build());
+
+        RegenerateRequestDto requestDto = new RegenerateRequestDto("Cố ý regenerate từ workspace B");
+
+        mockMvc.perform(post("/workspaces/" + workspaceB.getId() + "/generation/" + v1InA.getId() + "/regenerate")
+                        .header("Authorization", "Bearer " + tokenB)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.success", is(false)))
+                .andExpect(jsonPath("$.error", containsString("Cross-workspace content regeneration is forbidden")));
+    }
 }
+
 

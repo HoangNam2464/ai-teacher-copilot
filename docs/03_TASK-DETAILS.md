@@ -1585,7 +1585,7 @@ Gửi yêu cầu sinh lại kèm parent_id; hiển thị phiên bản mới mà 
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** High
 - **Assignee Type:** Backend Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-401, ATC-306
 
 **Description:**
@@ -1594,7 +1594,7 @@ Tạo endpoint POST /api/workspaces/{id}/generation/{id}/regenerate tạo bản 
 **Acceptance Criteria:**
 Bản ghi mới có version tăng dần, parent_id trỏ về bản cũ; dữ liệu cũ được bảo toàn.
 
-**Deliverable:** RegenerationService.java
+**Deliverable:** `backend/src/main/java/com/aiteachercopilot/generation/GenerationService.java` & `GenerationController.java`
 
 ---
 

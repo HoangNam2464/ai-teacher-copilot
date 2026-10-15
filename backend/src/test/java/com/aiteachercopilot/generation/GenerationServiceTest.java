@@ -709,4 +709,243 @@ public class GenerationServiceTest {
         verifyNoInteractions(documentChunkRepository);
         verify(contentCitationRepository, never()).saveAll(any());
     }
+
+    // =========================================================================
+    // [BE-027] Content Regeneration API with Version Lineage Unit Tests
+    // =========================================================================
+
+    @Test
+    @DisplayName("regenerateContent creates version 2 with parentId pointing to root [BE-027]")
+    void shouldRegenerateContentCreatingVersion2WithRootParentId() {
+        UUID rootId = UUID.randomUUID();
+        GeneratedContent v1 = GeneratedContent.builder()
+                .id(rootId)
+                .workspaceId(workspaceId)
+                .createdBy(userId)
+                .contentType("QUIZ")
+                .title("Đề kiểm tra Đại số 10")
+                .subject("Toán")
+                .gradeLevel("10")
+                .topic("Hàm số")
+                .contentData(Map.of("topic", "Hàm số"))
+                .promptInput("Soạn đề 10 câu")
+                .reviewStatus("REVIEWED")
+                .version(1)
+                .parentId(null)
+                .build();
+
+        when(generatedContentRepository.findById(rootId)).thenReturn(Optional.of(v1));
+        when(generatedContentRepository.findByParentIdOrderByVersionAsc(rootId)).thenReturn(List.of());
+
+        GeneratedContent savedV2 = GeneratedContent.builder()
+                .id(UUID.randomUUID())
+                .workspaceId(workspaceId)
+                .createdBy(userId)
+                .contentType("QUIZ")
+                .title(v1.getTitle())
+                .subject(v1.getSubject())
+                .gradeLevel(v1.getGradeLevel())
+                .topic(v1.getTopic())
+                .contentData(v1.getContentData())
+                .promptInput(v1.getPromptInput() + "\n[Refinement]: Thêm câu hỏi thực tiễn")
+                .reviewStatus("DRAFT")
+                .version(2)
+                .parentId(rootId)
+                .build();
+        when(generatedContentRepository.save(any(GeneratedContent.class))).thenReturn(savedV2);
+
+        GenerationResponseDto result = generationService.regenerateContent(
+                workspaceId, rootId, userId, "Thêm câu hỏi thực tiễn");
+
+        assertThat(result).isNotNull();
+        assertThat(result.getVersion()).isEqualTo(2);
+        assertThat(result.getParentId()).isEqualTo(rootId);
+        assertThat(result.getReviewStatus()).isEqualTo("DRAFT");
+
+        ArgumentCaptor<GeneratedContent> captor = ArgumentCaptor.forClass(GeneratedContent.class);
+        verify(generatedContentRepository).save(captor.capture());
+        GeneratedContent captured = captor.getValue();
+        assertThat(captured.getVersion()).isEqualTo(2);
+        assertThat(captured.getParentId()).isEqualTo(rootId);
+        assertThat(captured.getReviewStatus()).isEqualTo("DRAFT");
+        assertThat(captured.getPromptInput()).contains("[Refinement]: Thêm câu hỏi thực tiễn");
+    }
+
+    @Test
+    @DisplayName("regenerateContent from child version creates version 3 with root parentId [BE-027]")
+    void shouldRegenerateFromChildVersionCreatingVersion3WithSameRootParent() {
+        UUID rootId = UUID.randomUUID();
+        UUID v2Id = UUID.randomUUID();
+
+        GeneratedContent v1 = GeneratedContent.builder()
+                .id(rootId)
+                .workspaceId(workspaceId)
+                .version(1)
+                .parentId(null)
+                .build();
+
+        GeneratedContent v2 = GeneratedContent.builder()
+                .id(v2Id)
+                .workspaceId(workspaceId)
+                .createdBy(userId)
+                .contentType("LESSON_PLAN")
+                .title("Giáo án Lịch sử 11")
+                .subject("Lịch sử")
+                .gradeLevel("11")
+                .topic("Cách mạng tháng Mười")
+                .contentData(Map.of("topic", "Cách mạng"))
+                .promptInput("Bản gốc\n[Refinement]: Bổ sung tư liệu")
+                .reviewStatus("APPROVED")
+                .version(2)
+                .parentId(rootId)
+                .build();
+
+        when(generatedContentRepository.findById(v2Id)).thenReturn(Optional.of(v2));
+        when(generatedContentRepository.findById(rootId)).thenReturn(Optional.of(v1));
+        when(generatedContentRepository.findByParentIdOrderByVersionAsc(rootId)).thenReturn(List.of(v2));
+
+        GeneratedContent savedV3 = GeneratedContent.builder()
+                .id(UUID.randomUUID())
+                .workspaceId(workspaceId)
+                .version(3)
+                .parentId(rootId)
+                .build();
+        when(generatedContentRepository.save(any(GeneratedContent.class))).thenReturn(savedV3);
+
+        GenerationResponseDto result = generationService.regenerateContent(
+                workspaceId, v2Id, userId, "Tăng cường hoạt động thảo luận nhóm");
+
+        assertThat(result).isNotNull();
+        assertThat(result.getVersion()).isEqualTo(3);
+        assertThat(result.getParentId()).isEqualTo(rootId);
+
+        ArgumentCaptor<GeneratedContent> captor = ArgumentCaptor.forClass(GeneratedContent.class);
+        verify(generatedContentRepository).save(captor.capture());
+        GeneratedContent captured = captor.getValue();
+        assertThat(captured.getVersion()).isEqualTo(3);
+        assertThat(captured.getParentId()).isEqualTo(rootId);
+        assertThat(captured.getPromptInput()).contains("[Refinement]: Tăng cường hoạt động thảo luận nhóm");
+    }
+
+    @Test
+    @DisplayName("regenerateContent from v1 when v2 exists creates version 3 without version collision [BE-027]")
+    void shouldRegenerateFromV1WhenV2ExistsCreatingVersion3WithoutCollision() {
+        UUID rootId = UUID.randomUUID();
+        GeneratedContent v1 = GeneratedContent.builder()
+                .id(rootId)
+                .workspaceId(workspaceId)
+                .version(1)
+                .parentId(null)
+                .build();
+
+        GeneratedContent existingV2 = GeneratedContent.builder()
+                .id(UUID.randomUUID())
+                .workspaceId(workspaceId)
+                .version(2)
+                .parentId(rootId)
+                .build();
+
+        when(generatedContentRepository.findById(rootId)).thenReturn(Optional.of(v1));
+        when(generatedContentRepository.findByParentIdOrderByVersionAsc(rootId)).thenReturn(List.of(existingV2));
+
+        when(generatedContentRepository.save(any(GeneratedContent.class)))
+                .thenAnswer(inv -> inv.getArgument(0));
+
+        GenerationResponseDto result = generationService.regenerateContent(
+                workspaceId, rootId, userId, "Nhánh mới từ bản gốc v1");
+
+        assertThat(result.getVersion()).isEqualTo(3);
+        assertThat(result.getParentId()).isEqualTo(rootId);
+    }
+
+    @Test
+    @DisplayName("regenerateContent rejects cross-workspace attempt with ForbiddenException [BE-027]")
+    void shouldThrowForbiddenWhenRegeneratingCrossWorkspace() {
+        UUID contentId = UUID.randomUUID();
+        UUID otherWorkspaceId = UUID.randomUUID();
+
+        GeneratedContent contentInOtherWorkspace = GeneratedContent.builder()
+                .id(contentId)
+                .workspaceId(otherWorkspaceId)
+                .version(1)
+                .build();
+
+        when(generatedContentRepository.findById(contentId)).thenReturn(Optional.of(contentInOtherWorkspace));
+
+        assertThatThrownBy(() -> generationService.regenerateContent(workspaceId, contentId, userId, "Thử hack"))
+                .isInstanceOf(ForbiddenException.class)
+                .hasMessageContaining("Cross-workspace content regeneration is forbidden");
+
+        verify(generatedContentRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("regenerateContent throws ResourceNotFoundException when content does not exist [BE-027]")
+    void shouldThrowResourceNotFoundWhenRegeneratingNonExistentContent() {
+        UUID nonExistentId = UUID.randomUUID();
+        when(generatedContentRepository.findById(nonExistentId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> generationService.regenerateContent(workspaceId, nonExistentId, userId, "Instruction"))
+                .isInstanceOf(ResourceNotFoundException.class);
+
+        verify(generatedContentRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("getContentVersions returns complete sorted version lineage [BE-027]")
+    void shouldGetContentVersionsReturningAllVersionsSorted() {
+        UUID rootId = UUID.randomUUID();
+        GeneratedContent v1 = GeneratedContent.builder()
+                .id(rootId)
+                .workspaceId(workspaceId)
+                .title("Bản gốc")
+                .version(1)
+                .parentId(null)
+                .build();
+
+        GeneratedContent v2 = GeneratedContent.builder()
+                .id(UUID.randomUUID())
+                .workspaceId(workspaceId)
+                .title("Bản v2")
+                .version(2)
+                .parentId(rootId)
+                .build();
+
+        GeneratedContent v3 = GeneratedContent.builder()
+                .id(UUID.randomUUID())
+                .workspaceId(workspaceId)
+                .title("Bản v3")
+                .version(3)
+                .parentId(rootId)
+                .build();
+
+        when(generatedContentRepository.findById(v2.getId())).thenReturn(Optional.of(v2));
+        when(generatedContentRepository.findById(rootId)).thenReturn(Optional.of(v1));
+        when(generatedContentRepository.findByParentIdOrderByVersionAsc(rootId)).thenReturn(List.of(v2, v3));
+
+        List<GenerationResponseDto> versions = generationService.getContentVersions(workspaceId, v2.getId(), userId);
+
+        assertThat(versions).hasSize(3);
+        assertThat(versions.get(0).getVersion()).isEqualTo(1);
+        assertThat(versions.get(1).getVersion()).isEqualTo(2);
+        assertThat(versions.get(2).getVersion()).isEqualTo(3);
+    }
+
+    @Test
+    @DisplayName("getContentVersions rejects cross-workspace access with ForbiddenException [BE-027]")
+    void shouldThrowForbiddenWhenGettingVersionsCrossWorkspace() {
+        UUID contentId = UUID.randomUUID();
+        UUID otherWorkspaceId = UUID.randomUUID();
+
+        GeneratedContent target = GeneratedContent.builder()
+                .id(contentId)
+                .workspaceId(otherWorkspaceId)
+                .build();
+
+        when(generatedContentRepository.findById(contentId)).thenReturn(Optional.of(target));
+
+        assertThatThrownBy(() -> generationService.getContentVersions(workspaceId, contentId, userId))
+                .isInstanceOf(ForbiddenException.class)
+                .hasMessageContaining("Cross-workspace content access is forbidden");
+    }
 }
