@@ -1528,7 +1528,7 @@ Mỗi câu hỏi có trường bloom_taxonomy_level hợp lệ (REMEMBER, UNDERS
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** High
 - **Assignee Type:** QA Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-401
 
 **Description:**
@@ -1537,7 +1537,7 @@ Kiểm thử tính chính xác của việc gắn nhãn cấp độ Bloom trên 
 **Acceptance Criteria:**
 Nhãn Bloom phản ánh đúng độ khó của câu hỏi; bộ lọc UI hoạt động chính xác.
 
-**Deliverable:** Bloom Tagging Test Report
+**Deliverable:** `docs/4.Test_Case/TC_QA-024_Bloom_Taxonomy_Question_Tagging_Filtering.md` & `scripts/qa/test_qa024_bloom_tagging_filtering.ps1`
 
 ---
 
