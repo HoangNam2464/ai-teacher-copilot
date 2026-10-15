@@ -4463,7 +4463,16 @@
     "filterEmptyDesc": "Thử chọn một cấp độ Bloom khác hoặc hiển thị lại toàn bộ câu hỏi.",
     "showAllQuestions": "Xem tất cả câu hỏi",
     "clickToFilter": "Nhấn để lọc theo cấp độ",
-    "questionsUnit": "câu hỏi"
+    "questionsUnit": "câu hỏi",
+    "hotFilter": "Tư duy bậc cao (HOT)",
+    "hotFilterTooltip": "Lọc nhóm tư duy bậc cao (Phân tích, Đánh giá, Sáng tạo)",
+    "matrixDistribution": "Ma trận đề",
+    "viewMatrix": "Xem ma trận đề",
+    "hideMatrix": "Ẩn ma trận",
+    "matrixTitle": "Ma trận phân bổ câu hỏi theo Thang đo Bloom",
+    "matrixSubtitle": "Tỷ lệ câu hỏi giúp giáo viên cân đối giữa nhận thức cơ bản và tư duy bậc cao",
+    "foundationalLabel": "Cơ bản",
+    "hotLabel": "Tư duy nâng cao"
   },
   "generation": {
     "version": "Bản",

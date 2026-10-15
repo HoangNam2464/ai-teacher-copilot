@@ -7,8 +7,7 @@ import { useWorkspaceStore } from '@/stores/workspaceStore';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Spinner } from '@/components/ui/Spinner';
-import { BloomTaxonomyTag, normalizeBloomLevel } from '@/components/ui/BloomTaxonomyTag';
-import { BloomFilterBar } from '@/components/quiz/BloomFilterBar';
+import { BloomBadge, BloomFilter, normalizeBloomLevel } from '@/components/quiz';
 import { CitationBadge } from '@/components/citation/CitationBadge';
 import { CitationDrawer } from '@/components/citation/CitationDrawer';
 import { ExportDropdown } from '@/components/export/ExportDropdown';
@@ -243,6 +242,12 @@ export function QuizGeneratorPage() {
   const filteredQuestions = useMemo(() => {
     if (bloomFilter === 'ALL') {
       return allQuestions;
+    }
+    if (bloomFilter === 'HOT') {
+      return allQuestions.filter((q) => {
+        const norm = normalizeBloomLevel(q?.bloom_taxonomy_level);
+        return ['analyze', 'evaluate', 'create'].includes(norm);
+      });
     }
     return allQuestions.filter((q) => {
       const norm = normalizeBloomLevel(q?.bloom_taxonomy_level);
@@ -515,8 +520,8 @@ export function QuizGeneratorPage() {
               </CardHeader>
 
               <CardContent className="p-6 overflow-y-auto max-h-[calc(100vh-16rem)] space-y-5">
-                {/* Bloom's Taxonomy Filter Bar */}
-                <BloomFilterBar
+                {/* Bloom's Taxonomy Filter & Matrix Distribution */}
+                <BloomFilter
                   questions={allQuestions}
                   selectedFilter={bloomFilter}
                   onSelectFilter={(newFilter) => setBloomFilter(newFilter)}
@@ -577,7 +582,7 @@ export function QuizGeneratorPage() {
                           </div>
                           <div className="flex gap-2 flex-wrap justify-end shrink-0">
                             {q.bloom_taxonomy_level && (
-                              <BloomTaxonomyTag
+                              <BloomBadge
                                 level={q.bloom_taxonomy_level}
                                 interactive={true}
                                 active={isLevelActive}
