@@ -7,6 +7,12 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.core.security import verify_api_key
+from app.generation.bloom_classifier import (
+    BatchClassifyRequest,
+    BloomClassificationResult,
+    SingleQuestionClassifyRequest,
+    bloom_classifier,
+)
 from app.generation.evidence_validator import InsufficientEvidenceError
 from app.generation.lesson_planner import lesson_planner_pipeline
 from app.generation.quiz_generator import QuizValidationError, quiz_generator_pipeline
@@ -148,4 +154,62 @@ async def generate_quiz(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Quiz generation failed: {str(e)}",
+        )
+
+
+@router.post("/bloom/classify", response_model=BloomClassificationResult)
+async def classify_question_bloom(
+    request: SingleQuestionClassifyRequest,
+    _api_key: str = Depends(verify_api_key),
+):
+    """
+    Automated Bloom's Taxonomy Question Classification endpoint (BE-026 / ATC-82).
+    Classifies a question into REMEMBER, UNDERSTAND, APPLY, ANALYZE, EVALUATE, CREATE.
+    """
+    try:
+        result = bloom_classifier.classify_question(
+            question_text=request.question_text,
+            options=request.options,
+            explanation=request.explanation,
+            suggested_level=request.suggested_level,
+        )
+        return result
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Bloom classification failed: {str(e)}",
+        )
+
+
+@router.post("/bloom/batch-classify")
+async def batch_classify_questions_bloom(
+    request: BatchClassifyRequest,
+    _api_key: str = Depends(verify_api_key),
+):
+    """
+    Batch classification of multiple questions and computation of cognitive distribution (BE-026 / ATC-82).
+    """
+    try:
+        results = [
+            bloom_classifier.classify_question(
+                question_text=q.question_text,
+                options=q.options,
+                explanation=q.explanation,
+                suggested_level=q.suggested_level,
+            )
+            for q in request.questions
+        ]
+        distribution = bloom_classifier.calculate_bloom_distribution(
+            [{"bloom_taxonomy_level": r.level_titlecase} for r in results]
+        )
+        return {
+            "status": "success",
+            "count": len(results),
+            "results": [r.model_dump() for r in results],
+            "distribution": distribution,
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Batch Bloom classification failed: {str(e)}",
         )

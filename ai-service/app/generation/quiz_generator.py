@@ -16,6 +16,11 @@ import json
 import re
 import structlog
 
+from app.generation.bloom_classifier import (
+    BloomLevel,
+    bloom_classifier,
+    normalize_to_titlecase,
+)
 from app.generation.evidence_validator import (
     InsufficientEvidenceError,
     validate_retrieval_evidence,
@@ -87,23 +92,8 @@ class QuizValidationError(ValueError):
 
 
 def normalize_bloom_level(level: Optional[str]) -> str:
-    """Normalize Bloom's taxonomy level to standard Titlecase name."""
-    if not level or not isinstance(level, str):
-        return "Understand"
-
-    cleaned = level.strip()
-    # Check direct match case-insensitively
-    for standard in VALID_BLOOM_LEVELS:
-        if cleaned.lower() == standard.lower():
-            return standard
-
-    # Check synonyms
-    lower = cleaned.lower()
-    for syn, standard in BLOOM_SYNONYMS.items():
-        if syn in lower:
-            return standard
-
-    return "Understand"
+    """Normalize Bloom's taxonomy level to standard Titlecase name (delegates to bloom_classifier)."""
+    return normalize_to_titlecase(level)
 
 
 def repair_and_clean_options(raw_options: Any) -> List[str]:
@@ -215,7 +205,13 @@ def validate_and_repair_quiz(
 
         raw_explanation = str(q_data.get("explanation") or "").strip()
         explanation = raw_explanation or "Giải thích dựa trên tài liệu tham khảo bài học."
-        bloom_level = normalize_bloom_level(q_data.get("bloom_taxonomy_level"))
+        classification = bloom_classifier.classify_question(
+            question_text=q_text,
+            options=q_data.get("options"),
+            explanation=raw_explanation,
+            suggested_level=q_data.get("bloom_taxonomy_level"),
+        )
+        bloom_level = classification.level_titlecase
 
         # Resolve citations
         q_chunk_ids = q_data.get("source_chunk_ids") or []
