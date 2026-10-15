@@ -1490,7 +1490,7 @@ Bản vẽ Figma cho 6 Bloom Badges và widget thống kê ma trận nhận th�
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** High
 - **Assignee Type:** Frontend Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-401
 
 **Description:**
@@ -1499,7 +1499,7 @@ Gắn badge cấp độ Bloom vào từng câu hỏi và thêm bộ lọc câu h
 **Acceptance Criteria:**
 Giáo viên lọc được câu hỏi theo cấp độ nhận thức; xem tỷ lệ phân bổ ma trận đề.
 
-**Deliverable:** BloomBadge.jsx & BloomFilter.jsx
+**Deliverable:** `frontend/src/components/quiz/BloomBadge.jsx` & `frontend/src/components/quiz/BloomFilter.jsx`
 
 ---
 

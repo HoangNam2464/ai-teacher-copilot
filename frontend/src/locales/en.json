@@ -4463,7 +4463,16 @@
     "filterEmptyDesc": "Try selecting another Bloom level or view all questions.",
     "showAllQuestions": "Show all questions",
     "clickToFilter": "Click to filter by level",
-    "questionsUnit": "questions"
+    "questionsUnit": "questions",
+    "hotFilter": "Higher-Order Thinking (HOT)",
+    "hotFilterTooltip": "Filter higher-order cognitive questions (Analyze, Evaluate, Create)",
+    "matrixDistribution": "Assessment Matrix",
+    "viewMatrix": "View Matrix",
+    "hideMatrix": "Hide Matrix",
+    "matrixTitle": "Assessment Question Distribution Matrix (Bloom)",
+    "matrixSubtitle": "Question proportions helping teachers balance foundational understanding and higher-order skills",
+    "foundationalLabel": "Foundational",
+    "hotLabel": "Advanced HOT"
   },
   "generation": {
     "version": "Version",
