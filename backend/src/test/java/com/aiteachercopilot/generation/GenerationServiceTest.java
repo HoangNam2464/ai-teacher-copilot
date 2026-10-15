@@ -948,4 +948,176 @@ public class GenerationServiceTest {
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessageContaining("Cross-workspace content access is forbidden");
     }
+
+    @Test
+    @DisplayName("getWorkspaceGenerationHistory filters by contentType when provided [BE-028]")
+    void shouldGetWorkspaceGenerationHistoryFilteredByContentType() {
+        GeneratedContent quizItem = GeneratedContent.builder()
+                .id(UUID.randomUUID())
+                .workspaceId(workspaceId)
+                .contentType("QUIZ")
+                .title("Đề kiểm tra 15p")
+                .version(1)
+                .build();
+
+        when(generatedContentRepository.findByWorkspaceIdAndContentTypeOrderByCreatedAtDesc(workspaceId, "QUIZ"))
+                .thenReturn(List.of(quizItem));
+
+        List<GenerationResponseDto> history = generationService.getWorkspaceGenerationHistory(workspaceId, userId, "QUIZ");
+
+        assertThat(history).hasSize(1);
+        assertThat(history.get(0).getContentType()).isEqualTo("QUIZ");
+        assertThat(history.get(0).getTitle()).isEqualTo("Đề kiểm tra 15p");
+        verify(generatedContentRepository).findByWorkspaceIdAndContentTypeOrderByCreatedAtDesc(workspaceId, "QUIZ");
+    }
+
+    @Test
+    @DisplayName("getWorkspaceGenerationHistory returns all items when contentType is null or blank [BE-028]")
+    void shouldGetWorkspaceGenerationHistoryAllWhenContentTypeNullOrBlank() {
+        GeneratedContent item1 = GeneratedContent.builder()
+                .id(UUID.randomUUID())
+                .workspaceId(workspaceId)
+                .contentType("LESSON_PLAN")
+                .title("Giáo án 1")
+                .build();
+        GeneratedContent item2 = GeneratedContent.builder()
+                .id(UUID.randomUUID())
+                .workspaceId(workspaceId)
+                .contentType("QUIZ")
+                .title("Bài kiểm tra 1")
+                .build();
+
+        when(generatedContentRepository.findByWorkspaceIdOrderByCreatedAtDesc(workspaceId))
+                .thenReturn(List.of(item1, item2));
+
+        List<GenerationResponseDto> resultNull = generationService.getWorkspaceGenerationHistory(workspaceId, userId, null);
+        List<GenerationResponseDto> resultBlank = generationService.getWorkspaceGenerationHistory(workspaceId, userId, "   ");
+
+        assertThat(resultNull).hasSize(2);
+        assertThat(resultBlank).hasSize(2);
+        verify(generatedContentRepository, times(2)).findByWorkspaceIdOrderByCreatedAtDesc(workspaceId);
+    }
+
+    @Test
+    @DisplayName("getVersionTree returns structured tree with root, current, latest, and ordered versions [BE-028]")
+    void shouldGetVersionTreeWithCompleteHierarchyAndMetadata() {
+        UUID rootId = UUID.randomUUID();
+        UUID v2Id = UUID.randomUUID();
+        UUID v3Id = UUID.randomUUID();
+
+        GeneratedContent v1 = GeneratedContent.builder()
+                .id(rootId)
+                .workspaceId(workspaceId)
+                .title("Bản gốc")
+                .version(1)
+                .parentId(null)
+                .build();
+
+        GeneratedContent v2 = GeneratedContent.builder()
+                .id(v2Id)
+                .workspaceId(workspaceId)
+                .title("Bản v2")
+                .version(2)
+                .parentId(rootId)
+                .build();
+
+        GeneratedContent v3 = GeneratedContent.builder()
+                .id(v3Id)
+                .workspaceId(workspaceId)
+                .title("Bản v3")
+                .version(3)
+                .parentId(rootId)
+                .build();
+
+        when(generatedContentRepository.findById(v2Id)).thenReturn(Optional.of(v2));
+        when(generatedContentRepository.findById(rootId)).thenReturn(Optional.of(v1));
+        when(generatedContentRepository.findByParentIdOrderByVersionAsc(rootId)).thenReturn(List.of(v2, v3));
+
+        VersionTreeDto tree = generationService.getVersionTree(workspaceId, v2Id, userId);
+
+        assertThat(tree).isNotNull();
+        assertThat(tree.getRootId()).isEqualTo(rootId);
+        assertThat(tree.getCurrentId()).isEqualTo(v2Id);
+        assertThat(tree.getCurrentVersion()).isEqualTo(2);
+        assertThat(tree.getLatestVersion()).isEqualTo(3);
+        assertThat(tree.getTotalVersions()).isEqualTo(3);
+        assertThat(tree.getVersions()).hasSize(3);
+        assertThat(tree.getVersions().get(0).getVersion()).isEqualTo(1);
+        assertThat(tree.getVersions().get(1).getVersion()).isEqualTo(2);
+        assertThat(tree.getVersions().get(2).getVersion()).isEqualTo(3);
+    }
+
+    @Test
+    @DisplayName("getVersionTree rejects cross-workspace access with ForbiddenException [BE-028]")
+    void shouldThrowForbiddenWhenGettingVersionTreeCrossWorkspace() {
+        UUID contentId = UUID.randomUUID();
+        UUID otherWorkspaceId = UUID.randomUUID();
+
+        GeneratedContent target = GeneratedContent.builder()
+                .id(contentId)
+                .workspaceId(otherWorkspaceId)
+                .build();
+
+        when(generatedContentRepository.findById(contentId)).thenReturn(Optional.of(target));
+
+        assertThatThrownBy(() -> generationService.getVersionTree(workspaceId, contentId, userId))
+                .isInstanceOf(ForbiddenException.class)
+                .hasMessageContaining("Cross-workspace content access is forbidden");
+    }
+
+    @Test
+    @DisplayName("getGeneratedContentById directly retrieves content and authorizes workspace [BE-028]")
+    void shouldGetGeneratedContentByIdDirectly() {
+        UUID contentId = UUID.randomUUID();
+        GeneratedContent content = GeneratedContent.builder()
+                .id(contentId)
+                .workspaceId(workspaceId)
+                .title("Nội dung tra cứu")
+                .build();
+
+        when(generatedContentRepository.findById(contentId)).thenReturn(Optional.of(content));
+
+        GenerationResponseDto result = generationService.getGeneratedContentById(contentId, userId);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(contentId);
+        assertThat(result.getTitle()).isEqualTo("Nội dung tra cứu");
+        verify(workspaceService).findAndAuthorize(workspaceId, userId);
+    }
+
+    @Test
+    @DisplayName("deleteGeneratedContent removes content and related citations [BE-028]")
+    void shouldDeleteGeneratedContentWithCitations() {
+        UUID contentId = UUID.randomUUID();
+        GeneratedContent content = GeneratedContent.builder()
+                .id(contentId)
+                .workspaceId(workspaceId)
+                .build();
+
+        when(generatedContentRepository.findById(contentId)).thenReturn(Optional.of(content));
+
+        generationService.deleteGeneratedContent(workspaceId, contentId, userId);
+
+        verify(contentCitationRepository).deleteByContentId(contentId);
+        verify(generatedContentRepository).delete(content);
+    }
+
+    @Test
+    @DisplayName("deleteGeneratedContent throws ForbiddenException on cross-workspace deletion [BE-028]")
+    void shouldThrowForbiddenWhenDeletingCrossWorkspace() {
+        UUID contentId = UUID.randomUUID();
+        UUID otherWorkspaceId = UUID.randomUUID();
+        GeneratedContent content = GeneratedContent.builder()
+                .id(contentId)
+                .workspaceId(otherWorkspaceId)
+                .build();
+
+        when(generatedContentRepository.findById(contentId)).thenReturn(Optional.of(content));
+
+        assertThatThrownBy(() -> generationService.deleteGeneratedContent(workspaceId, contentId, userId))
+                .isInstanceOf(ForbiddenException.class)
+                .hasMessageContaining("Cross-workspace content deletion is forbidden");
+
+        verify(generatedContentRepository, never()).delete(any());
+    }
 }

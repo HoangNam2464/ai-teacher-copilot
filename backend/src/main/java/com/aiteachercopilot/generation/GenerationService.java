@@ -415,14 +415,33 @@ public class GenerationService {
     }
 
     /**
+     * Lists generation history for a workspace, ordered by newest first [BE-021, BE-028].
+     * Supports optional contentType filtering (e.g. QUIZ, LESSON_PLAN).
+     */
+    @Transactional(readOnly = true)
+    public List<GenerationResponseDto> getWorkspaceGenerationHistory(UUID workspaceId, UUID userId, String contentType) {
+        workspaceService.findAndAuthorize(workspaceId, userId);
+
+        List<GeneratedContent> list;
+        if (contentType != null && !contentType.trim().isEmpty()) {
+            list = generatedContentRepository.findByWorkspaceIdAndContentTypeOrderByCreatedAtDesc(
+                    workspaceId, contentType.trim().toUpperCase());
+            if (list.isEmpty()) {
+                list = generatedContentRepository.findByWorkspaceIdAndContentTypeOrderByCreatedAtDesc(
+                        workspaceId, contentType.trim());
+            }
+        } else {
+            list = generatedContentRepository.findByWorkspaceIdOrderByCreatedAtDesc(workspaceId);
+        }
+        return list.stream().map(GenerationResponseDto::fromEntity).toList();
+    }
+
+    /**
      * Lists generation history for a workspace, ordered by newest first.
      */
     @Transactional(readOnly = true)
     public List<GenerationResponseDto> getWorkspaceGenerationHistory(UUID workspaceId, UUID userId) {
-        workspaceService.findAndAuthorize(workspaceId, userId);
-
-        List<GeneratedContent> list = generatedContentRepository.findByWorkspaceIdOrderByCreatedAtDesc(workspaceId);
-        return list.stream().map(GenerationResponseDto::fromEntity).toList();
+        return getWorkspaceGenerationHistory(workspaceId, userId, null);
     }
 
     /**
@@ -556,5 +575,91 @@ public class GenerationService {
         all.sort(java.util.Comparator.comparingInt(c -> c.getVersion() != null ? c.getVersion() : 1));
 
         return all.stream().map(GenerationResponseDto::fromEntity).toList();
+    }
+
+    /**
+     * Retrieves the complete version tree and lineage hierarchy for a given content record [BE-028].
+     */
+    @Transactional(readOnly = true)
+    public VersionTreeDto getVersionTree(UUID workspaceId, UUID contentId, UUID userId) {
+        workspaceService.findAndAuthorize(workspaceId, userId);
+
+        GeneratedContent target = generatedContentRepository.findById(contentId)
+                .orElseThrow(() -> new ResourceNotFoundException("GeneratedContent", contentId));
+
+        if (!workspaceId.equals(target.getWorkspaceId())) {
+            throw new ForbiddenException("Cross-workspace content access is forbidden");
+        }
+
+        UUID rootId = target.getParentId() != null ? target.getParentId() : target.getId();
+        GeneratedContent root = generatedContentRepository.findById(rootId).orElse(target);
+
+        List<GeneratedContent> children = generatedContentRepository.findByParentIdOrderByVersionAsc(rootId);
+        List<GeneratedContent> all = new ArrayList<>();
+        all.add(root);
+        for (GeneratedContent child : children) {
+            if (!child.getId().equals(root.getId())) {
+                all.add(child);
+            }
+        }
+        all.sort(java.util.Comparator.comparingInt(c -> c.getVersion() != null ? c.getVersion() : 1));
+
+        int currentVersion = target.getVersion() != null ? target.getVersion() : 1;
+        int latestVersion = all.stream()
+                .mapToInt(c -> c.getVersion() != null ? c.getVersion() : 1)
+                .max()
+                .orElse(currentVersion);
+
+        return VersionTreeDto.builder()
+                .rootId(root.getId())
+                .currentId(target.getId())
+                .currentVersion(currentVersion)
+                .latestVersion(latestVersion)
+                .totalVersions(all.size())
+                .versions(all.stream().map(GenerationResponseDto::fromEntity).toList())
+                .build();
+    }
+
+    /**
+     * Retrieves a generated content record by ID directly, authorizing against its workspace.
+     */
+    @Transactional(readOnly = true)
+    public GenerationResponseDto getGeneratedContentById(UUID contentId, UUID userId) {
+        GeneratedContent content = generatedContentRepository.findById(contentId)
+                .orElseThrow(() -> new ResourceNotFoundException("GeneratedContent", contentId));
+        workspaceService.findAndAuthorize(content.getWorkspaceId(), userId);
+        return GenerationResponseDto.fromEntity(content);
+    }
+
+    /**
+     * Deletes a generated content record, ensuring workspace ownership.
+     */
+    @Transactional
+    public void deleteGeneratedContent(UUID workspaceId, UUID contentId, UUID userId) {
+        workspaceService.findAndAuthorize(workspaceId, userId);
+
+        GeneratedContent content = generatedContentRepository.findById(contentId)
+                .orElseThrow(() -> new ResourceNotFoundException("GeneratedContent", contentId));
+
+        if (!workspaceId.equals(content.getWorkspaceId())) {
+            throw new ForbiddenException("Cross-workspace content deletion is forbidden");
+        }
+
+        contentCitationRepository.deleteByContentId(contentId);
+        generatedContentRepository.delete(content);
+        log.info("Deleted generated content {} in workspace {}", contentId, workspaceId);
+    }
+
+    /**
+     * Deletes a generated content record by ID directly, authorizing against its workspace.
+     */
+    @Transactional
+    public void deleteGeneratedContent(UUID contentId, UUID userId) {
+        GeneratedContent content = generatedContentRepository.findById(contentId)
+                .orElseThrow(() -> new ResourceNotFoundException("GeneratedContent", contentId));
+        workspaceService.findAndAuthorize(content.getWorkspaceId(), userId);
+        contentCitationRepository.deleteByContentId(contentId);
+        generatedContentRepository.delete(content);
+        log.info("Deleted generated content {} by user {}", contentId, userId);
     }
 }

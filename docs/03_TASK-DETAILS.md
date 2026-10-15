@@ -1661,7 +1661,7 @@ Giáo viên xem được toàn bộ các bài soạn trong workspace và mở l�
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** Medium
 - **Assignee Type:** Backend Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-403
 
 **Description:**
@@ -1670,7 +1670,7 @@ Tạo endpoint GET /api/workspaces/{id}/generation/history và GET /api/workspac
 **Acceptance Criteria:**
 Trả về danh sách bài soạn kèm thông tin phiên bản và chuỗi phả hệ version.
 
-**Deliverable:** HistoryController.java
+**Deliverable:** HistoryController.java, VersionTreeDto.java
 
 ---
 

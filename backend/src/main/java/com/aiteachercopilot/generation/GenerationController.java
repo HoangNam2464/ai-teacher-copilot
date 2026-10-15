@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -23,8 +24,7 @@ import java.util.UUID;
 @RequestMapping({
         "/workspaces/{workspaceId}/generation",
         "/workspaces/{workspaceId}/generations",
-        "/workspaces/{workspaceId}/generate",
-        "/workspaces/{workspaceId}/history"
+        "/workspaces/{workspaceId}/generate"
 })
 @RequiredArgsConstructor
 public class GenerationController {
@@ -89,10 +89,11 @@ public class GenerationController {
     @GetMapping({"/history", ""})
     public ResponseEntity<ApiResponse<List<GenerationResponseDto>>> getGenerationHistory(
             @AuthenticationPrincipal User user,
-            @PathVariable UUID workspaceId) {
+            @PathVariable UUID workspaceId,
+            @RequestParam(required = false) String contentType) {
 
         List<GenerationResponseDto> history = generationService.getWorkspaceGenerationHistory(
-                workspaceId, user.getId());
+                workspaceId, user.getId(), contentType);
         return ResponseEntity.ok(ApiResponse.success(history));
     }
 
@@ -119,5 +120,16 @@ public class GenerationController {
         List<GenerationResponseDto> versions = generationService.getContentVersions(
                 workspaceId, id, user.getId());
         return ResponseEntity.ok(ApiResponse.success(versions));
+    }
+
+    @GetMapping({"/{id}/tree", "/{id}/version-tree"})
+    public ResponseEntity<ApiResponse<VersionTreeDto>> getVersionTree(
+            @AuthenticationPrincipal User user,
+            @PathVariable UUID workspaceId,
+            @PathVariable UUID id) {
+
+        VersionTreeDto tree = generationService.getVersionTree(
+                workspaceId, id, user.getId());
+        return ResponseEntity.ok(ApiResponse.success(tree));
     }
 }
