@@ -195,3 +195,102 @@ class QuizGenerationRequest(BaseModel):
         le=1.0,
         description="Minimum cosine similarity threshold for vector retrieval",
     )
+
+
+class RubricScoreLevel(BaseModel):
+    """
+    Score level in assessment rubric matrix (e.g. Xuất sắc, Khá, Đạt, Cần cố gắng) (BE-029).
+    """
+    model_config = ConfigDict(from_attributes=True, extra="ignore")
+
+    id: str = Field(..., description="Level identifier code: L4, L3, L2, L1")
+    name: str = Field(..., description="Level name: Xuất sắc, Tốt / Khá, Đạt / TB, Cần cố gắng")
+    points: float = Field(default=4.0, description="Numerical score or point value for level")
+    label: str = Field(default="", description="Descriptive label e.g. 'Mức 4 (Giỏi)'")
+    color: str = Field(default="emerald", description="UI styling badge color: emerald, blue, amber, rose")
+
+
+class RubricCriterion(BaseModel):
+    """
+    Single criterion row in the assessment rubric matrix (BE-029 / ATC-405).
+    """
+    model_config = ConfigDict(from_attributes=True, extra="ignore")
+
+    id: str = Field(
+        default_factory=lambda: f"crit-{uuid.uuid4().hex[:6]}",
+        description="Unique identifier for the criterion",
+    )
+    name: str = Field(..., description="Criterion name (e.g. 'Nắm vững kiến thức cốt lõi')")
+    description: str = Field(..., description="Pedagogical description of what is assessed")
+    weight: int = Field(
+        default=25,
+        ge=1,
+        le=100,
+        description="Percentage weight of criterion. The sum of all criteria weights must be 100%.",
+    )
+    descriptors: dict[str, str] = Field(
+        ...,
+        description="Mapping from level ID (L4, L3, L2, L1) to concrete observable student performance descriptor",
+    )
+    curriculum_alignment: Optional[str] = Field(
+        default=None,
+        description="Specific learning outcome or standard from curriculum (YCCĐ CT GDPT 2018)",
+    )
+
+
+class RubricSchema(BaseModel):
+    """
+    Standardized curriculum-grounded Assessment Rubric schema conforming to BE-029 / ATC-405.
+    """
+    model_config = ConfigDict(from_attributes=True, extra="ignore")
+
+    title: str = Field(..., description="Assessment rubric matrix title")
+    subject: str = Field(..., description="Subject name (e.g. Toán học, Hóa học)")
+    grade_level: str = Field(..., description="Target grade level (e.g. 10, 11, 12)")
+    topic: str = Field(..., description="Curriculum topic or assessment focus")
+    description: str = Field(..., description="General scoring guide and assessment purpose")
+    scale_type: Literal["PERCENTAGE", "POINTS"] = Field(
+        default="PERCENTAGE",
+        description="Scoring scale format: 'PERCENTAGE' or 'POINTS'",
+    )
+    levels: List[RubricScoreLevel] = Field(
+        ...,
+        description="Competency levels ordered from highest (L4) to lowest (L1)",
+    )
+    criteria: List[RubricCriterion] = Field(
+        ...,
+        description="List of evaluation criteria matrix rows",
+    )
+    curriculum_alignment: Optional[str] = Field(
+        default=None,
+        description="Overall curriculum standards alignment summary (CT GDPT 2018)",
+    )
+    source_chunk_ids: List[str] = Field(
+        default_factory=list,
+        description="Provenance chunk IDs from pgvector grounding this rubric",
+    )
+    insufficient_evidence: bool = Field(
+        default=False,
+        description="Flag indicating if generation had insufficient context",
+    )
+
+
+# Alias for backward compatibility
+Rubric = RubricSchema
+
+
+class RubricGenerationRequest(BaseModel):
+    """Request payload for assessment rubric generation pipeline (BE-029)."""
+    model_config = ConfigDict(extra="ignore")
+
+    workspace_id: uuid.UUID = Field(..., description="Workspace ID for multi-tenant data isolation")
+    subject: str = Field(..., min_length=1, description="Subject (e.g. Toán, Sinh học)")
+    grade_level: str = Field(..., min_length=1, description="Grade level (e.g. 10, 11)")
+    topic: str = Field(..., min_length=1, description="Assessment topic or project theme")
+    objectives: Optional[List[str]] = Field(default=None, description="Target learning objectives to assess")
+    instructions: Optional[str] = Field(default=None, description="Custom teacher instructions or criteria requirements")
+    num_criteria: int = Field(default=3, ge=2, le=8, description="Target number of criteria rows (2 to 8)")
+    scale_type: Literal["PERCENTAGE", "POINTS"] = Field(default="PERCENTAGE", description="Scale type")
+    document_ids: Optional[List[uuid.UUID]] = Field(default=None, description="Optional document IDs to restrict RAG search")
+    min_similarity: float = Field(default=0.30, ge=0.0, le=1.0, description="Minimum cosine similarity threshold")
+

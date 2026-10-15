@@ -4,7 +4,7 @@ Guarantees evidence grounding, schema enforcement, and maps failures to appropri
 """
 
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from app.core.security import verify_api_key
 from app.generation.bloom_classifier import (
@@ -16,11 +16,17 @@ from app.generation.bloom_classifier import (
 from app.generation.evidence_validator import InsufficientEvidenceError
 from app.generation.lesson_planner import lesson_planner_pipeline
 from app.generation.quiz_generator import QuizValidationError, quiz_generator_pipeline
+from app.generation.rubric_generator import rubric_generator_pipeline
 from app.generation.schemas import (
     LessonPlanGenerationRequest,
     QuizGenerationRequest,
+    RubricGenerationRequest,
 )
-from app.generation.service import generate_lesson_plan_service, generate_quiz_service
+from app.generation.service import (
+    generate_lesson_plan_service,
+    generate_quiz_service,
+    generate_rubric_service,
+)
 from app.providers.exceptions import AIProviderError
 
 router = APIRouter()
@@ -154,6 +160,70 @@ async def generate_quiz(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Quiz generation failed: {str(e)}",
+        )
+
+
+@router.post("/rubric")
+async def generate_rubric(
+    request: Optional[RubricGenerationRequest] = None,
+    workspace_id: Optional[str] = None,
+    subject: Optional[str] = None,
+    grade_level: Optional[str] = None,
+    topic: Optional[str] = None,
+    objectives: Optional[List[str]] = Query(None),
+    instructions: Optional[str] = None,
+    num_criteria: int = 3,
+    scale_type: str = "PERCENTAGE",
+    _api_key: str = Depends(verify_api_key),
+):
+    """
+    Generate structured assessment rubric matrix (BE-029 / ATC-405).
+    Supports JSON body payload or query parameters.
+    """
+    try:
+        if request is not None:
+            rubric = await rubric_generator_pipeline.generate_rubric(request)
+        else:
+            if not workspace_id or not subject or not grade_level or not topic:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Missing required fields: workspace_id, subject, grade_level, topic",
+                )
+            rubric = await generate_rubric_service(
+                workspace_id=workspace_id,
+                subject=subject,
+                grade_level=grade_level,
+                topic=topic,
+                objectives=objectives,
+                instructions=instructions,
+                num_criteria=num_criteria,
+                scale_type=scale_type,
+            )
+        return {
+            "status": "success",
+            "content_type": "rubric",
+            "data": rubric.model_dump(),
+        }
+    except HTTPException:
+        raise
+    except InsufficientEvidenceError as e:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=e.to_dict(),
+        )
+    except AIProviderError as e:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail={
+                "error_code": "AI_PROVIDER_ERROR",
+                "message": str(e),
+                "provider": e.provider,
+            },
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Rubric generation failed: {str(e)}",
         )
 
 

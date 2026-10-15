@@ -42,4 +42,8 @@ public class GenerationRequestDto {
     private String difficulty; // "EASY", "MEDIUM", "HARD"
 
     private String targetBloomLevel; // Bloom taxonomy level
+
+    private Integer numCriteria; // For assessment rubric (BE-029)
+
+    private String scaleType; // "PERCENTAGE", "POINTS" (BE-029)
 }

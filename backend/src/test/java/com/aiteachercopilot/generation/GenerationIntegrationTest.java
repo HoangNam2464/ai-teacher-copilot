@@ -949,6 +949,102 @@ public class GenerationIntegrationTest {
         // 4. Verify content is deleted
         assertThat(generatedContentRepository.findById(content.getId())).isEmpty();
     }
+
+    @Test
+    @DisplayName("POST /generation/rubric generates structured rubric draft and persists with content_type='RUBRIC' [BE-029]")
+    void shouldGenerateRubricAndPersistWithContentTypeRubric() throws Exception {
+        // Mock WebClient response
+        WebClient.RequestBodyUriSpec requestBodyUriSpec = mock(WebClient.RequestBodyUriSpec.class);
+        WebClient.RequestBodySpec requestBodySpec = mock(WebClient.RequestBodySpec.class);
+        WebClient.RequestHeadersSpec<?> requestHeadersSpec = mock(WebClient.RequestHeadersSpec.class);
+        WebClient.ResponseSpec responseSpec = mock(WebClient.ResponseSpec.class);
+
+        doReturn(requestBodyUriSpec).when(aiServiceWebClient).post();
+        doReturn(requestBodySpec).when(requestBodyUriSpec).uri(anyString());
+        doReturn(requestHeadersSpec).when(requestBodySpec).bodyValue(any());
+        doReturn(responseSpec).when(requestHeadersSpec).retrieve();
+
+        Map<String, Object> aiRubricData = Map.of(
+                "title", "Ma trận Rubric Đánh giá Bảng tuần hoàn",
+                "subject", "Hóa học",
+                "grade_level", "10",
+                "topic", "Bảng tuần hoàn",
+                "scale_type", "PERCENTAGE",
+                "levels", List.of(
+                        Map.of("id", "L4", "name", "Xuất sắc", "points", 4.0),
+                        Map.of("id", "L3", "name", "Tốt", "points", 3.0),
+                        Map.of("id", "L2", "name", "Đạt", "points", 2.0),
+                        Map.of("id", "L1", "name", "Cần cố gắng", "points", 1.0)
+                ),
+                "criteria", List.of(
+                        Map.of("id", "crit-1", "name", "Nắm vững lý thuyết", "weight", 50, "descriptors", Map.of("L4", "Rất tốt")),
+                        Map.of("id", "crit-2", "name", "Vận dụng bài tập", "weight", 50, "descriptors", Map.of("L4", "Rất tốt"))
+                ),
+                "curriculum_alignment", "Chương trình GDPT 2018 môn Hóa học",
+                "source_chunk_ids", List.of(chunk1.getId().toString())
+        );
+
+        Map<String, Object> aiResponse = Map.of(
+                "status", "success",
+                "content_type", "rubric",
+                "data", aiRubricData
+        );
+
+        doReturn(Mono.just(aiResponse)).when(responseSpec).bodyToMono(any(ParameterizedTypeReference.class));
+
+        GenerationRequestDto requestDto = GenerationRequestDto.builder()
+                .subject("Hóa học")
+                .gradeLevel("10")
+                .topic("Bảng tuần hoàn")
+                .numCriteria(2)
+                .scaleType("PERCENTAGE")
+                .instructions("Đánh giá năng lực hóa học")
+                .build();
+
+        // 1. Generate Rubric
+        mockMvc.perform(post("/workspaces/" + workspaceA.getId() + "/generation/rubric")
+                        .header("Authorization", "Bearer " + tokenA)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.data.contentType", is("RUBRIC")))
+                .andExpect(jsonPath("$.data.reviewStatus", is("DRAFT")))
+                .andExpect(jsonPath("$.data.version", is(1)))
+                .andExpect(jsonPath("$.data.title", is("Ma trận Rubric Đánh giá Bảng tuần hoàn")))
+                .andExpect(jsonPath("$.data.contentData.criteria", hasSize(2)))
+                .andExpect(jsonPath("$.data.contentData.levels", hasSize(4)));
+
+        // 2. Verify Citations were persisted
+        List<GeneratedContent> contents = generatedContentRepository.findByWorkspaceIdOrderByCreatedAtDesc(workspaceA.getId());
+        assertThat(contents).isNotEmpty();
+        GeneratedContent rubricContent = contents.stream()
+                .filter(c -> "RUBRIC".equals(c.getContentType()))
+                .findFirst()
+                .orElse(null);
+        assertThat(rubricContent).isNotNull();
+
+        List<ContentCitation> citations = contentCitationRepository.findByContentId(rubricContent.getId());
+        assertThat(citations).isNotEmpty();
+        assertThat(citations.get(0).getChunkId()).isEqualTo(chunk1.getId());
+
+        // 3. Query History with ?contentType=RUBRIC
+        mockMvc.perform(get("/workspaces/" + workspaceA.getId() + "/generation/history")
+                        .param("contentType", "RUBRIC")
+                        .header("Authorization", "Bearer " + tokenA))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.data", hasSize(1)))
+                .andExpect(jsonPath("$.data[0].contentType", is("RUBRIC")));
+
+        // 4. Unauthorized teacher B cannot generate rubric in workspace A -> 403
+        mockMvc.perform(post("/workspaces/" + workspaceA.getId() + "/generation/rubric")
+                        .header("Authorization", "Bearer " + tokenB)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.success", is(false)));
+    }
 }
 
 

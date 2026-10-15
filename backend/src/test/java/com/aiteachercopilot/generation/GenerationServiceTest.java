@@ -1120,4 +1120,110 @@ public class GenerationServiceTest {
 
         verify(generatedContentRepository, never()).delete(any());
     }
+
+    @Test
+    @DisplayName("Should successfully generate rubric, persist draft with content_type='RUBRIC', and save citations [BE-029]")
+    void shouldGenerateAndPersistRubricSuccessfully() {
+        // Arrange
+        GenerationRequestDto request = GenerationRequestDto.builder()
+                .subject("Hóa học")
+                .gradeLevel("10")
+                .topic("Bảng tuần hoàn các nguyên tố hóa học")
+                .objectives(List.of("Nắm quy luật biến đổi tuần hoàn", "Giải thích bán kính nguyên tử"))
+                .instructions("Ma trận đánh giá bài tập nhóm")
+                .numCriteria(3)
+                .scaleType("PERCENTAGE")
+                .build();
+
+        when(workspaceService.findAndAuthorize(workspaceId, userId)).thenReturn(mock(Workspace.class));
+
+        Map<String, Object> aiRubricData = new HashMap<>();
+        aiRubricData.put("title", "Ma trận Rubric Đánh giá Bảng tuần hoàn");
+        aiRubricData.put("subject", "Hóa học");
+        aiRubricData.put("grade_level", "10");
+        aiRubricData.put("topic", "Bảng tuần hoàn các nguyên tố hóa học");
+        aiRubricData.put("scale_type", "PERCENTAGE");
+        aiRubricData.put("levels", List.of(
+                Map.of("id", "L4", "name", "Xuất sắc", "points", 4.0),
+                Map.of("id", "L3", "name", "Tốt", "points", 3.0),
+                Map.of("id", "L2", "name", "Đạt", "points", 2.0),
+                Map.of("id", "L1", "name", "Cần cố gắng", "points", 1.0)
+        ));
+        aiRubricData.put("criteria", List.of(
+                Map.of("id", "crit-1", "name", "Cấu hình electron", "weight", 30, "descriptors", Map.of("L4", "Rất tốt")),
+                Map.of("id", "crit-2", "name", "Quy luật tuần hoàn", "weight", 40, "descriptors", Map.of("L4", "Rất tốt")),
+                Map.of("id", "crit-3", "name", "Vận dụng thực tế", "weight", 30, "descriptors", Map.of("L4", "Rất tốt"))
+        ));
+        aiRubricData.put("curriculum_alignment", "YCCĐ GDPT 2018 môn Hóa học");
+        aiRubricData.put("source_chunk_ids", List.of(chunkId1.toString(), chunkId2.toString()));
+
+        Map<String, Object> aiResponse = Map.of(
+                "status", "success",
+                "content_type", "rubric",
+                "data", aiRubricData
+        );
+
+        doReturn(requestBodyUriSpec).when(aiServiceWebClient).post();
+        doReturn(requestBodySpec).when(requestBodyUriSpec).uri(eq("/generation/rubric"));
+        doReturn(requestHeadersSpec).when(requestBodySpec).bodyValue(any());
+        doReturn(responseSpec).when(requestHeadersSpec).retrieve();
+        doReturn(Mono.just(aiResponse)).when(responseSpec).bodyToMono(any(ParameterizedTypeReference.class));
+
+        GeneratedContent savedEntity = GeneratedContent.builder()
+                .id(UUID.randomUUID())
+                .workspaceId(workspaceId)
+                .createdBy(userId)
+                .contentType("RUBRIC")
+                .title("Ma trận Rubric Đánh giá Bảng tuần hoàn")
+                .subject("Hóa học")
+                .gradeLevel("10")
+                .topic("Bảng tuần hoàn các nguyên tố hóa học")
+                .contentData(aiRubricData)
+                .promptInput("Ma trận đánh giá bài tập nhóm")
+                .reviewStatus("DRAFT")
+                .version(1)
+                .modelUsed("gemini-1.5-flash")
+                .generationTimeMs(150)
+                .createdAt(Instant.now())
+                .build();
+        when(generatedContentRepository.save(any(GeneratedContent.class))).thenReturn(savedEntity);
+
+        DocumentChunk chunk1 = DocumentChunk.builder()
+                .id(chunkId1)
+                .documentId(documentId)
+                .workspaceId(workspaceId)
+                .chunkIndex(0)
+                .content("Bảng tuần hoàn các nguyên tố...")
+                .build();
+        DocumentChunk chunk2 = DocumentChunk.builder()
+                .id(chunkId2)
+                .documentId(documentId)
+                .workspaceId(workspaceId)
+                .chunkIndex(1)
+                .content("Quy luật biến đổi tính kim loại...")
+                .build();
+        when(documentChunkRepository.findAllById(any())).thenReturn(List.of(chunk1, chunk2));
+
+        // Act
+        GenerationResponseDto response = generationService.generateRubric(workspaceId, userId, request);
+
+        // Assert
+        assertThat(response).isNotNull();
+        assertThat(response.getContentType()).isEqualTo("RUBRIC");
+        assertThat(response.getReviewStatus()).isEqualTo("DRAFT");
+        assertThat(response.getVersion()).isEqualTo(1);
+        assertThat(response.getTitle()).isEqualTo("Ma trận Rubric Đánh giá Bảng tuần hoàn");
+        assertThat(response.getContentData()).containsKey("criteria");
+        assertThat(response.getContentData()).containsKey("levels");
+
+        verify(generatedContentRepository).save(contentCaptor.capture());
+        GeneratedContent captured = contentCaptor.getValue();
+        assertThat(captured.getContentType()).isEqualTo("RUBRIC");
+        assertThat(captured.getWorkspaceId()).isEqualTo(workspaceId);
+        assertThat(captured.getCreatedBy()).isEqualTo(userId);
+
+        verify(contentCitationRepository).saveAll(citationsCaptor.capture());
+        List<ContentCitation> capturedCitations = citationsCaptor.getValue();
+        assertThat(capturedCitations).hasSize(2);
+    }
 }

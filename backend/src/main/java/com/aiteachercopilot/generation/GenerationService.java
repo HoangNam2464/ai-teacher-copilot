@@ -338,6 +338,92 @@ public class GenerationService {
     }
 
     /**
+     * Generates a curriculum-grounded structured assessment rubric via FastAPI,
+     * persists the draft in generated_contents with content_type='RUBRIC',
+     * and records citation links (BE-029).
+     */
+    @Transactional
+    public GenerationResponseDto generateRubric(UUID workspaceId, UUID userId, GenerationRequestDto req) {
+        workspaceService.findAndAuthorize(workspaceId, userId);
+
+        Map<String, Object> aiRequest = new HashMap<>();
+        aiRequest.put("workspace_id", workspaceId.toString());
+        aiRequest.put("subject", req.getSubject());
+        aiRequest.put("grade_level", req.getGradeLevel());
+        aiRequest.put("topic", req.getTopic());
+        if (req.getObjectives() != null && !req.getObjectives().isEmpty()) {
+            aiRequest.put("objectives", req.getObjectives());
+        }
+        if (req.getNumCriteria() != null) {
+            aiRequest.put("num_criteria", req.getNumCriteria());
+        }
+        if (req.getScaleType() != null && !req.getScaleType().isBlank()) {
+            aiRequest.put("scale_type", req.getScaleType());
+        }
+        if (req.getInstructions() != null && !req.getInstructions().isBlank()) {
+            aiRequest.put("instructions", req.getInstructions());
+        }
+        if (req.getDocumentIds() != null && !req.getDocumentIds().isEmpty()) {
+            aiRequest.put("document_ids", req.getDocumentIds().stream().map(UUID::toString).toList());
+        }
+
+        long startTime = System.currentTimeMillis();
+        Map<String, Object> responseBody;
+
+        try {
+            responseBody = aiServiceWebClient.post()
+                    .uri("/generation/rubric")
+                    .bodyValue(aiRequest)
+                    .retrieve()
+                    .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
+                    .block();
+        } catch (WebClientResponseException e) {
+            log.error("AI Service returned error status {} for rubric generation: {}", e.getStatusCode(), e.getResponseBodyAsString());
+            throw e;
+        } catch (Exception e) {
+            log.error("Failed to connect to AI Service for rubric generation: {}", e.getMessage(), e);
+            throw e;
+        }
+
+        long durationMs = System.currentTimeMillis() - startTime;
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> contentData = (responseBody != null && responseBody.get("data") instanceof Map)
+                ? (Map<String, Object>) responseBody.get("data")
+                : (responseBody != null ? responseBody : Collections.emptyMap());
+
+        String title = (contentData.get("title") != null && !contentData.get("title").toString().isBlank())
+                ? contentData.get("title").toString()
+                : "Ma trận Rubric: " + req.getTopic();
+
+        GeneratedContent generatedContent = GeneratedContent.builder()
+                .workspaceId(workspaceId)
+                .createdBy(userId)
+                .contentType("RUBRIC")
+                .title(title)
+                .subject(req.getSubject())
+                .gradeLevel(req.getGradeLevel())
+                .topic(req.getTopic())
+                .contentData(contentData)
+                .promptInput(req.getInstructions() != null && !req.getInstructions().isBlank()
+                        ? req.getInstructions()
+                        : req.getTopic())
+                .reviewStatus("DRAFT")
+                .version(1)
+                .modelUsed("gemini-1.5-flash")
+                .generationTimeMs((int) durationMs)
+                .build();
+
+        GeneratedContent savedContent = generatedContentRepository.save(generatedContent);
+        log.info("Persisted generated rubric {} for workspace {}", savedContent.getId(), workspaceId);
+
+        // Record citations from rubric source_chunk_ids
+        persistCitations(savedContent.getId(), contentData);
+
+        return GenerationResponseDto.fromEntity(savedContent);
+    }
+
+    /**
      * Updates lesson plan content, review status, and/or title directly without invoking LLM (BE-021).
      * Enforces teacher authority and workspace ownership.
      */
@@ -490,7 +576,9 @@ public class GenerationService {
             try {
                 String endpoint = "QUIZ".equalsIgnoreCase(parent.getContentType())
                         ? "/generation/quiz"
-                        : "/generation/lesson-plan";
+                        : ("RUBRIC".equalsIgnoreCase(parent.getContentType())
+                                ? "/generation/rubric"
+                                : "/generation/lesson-plan");
 
                 Map<String, Object> aiRequest = new HashMap<>();
                 aiRequest.put("workspace_id", workspaceId.toString());
