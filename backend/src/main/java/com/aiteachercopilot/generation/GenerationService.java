@@ -442,11 +442,64 @@ public class GenerationService {
             throw new ForbiddenException("Cross-workspace content regeneration is forbidden");
         }
 
-        int nextVersion = (parent.getVersion() != null ? parent.getVersion() : 1) + 1;
         UUID rootParentId = parent.getParentId() != null ? parent.getParentId() : parent.getId();
+
+        // Calculate next version by finding the maximum version in this lineage to prevent version collisions
+        List<GeneratedContent> existingLineage = generatedContentRepository.findByParentIdOrderByVersionAsc(rootParentId);
+        int maxVersion = parent.getVersion() != null ? parent.getVersion() : 1;
+        for (GeneratedContent item : existingLineage) {
+            if (item.getVersion() != null && item.getVersion() > maxVersion) {
+                maxVersion = item.getVersion();
+            }
+        }
+        GeneratedContent rootContent = generatedContentRepository.findById(rootParentId).orElse(null);
+        if (rootContent != null && rootContent.getVersion() != null && rootContent.getVersion() > maxVersion) {
+            maxVersion = rootContent.getVersion();
+        }
+        int nextVersion = maxVersion + 1;
 
         String combinedInstructions = (parent.getPromptInput() != null ? parent.getPromptInput() : "")
                 + (instructions != null && !instructions.isBlank() ? "\n[Refinement]: " + instructions.trim() : "");
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> contentData = parent.getContentData() != null
+                ? new HashMap<>(parent.getContentData())
+                : new HashMap<>();
+
+        // If AI Service is configured and instructions are provided, attempt AI re-prompting
+        if (aiServiceWebClient != null && instructions != null && !instructions.isBlank()) {
+            try {
+                String endpoint = "QUIZ".equalsIgnoreCase(parent.getContentType())
+                        ? "/generation/quiz"
+                        : "/generation/lesson-plan";
+
+                Map<String, Object> aiRequest = new HashMap<>();
+                aiRequest.put("workspace_id", workspaceId.toString());
+                aiRequest.put("subject", parent.getSubject() != null ? parent.getSubject() : "");
+                aiRequest.put("grade_level", parent.getGradeLevel() != null ? parent.getGradeLevel() : "");
+                aiRequest.put("topic", parent.getTopic() != null ? parent.getTopic() : parent.getTitle());
+                aiRequest.put("instructions", combinedInstructions);
+
+                Map<String, Object> responseBody = aiServiceWebClient.post()
+                        .uri(endpoint)
+                        .bodyValue(aiRequest)
+                        .retrieve()
+                        .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
+                        .block();
+
+                if (responseBody != null) {
+                    if (responseBody.get("data") instanceof Map<?, ?> dataMap) {
+                        contentData = (Map<String, Object>) dataMap;
+                    } else if (responseBody.get("contentData") instanceof Map<?, ?> cdMap) {
+                        contentData = (Map<String, Object>) cdMap;
+                    } else if (!responseBody.isEmpty() && !responseBody.containsKey("error")) {
+                        contentData = responseBody;
+                    }
+                }
+            } catch (Exception e) {
+                log.info("AI service re-prompting skipped or not available during regeneration ({}), preserving parent contentData", e.getMessage());
+            }
+        }
 
         GeneratedContent newContent = GeneratedContent.builder()
                 .workspaceId(workspaceId)
@@ -456,14 +509,19 @@ public class GenerationService {
                 .subject(parent.getSubject())
                 .gradeLevel(parent.getGradeLevel())
                 .topic(parent.getTopic())
-                .contentData(parent.getContentData() != null ? new HashMap<>(parent.getContentData()) : new HashMap<>())
+                .contentData(contentData)
                 .promptInput(combinedInstructions)
                 .reviewStatus("DRAFT")
                 .version(nextVersion)
                 .parentId(rootParentId)
+                .modelUsed(parent.getModelUsed() != null ? parent.getModelUsed() : "gemini-1.5-flash")
                 .build();
 
         newContent = generatedContentRepository.save(newContent);
+
+        // Persist citations if present in re-generated content
+        persistCitations(newContent.getId(), contentData);
+
         log.info("Regenerated content {} creating version {} (parentId={}) in workspace {}",
                 contentId, nextVersion, rootParentId, workspaceId);
 
