@@ -1509,16 +1509,16 @@ Giáo viên lọc được câu hỏi theo cấp độ nhận thức; xem tỷ l
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** High
 - **Assignee Type:** Backend Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-401
 
 **Description:**
-Tích hợp chỉ thị phân loại cấp độ Bloom trực tiếp vào prompt sinh câu hỏi.
+Tích hợp chỉ thị phân loại cấp độ Bloom trực tiếp vào prompt sinh câu hỏi và xây dựng cơ chế tự động phân loại theo 6 cấp độ Bloom.
 
 **Acceptance Criteria:**
 Mỗi câu hỏi có trường bloom_taxonomy_level hợp lệ (REMEMBER, UNDERSTAND, APPLY, ANALYZE, EVALUATE, CREATE).
 
-**Deliverable:** bloom_classifier.py
+**Deliverable:** `ai-service/app/generation/bloom_classifier.py`
 
 ---
 
