@@ -19,6 +19,7 @@ import java.util.UUID;
 public class GenerationResponseDto {
 
     private UUID id;
+    private UUID workspaceId;
     private String contentType;
     private String title;
     private Map<String, Object> contentData;
@@ -34,6 +35,7 @@ public class GenerationResponseDto {
         }
         return GenerationResponseDto.builder()
                 .id(entity.getId())
+                .workspaceId(entity.getWorkspaceId())
                 .contentType(entity.getContentType())
                 .title(entity.getTitle())
                 .contentData(entity.getContentData())
