@@ -1,13 +1,16 @@
-from typing import List, Optional, Union
+from typing import List, Literal, Optional, Union
 import uuid
 from app.generation.evidence_validator import validate_retrieval_evidence
 from app.generation.lesson_planner import lesson_planner_pipeline
 from app.generation.quiz_generator import QuizGeneratorPipeline, quiz_generator_pipeline
+from app.generation.rubric_generator import rubric_generator_pipeline
 from app.generation.schemas import (
     LessonPlanGenerationRequest,
     LessonPlanSchema,
     QuizGenerationRequest,
     QuizSchema,
+    RubricGenerationRequest,
+    RubricSchema,
 )
 from app.providers.factory import get_ai_provider
 from app.retrieval.service import search_similar_chunks
@@ -106,5 +109,39 @@ async def generate_quiz_service(
     provider = get_ai_provider()
     pipeline = QuizGeneratorPipeline(provider=provider)
     return await pipeline.generate_quiz_from_chunks(request, validated_chunks)
+
+
+async def generate_rubric_service(
+    workspace_id: Union[str, uuid.UUID],
+    subject: str,
+    grade_level: str,
+    topic: str,
+    objectives: Optional[List[str]] = None,
+    instructions: Optional[str] = None,
+    num_criteria: int = 3,
+    scale_type: str = "PERCENTAGE",
+    document_ids: Optional[List[uuid.UUID]] = None,
+    min_similarity: float = 0.30,
+) -> RubricSchema:
+    """
+    Delegate assessment rubric generation to the structured RubricGeneratorPipeline (BE-029).
+    """
+    ws_uuid = workspace_id if isinstance(workspace_id, uuid.UUID) else uuid.UUID(str(workspace_id))
+    scale: Literal["PERCENTAGE", "POINTS"] = "POINTS" if scale_type.upper() == "POINTS" else "PERCENTAGE"
+
+    request = RubricGenerationRequest(
+        workspace_id=ws_uuid,
+        subject=subject,
+        grade_level=grade_level,
+        topic=topic,
+        objectives=objectives,
+        instructions=instructions,
+        num_criteria=num_criteria,
+        scale_type=scale,
+        document_ids=document_ids,
+        min_similarity=min_similarity,
+    )
+    return await rubric_generator_pipeline.generate_rubric(request)
+
 
 

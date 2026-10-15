@@ -1737,16 +1737,20 @@ Hiển thị bảng Rubric rõ ràng; hỗ trợ sửa trọng số và tiêu ch
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** Medium
 - **Assignee Type:** Backend Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-304, ATC-401
 
 **Description:**
-Xây dựng pipeline sinh Rubric đánh giá có cấu trúc qua RubricSchema.
+Xây dựng pipeline sinh Rubric đánh giá có cấu trúc qua RubricSchema, chuẩn hóa trọng số tiêu chí (tổng = 100%), đối chiếu YCCĐ Chương trình GDPT 2018 và tích hợp lưu trữ CSDL với content_type='RUBRIC' cùng nguồn trích dẫn provenance.
 
 **Acceptance Criteria:**
-Sinh Rubric đánh giá phù hợp với mục tiêu bài giảng; lưu vào CSDL với content_type='RUBRIC'.
+- Rubric được sinh theo RubricSchema (title, scale_type, levels L4-L1, criteria, curriculum_alignment, source_chunk_ids).
+- Criteria đầy đủ (name, description, weight, descriptors cho từng mức điểm).
+- Trọng số tiêu chí được tự động cân đối tổng bằng 100%.
+- Ngắt sinh và trả về HTTP 422 khi phát hiện ngữ cảnh tài liệu thiếu (InsufficientEvidenceError).
+- Spring Boot backend lưu trữ bản thảo trong `generated_contents` với `content_type='RUBRIC'` và trích xuất lưu `content_citations`.
 
-**Deliverable:** rubric_generator.py
+**Deliverable:** rubric_generator.py, GenerationService.java, GenerationController.java
 
 ---
 

@@ -52,6 +52,16 @@ public class GenerationController {
         return ResponseEntity.ok(ApiResponse.success(result));
     }
 
+    @PostMapping("/rubric")
+    public ResponseEntity<ApiResponse<GenerationResponseDto>> generateRubric(
+            @AuthenticationPrincipal User user,
+            @PathVariable UUID workspaceId,
+            @Valid @RequestBody GenerationRequestDto request) {
+
+        GenerationResponseDto result = generationService.generateRubric(workspaceId, user.getId(), request);
+        return ResponseEntity.ok(ApiResponse.success(result));
+    }
+
     @GetMapping("/{contentId}/citations")
     public ResponseEntity<ApiResponse<List<CitationResolutionDto>>> getContentCitations(
             @AuthenticationPrincipal User user,
