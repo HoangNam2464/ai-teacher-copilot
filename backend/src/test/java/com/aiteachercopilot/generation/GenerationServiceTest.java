@@ -435,4 +435,278 @@ public class GenerationServiceTest {
         assertThat(history.get(0).getTitle()).isEqualTo("Bài 1");
         assertThat(history.get(1).getTitle()).isEqualTo("Bài 2");
     }
+
+    // ===== [BE-025] Quiz Content Persistence Tests =====
+
+    @Test
+    @DisplayName("Should generate quiz, persist as QUIZ draft, and record citations from quiz and question level [BE-025]")
+    void shouldGenerateAndPersistQuiz() {
+        // Arrange
+        GenerationRequestDto request = GenerationRequestDto.builder()
+                .subject("Vật lí")
+                .gradeLevel("11")
+                .topic("Động lực học chất điểm")
+                .numQuestions(3)
+                .questionTypes(List.of("MCQ", "SHORT_ANSWER"))
+                .difficulty("MEDIUM")
+                .targetBloomLevel("Apply")
+                .instructions("Tập trung vào định luật Newton")
+                .documentIds(List.of(documentId))
+                .build();
+
+        Workspace workspace = Workspace.builder()
+                .id(workspaceId)
+                .ownerId(userId)
+                .name("Vật lí 11")
+                .build();
+        when(workspaceService.findAndAuthorize(workspaceId, userId)).thenReturn(workspace);
+
+        // Build AI quiz response with quiz-level and per-question source_chunk_ids
+        Map<String, Object> question1 = new HashMap<>();
+        question1.put("question_number", 1);
+        question1.put("type", "MCQ");
+        question1.put("question_text", "Theo định luật II Newton, F = ?");
+        question1.put("options", List.of("ma", "mv", "mgh", "½mv²"));
+        question1.put("correct_answer", "A");
+        question1.put("correct_answer_index", 0);
+        question1.put("explanation", "Theo định luật II Newton F = ma");
+        question1.put("bloom_taxonomy_level", "Remember");
+        question1.put("source_chunk_ids", List.of(chunkId1.toString()));
+
+        Map<String, Object> question2 = new HashMap<>();
+        question2.put("question_number", 2);
+        question2.put("type", "SHORT_ANSWER");
+        question2.put("question_text", "Phát biểu định luật III Newton");
+        question2.put("correct_answer", "Khi vật A tác dụng lên vật B một lực...");
+        question2.put("explanation", "Định luật III Newton về cặp lực tương tác");
+        question2.put("bloom_taxonomy_level", "Understand");
+        question2.put("source_chunk_ids", List.of(chunkId2.toString()));
+
+        Map<String, Object> aiQuizData = new HashMap<>();
+        aiQuizData.put("title", "Kiểm tra Động lực học chất điểm");
+        aiQuizData.put("subject", "Vật lí");
+        aiQuizData.put("grade_level", "11");
+        aiQuizData.put("topic", "Động lực học chất điểm");
+        aiQuizData.put("difficulty", "MEDIUM");
+        aiQuizData.put("questions", List.of(question1, question2));
+        aiQuizData.put("source_chunk_ids", List.of(chunkId1.toString(), chunkId2.toString()));
+        aiQuizData.put("insufficient_evidence", false);
+
+        Map<String, Object> aiResponse = Map.of(
+                "status", "success",
+                "content_type", "quiz",
+                "data", aiQuizData
+        );
+
+        doReturn(requestBodyUriSpec).when(aiServiceWebClient).post();
+        doReturn(requestBodySpec).when(requestBodyUriSpec).uri(eq("/generation/quiz"));
+        doReturn(requestHeadersSpec).when(requestBodySpec).bodyValue(any());
+        doReturn(responseSpec).when(requestHeadersSpec).retrieve();
+        doReturn(Mono.just(aiResponse)).when(responseSpec).bodyToMono(any(ParameterizedTypeReference.class));
+
+        GeneratedContent savedEntity = GeneratedContent.builder()
+                .id(UUID.randomUUID())
+                .workspaceId(workspaceId)
+                .createdBy(userId)
+                .contentType("QUIZ")
+                .title("Kiểm tra Động lực học chất điểm")
+                .subject("Vật lí")
+                .gradeLevel("11")
+                .topic("Động lực học chất điểm")
+                .contentData(aiQuizData)
+                .promptInput("Tập trung vào định luật Newton")
+                .reviewStatus("DRAFT")
+                .version(1)
+                .modelUsed("gemini-1.5-flash")
+                .generationTimeMs(200)
+                .createdAt(Instant.now())
+                .build();
+        when(generatedContentRepository.save(any(GeneratedContent.class))).thenReturn(savedEntity);
+
+        DocumentChunk chunk1 = DocumentChunk.builder()
+                .id(chunkId1)
+                .documentId(documentId)
+                .workspaceId(workspaceId)
+                .chunkIndex(0)
+                .content("Nội dung về các định luật Newton...")
+                .build();
+        DocumentChunk chunk2 = DocumentChunk.builder()
+                .id(chunkId2)
+                .documentId(documentId)
+                .workspaceId(workspaceId)
+                .chunkIndex(1)
+                .content("Định luật III Newton về lực và phản lực...")
+                .build();
+        when(documentChunkRepository.findAllById(any())).thenReturn(List.of(chunk1, chunk2));
+
+        // Act
+        GenerationResponseDto response = generationService.generateQuiz(workspaceId, userId, request);
+
+        // Assert - AC1: Quiz saved successfully
+        assertThat(response).isNotNull();
+        assertThat(response.getContentType()).isEqualTo("QUIZ");
+        assertThat(response.getReviewStatus()).isEqualTo("DRAFT");
+        assertThat(response.getVersion()).isEqualTo(1);
+        assertThat(response.getTitle()).isEqualTo("Kiểm tra Động lực học chất điểm");
+
+        // Assert - AC2: Questions saved fully (contentData contains questions)
+        assertThat(response.getContentData()).isNotNull();
+        assertThat(response.getContentData()).containsKey("questions");
+
+        // Assert - AC4: Generation metadata preserved
+        verify(generatedContentRepository).save(contentCaptor.capture());
+        GeneratedContent captured = contentCaptor.getValue();
+        assertThat(captured.getWorkspaceId()).isEqualTo(workspaceId);
+        assertThat(captured.getCreatedBy()).isEqualTo(userId);
+        assertThat(captured.getContentType()).isEqualTo("QUIZ");
+        assertThat(captured.getSubject()).isEqualTo("Vật lí");
+        assertThat(captured.getGradeLevel()).isEqualTo("11");
+        assertThat(captured.getTopic()).isEqualTo("Động lực học chất điểm");
+        assertThat(captured.getReviewStatus()).isEqualTo("DRAFT");
+        assertThat(captured.getVersion()).isEqualTo(1);
+        assertThat(captured.getModelUsed()).isEqualTo("gemini-1.5-flash");
+        assertThat(captured.getGenerationTimeMs()).isNotNull();
+        assertThat(captured.getPromptInput()).isEqualTo("Tập trung vào định luật Newton");
+
+        // Verify citation persistence (deduplicated from quiz + question level)
+        verify(contentCitationRepository).saveAll(citationsCaptor.capture());
+        List<ContentCitation> capturedCitations = citationsCaptor.getValue();
+        assertThat(capturedCitations).hasSize(2);
+        assertThat(capturedCitations.get(0).getContentId()).isEqualTo(savedEntity.getId());
+        assertThat(capturedCitations.get(0).getDocumentId()).isEqualTo(documentId);
+    }
+
+    @Test
+    @DisplayName("Should throw ForbiddenException when user does not own workspace for quiz generation [BE-025]")
+    void shouldThrowForbiddenWhenUserUnauthorizedForQuiz() {
+        GenerationRequestDto request = GenerationRequestDto.builder()
+                .subject("Toán")
+                .gradeLevel("10")
+                .topic("Hàm số")
+                .numQuestions(5)
+                .build();
+
+        doThrow(new ForbiddenException("Access denied to workspace"))
+                .when(workspaceService).findAndAuthorize(workspaceId, userId);
+
+        assertThatThrownBy(() -> generationService.generateQuiz(workspaceId, userId, request))
+                .isInstanceOf(ForbiddenException.class)
+                .hasMessageContaining("Access denied");
+
+        verifyNoInteractions(generatedContentRepository);
+    }
+
+    @Test
+    @DisplayName("Should persist quiz with correct contentType QUIZ and version 1 as DRAFT [BE-025]")
+    void shouldPersistQuizWithCorrectMetadata() {
+        GenerationRequestDto request = GenerationRequestDto.builder()
+                .subject("Hóa học")
+                .gradeLevel("12")
+                .topic("Phản ứng hóa học")
+                .build();
+
+        Workspace workspace = Workspace.builder().id(workspaceId).ownerId(userId).name("Hóa 12").build();
+        when(workspaceService.findAndAuthorize(workspaceId, userId)).thenReturn(workspace);
+
+        Map<String, Object> aiQuizData = new HashMap<>();
+        aiQuizData.put("title", "Kiểm tra Phản ứng hóa học");
+        aiQuizData.put("subject", "Hóa học");
+        aiQuizData.put("grade_level", "12");
+        aiQuizData.put("topic", "Phản ứng hóa học");
+        aiQuizData.put("difficulty", "EASY");
+        aiQuizData.put("questions", List.of());
+
+        Map<String, Object> aiResponse = Map.of(
+                "status", "success",
+                "content_type", "quiz",
+                "data", aiQuizData
+        );
+
+        doReturn(requestBodyUriSpec).when(aiServiceWebClient).post();
+        doReturn(requestBodySpec).when(requestBodyUriSpec).uri(eq("/generation/quiz"));
+        doReturn(requestHeadersSpec).when(requestBodySpec).bodyValue(any());
+        doReturn(responseSpec).when(requestHeadersSpec).retrieve();
+        doReturn(Mono.just(aiResponse)).when(responseSpec).bodyToMono(any(ParameterizedTypeReference.class));
+
+        GeneratedContent savedEntity = GeneratedContent.builder()
+                .id(UUID.randomUUID())
+                .workspaceId(workspaceId)
+                .createdBy(userId)
+                .contentType("QUIZ")
+                .title("Kiểm tra Phản ứng hóa học")
+                .subject("Hóa học")
+                .gradeLevel("12")
+                .topic("Phản ứng hóa học")
+                .contentData(aiQuizData)
+                .promptInput("Phản ứng hóa học")
+                .reviewStatus("DRAFT")
+                .version(1)
+                .createdAt(Instant.now())
+                .build();
+        when(generatedContentRepository.save(any(GeneratedContent.class))).thenReturn(savedEntity);
+
+        GenerationResponseDto response = generationService.generateQuiz(workspaceId, userId, request);
+
+        assertThat(response.getContentType()).isEqualTo("QUIZ");
+        assertThat(response.getVersion()).isEqualTo(1);
+        assertThat(response.getReviewStatus()).isEqualTo("DRAFT");
+
+        verify(generatedContentRepository).save(contentCaptor.capture());
+        GeneratedContent captured = contentCaptor.getValue();
+        assertThat(captured.getContentType()).isEqualTo("QUIZ");
+        assertThat(captured.getSubject()).isEqualTo("Hóa học");
+        assertThat(captured.getGradeLevel()).isEqualTo("12");
+        assertThat(captured.getTopic()).isEqualTo("Phản ứng hóa học");
+        assertThat(captured.getPromptInput()).isEqualTo("Phản ứng hóa học");
+    }
+
+    @Test
+    @DisplayName("Should persist quiz without citations when no source_chunk_ids present [BE-025]")
+    void shouldPersistQuizWithoutCitationsWhenNoChunkIds() {
+        GenerationRequestDto request = GenerationRequestDto.builder()
+                .subject("Sinh học")
+                .gradeLevel("10")
+                .topic("Tế bào")
+                .build();
+
+        Workspace workspace = Workspace.builder().id(workspaceId).ownerId(userId).name("Sinh 10").build();
+        when(workspaceService.findAndAuthorize(workspaceId, userId)).thenReturn(workspace);
+
+        Map<String, Object> aiQuizData = new HashMap<>();
+        aiQuizData.put("title", "Kiểm tra Tế bào");
+        aiQuizData.put("questions", List.of());
+
+        Map<String, Object> aiResponse = Map.of(
+                "status", "success",
+                "content_type", "quiz",
+                "data", aiQuizData
+        );
+
+        doReturn(requestBodyUriSpec).when(aiServiceWebClient).post();
+        doReturn(requestBodySpec).when(requestBodyUriSpec).uri(eq("/generation/quiz"));
+        doReturn(requestHeadersSpec).when(requestBodySpec).bodyValue(any());
+        doReturn(responseSpec).when(requestHeadersSpec).retrieve();
+        doReturn(Mono.just(aiResponse)).when(responseSpec).bodyToMono(any(ParameterizedTypeReference.class));
+
+        GeneratedContent savedEntity = GeneratedContent.builder()
+                .id(UUID.randomUUID())
+                .workspaceId(workspaceId)
+                .createdBy(userId)
+                .contentType("QUIZ")
+                .title("Kiểm tra Tế bào")
+                .contentData(aiQuizData)
+                .reviewStatus("DRAFT")
+                .version(1)
+                .createdAt(Instant.now())
+                .build();
+        when(generatedContentRepository.save(any(GeneratedContent.class))).thenReturn(savedEntity);
+
+        GenerationResponseDto response = generationService.generateQuiz(workspaceId, userId, request);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getContentType()).isEqualTo("QUIZ");
+        verify(generatedContentRepository).save(any(GeneratedContent.class));
+        verifyNoInteractions(documentChunkRepository);
+        verify(contentCitationRepository, never()).saveAll(any());
+    }
 }

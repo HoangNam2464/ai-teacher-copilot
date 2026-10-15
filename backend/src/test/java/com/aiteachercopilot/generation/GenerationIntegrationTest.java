@@ -523,4 +523,132 @@ public class GenerationIntegrationTest {
                 .andExpect(jsonPath("$.success", is(false)))
                 .andExpect(jsonPath("$.error", containsString("Cross-workspace content modification is forbidden")));
     }
+
+    // ===== [BE-025] Quiz Generation & Persistence Integration Tests =====
+
+    @Test
+    @DisplayName("POST /workspaces/{workspaceId}/generation/quiz generates and persists quiz with citations [BE-025]")
+    void shouldGenerateAndPersistQuizSuccessfully() throws Exception {
+        // Arrange
+        WebClient.RequestBodyUriSpec requestBodyUriSpec = mock(WebClient.RequestBodyUriSpec.class);
+        WebClient.RequestBodySpec requestBodySpec = mock(WebClient.RequestBodySpec.class);
+        WebClient.RequestHeadersSpec<?> requestHeadersSpec = mock(WebClient.RequestHeadersSpec.class);
+        WebClient.ResponseSpec responseSpec = mock(WebClient.ResponseSpec.class);
+
+        doReturn(requestBodyUriSpec).when(aiServiceWebClient).post();
+        doReturn(requestBodySpec).when(requestBodyUriSpec).uri(anyString());
+        doReturn(requestHeadersSpec).when(requestBodySpec).bodyValue(any());
+        doReturn(responseSpec).when(requestHeadersSpec).retrieve();
+
+        Map<String, Object> question1 = Map.of(
+                "question_number", 1,
+                "question_type", "MCQ",
+                "question_text", "Véc tơ là gì?",
+                "options", List.of("Đoạn thẳng", "Đoạn thẳng có hướng", "Đường thẳng", "Tia"),
+                "correct_answer", "B",
+                "explanation", "Theo định nghĩa SGK Toán 10",
+                "bloom_level", "REMEMBER",
+                "points", 1.0,
+                "source_chunk_ids", List.of(chunk1.getId().toString())
+        );
+
+        Map<String, Object> question2 = Map.of(
+                "question_number", 2,
+                "question_type", "SHORT_ANSWER",
+                "question_text", "Nêu hai đặc trưng cơ bản của véc tơ?",
+                "correct_answer", "Phương hướng và độ dài",
+                "explanation", "Véc tơ có phương, hướng và độ dài",
+                "bloom_level", "UNDERSTAND",
+                "points", 2.0,
+                "source_chunk_ids", List.of()
+        );
+
+        Map<String, Object> quizData = Map.of(
+                "title", "Đề kiểm tra 15 phút: Véc tơ và các phép toán",
+                "subject", "Toán",
+                "grade_level", "10",
+                "total_points", 10.0,
+                "duration_minutes", 15,
+                "bloom_distribution", Map.of("REMEMBER", 1, "UNDERSTAND", 1),
+                "questions", List.of(question1, question2),
+                "source_chunk_ids", List.of(chunk1.getId().toString()),
+                "insufficient_evidence", false
+        );
+
+        Map<String, Object> aiResponse = Map.of(
+                "status", "success",
+                "content_type", "quiz",
+                "data", quizData
+        );
+
+        doReturn(Mono.just(aiResponse)).when(responseSpec).bodyToMono(any(ParameterizedTypeReference.class));
+
+        GenerationRequestDto requestDto = GenerationRequestDto.builder()
+                .subject("Toán")
+                .gradeLevel("10")
+                .topic("Véc tơ")
+                .numQuestions(2)
+                .questionTypes(List.of("MCQ", "SHORT_ANSWER"))
+                .difficulty("MEDIUM")
+                .instructions("Soạn đề kiểm tra 15 phút")
+                .build();
+
+        // Act & Assert
+        mockMvc.perform(post("/workspaces/" + workspaceA.getId() + "/generation/quiz")
+                        .header("Authorization", "Bearer " + tokenA)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.data.contentType", is("QUIZ")))
+                .andExpect(jsonPath("$.data.reviewStatus", is("DRAFT")))
+                .andExpect(jsonPath("$.data.version", is(1)))
+                .andExpect(jsonPath("$.data.title", is("Đề kiểm tra 15 phút: Véc tơ và các phép toán")))
+                .andExpect(jsonPath("$.data.id", notNullValue()));
+
+        // Assert database persistence
+        List<GeneratedContent> allContents = generatedContentRepository.findByWorkspaceIdOrderByCreatedAtDesc(workspaceA.getId());
+        assertThat(allContents).hasSize(1);
+
+        GeneratedContent saved = allContents.get(0);
+        assertThat(saved.getContentType()).isEqualTo("QUIZ");
+        assertThat(saved.getReviewStatus()).isEqualTo("DRAFT");
+        assertThat(saved.getVersion()).isEqualTo(1);
+        assertThat(saved.getCreatedBy()).isEqualTo(teacherA.getId());
+        assertThat(saved.getWorkspaceId()).isEqualTo(workspaceA.getId());
+        assertThat(saved.getSubject()).isEqualTo("Toán");
+        assertThat(saved.getGradeLevel()).isEqualTo("10");
+        assertThat(saved.getTopic()).isEqualTo("Véc tơ");
+        assertThat(saved.getModelUsed()).isEqualTo("gemini-1.5-flash");
+        assertThat(saved.getGenerationTimeMs()).isNotNull();
+
+        // Verify contentData structure contains questions
+        Map<String, Object> savedContentData = saved.getContentData();
+        assertThat(savedContentData).containsKey("questions");
+        assertThat((List<?>) savedContentData.get("questions")).hasSize(2);
+
+        // Assert citation persistence
+        var citations = contentCitationRepository.findByContentId(saved.getId());
+        assertThat(citations).hasSize(1);
+        assertThat(citations.get(0).getChunkId()).isEqualTo(chunk1.getId());
+        assertThat(citations.get(0).getDocumentId()).isEqualTo(chunk1.getDocumentId());
+    }
+
+    @Test
+    @DisplayName("POST /workspaces/{workspaceId}/generation/quiz rejects cross-workspace request with 403 Forbidden [BE-025]")
+    void shouldReturnForbiddenForCrossWorkspaceQuizGeneration() throws Exception {
+        GenerationRequestDto requestDto = GenerationRequestDto.builder()
+                .subject("Toán")
+                .gradeLevel("10")
+                .topic("Véc tơ")
+                .build();
+
+        mockMvc.perform(post("/workspaces/" + workspaceA.getId() + "/generation/quiz")
+                        .header("Authorization", "Bearer " + tokenB)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.success", is(false)));
+    }
 }
+

@@ -36,4 +36,10 @@ public class GenerationRequestDto {
     private List<UUID> documentIds;
 
     private Integer numQuestions; // For quiz
+
+    private List<String> questionTypes; // "MCQ", "SHORT_ANSWER"
+
+    private String difficulty; // "EASY", "MEDIUM", "HARD"
+
+    private String targetBloomLevel; // Bloom taxonomy level
 }
