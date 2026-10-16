@@ -465,6 +465,146 @@ public class ExportIntegrationTest {
     }
 
     @Test
+    @DisplayName("POST /workspaces/{id}/export/{id} - export QUIZ to DOCX in TEACHER_KEY mode includes answers and grading guide [BE-031]")
+    void testExportQuizDocx_TeacherKey_Success_IncludesAnswersAndGradingGuide() throws Exception {
+        GeneratedContent quizContent = generatedContentRepository.save(GeneratedContent.builder()
+                .workspaceId(workspaceA.getId())
+                .createdBy(teacherA.getId())
+                .contentType("QUIZ")
+                .title("Kiểm tra 15 phút Toán học")
+                .topic("Hàm số bậc hai")
+                .subject("Toán")
+                .gradeLevel("10")
+                .reviewStatus("REVIEWED")
+                .contentData(Map.of(
+                        "title", "Kiểm tra 15 phút Toán học",
+                        "subject", "Toán",
+                        "grade_level", "10",
+                        "questions", List.of(
+                                Map.of(
+                                        "question_number", 1,
+                                        "type", "MCQ",
+                                        "question_text", "Đỉnh của parabol y = x^2 - 2x + 3 là điểm nào?",
+                                        "options", List.of("I(1; 2)", "I(-1; 2)", "I(1; -2)", "I(2; 3)"),
+                                        "correct_answer", "A",
+                                        "explanation", "Hoành độ đỉnh x = -b / (2a) = 1, tung độ y = 2.",
+                                        "bloom_taxonomy_level", "Understand"
+                                )
+                        )
+                ))
+                .build());
+
+        MvcResult result = mockMvc.perform(post("/workspaces/{workspaceId}/export/{generationId}",
+                        workspaceA.getId(), quizContent.getId())
+                        .header("Authorization", "Bearer " + tokenA)
+                        .param("format", "DOCX")
+                        .param("exportMode", "TEACHER_KEY"))
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, ExportService.DOCX_MIME_TYPE))
+                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, containsString("attachment;")))
+                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, containsString("dap-an_")))
+                .andReturn();
+
+        byte[] body = result.getResponse().getContentAsByteArray();
+        assertThat(body).isNotNull();
+        assertThat(body.length).isGreaterThan(1000);
+
+        try (XWPFDocument document = new XWPFDocument(new ByteArrayInputStream(body))) {
+            StringBuilder sb = new StringBuilder();
+            for (org.apache.poi.xwpf.usermodel.XWPFParagraph p : document.getParagraphs()) {
+                sb.append(p.getText()).append("\n");
+            }
+            for (org.apache.poi.xwpf.usermodel.XWPFTable t : document.getTables()) {
+                for (org.apache.poi.xwpf.usermodel.XWPFTableRow r : t.getRows()) {
+                    for (org.apache.poi.xwpf.usermodel.XWPFTableCell c : r.getTableCells()) {
+                        sb.append(c.getText()).append(" ");
+                    }
+                    sb.append("\n");
+                }
+            }
+            String fullText = sb.toString();
+
+            // Verify Answer Key, Explanations, and Grading Guide
+            assertThat(fullText).contains("HƯỚNG DẪN CHẤM & ĐÁP ÁN");
+            assertThat(fullText).contains("▶ Đáp án đúng: A");
+            assertThat(fullText).contains("Hoành độ đỉnh x = -b / (2a) = 1, tung độ y = 2.");
+            assertThat(fullText).contains("I. NGUYÊN TẮC CHẤM & BIỂU ĐIỂM (GRADING GUIDE)");
+            assertThat(fullText).contains("Thang điểm chuẩn: 10.0 điểm toàn bài");
+            assertThat(fullText).contains("II. MA TRẬN ĐÁP ÁN & BIỂU ĐIỂM CHI TIẾT");
+            assertThat(fullText).contains("III. PHÂN BỔ MỨC ĐỘ NHẬN THỨC THEO BLOOM");
+        }
+    }
+
+    @Test
+    @DisplayName("POST /workspaces/{id}/export/{id} - export QUIZ to PDF in TEACHER_KEY mode succeeds [BE-031]")
+    void testExportQuizPdf_TeacherKey_Success() throws Exception {
+        GeneratedContent quizContent = generatedContentRepository.save(GeneratedContent.builder()
+                .workspaceId(workspaceA.getId())
+                .createdBy(teacherA.getId())
+                .contentType("QUIZ")
+                .title("Kiểm tra 15 phút Toán học")
+                .topic("Hàm số bậc hai")
+                .subject("Toán")
+                .gradeLevel("10")
+                .reviewStatus("REVIEWED")
+                .contentData(Map.of(
+                        "title", "Kiểm tra 15 phút Toán học",
+                        "subject", "Toán",
+                        "grade_level", "10",
+                        "questions", List.of(
+                                Map.of(
+                                        "question_number", 1,
+                                        "type", "MCQ",
+                                        "question_text", "Đỉnh của parabol y = x^2 - 2x + 3 là điểm nào?",
+                                        "options", List.of("I(1; 2)", "I(-1; 2)", "I(1; -2)", "I(2; 3)"),
+                                        "correct_answer", "A",
+                                        "explanation", "Hoành độ đỉnh x = -b / (2a) = 1, tung độ y = 2.",
+                                        "bloom_taxonomy_level", "Understand"
+                                )
+                        )
+                ))
+                .build());
+
+        MvcResult result = mockMvc.perform(post("/workspaces/{workspaceId}/export/{generationId}",
+                        workspaceA.getId(), quizContent.getId())
+                        .header("Authorization", "Bearer " + tokenA)
+                        .param("format", "PDF")
+                        .param("exportMode", "TEACHER_KEY"))
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, ExportService.PDF_MIME_TYPE))
+                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, containsString("attachment;")))
+                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, containsString("dap-an_")))
+                .andReturn();
+
+        byte[] body = result.getResponse().getContentAsByteArray();
+        assertThat(body).isNotNull();
+        String pdfHeader = new String(body, 0, Math.min(8, body.length), java.nio.charset.StandardCharsets.US_ASCII);
+        assertThat(pdfHeader).startsWith("%PDF-");
+    }
+
+    @Test
+    @DisplayName("POST /workspaces/{id}/export/{id} - non-teacher role (STUDENT) cannot export teaching materials [BE-031]")
+    void testExportQuiz_StudentRole_ThrowsForbidden() throws Exception {
+        User student = userRepository.save(User.builder()
+                .email("student.quiz@school.edu.vn")
+                .passwordHash(passwordEncoder.encode("Password123@"))
+                .fullName("Học sinh Nguyễn Văn An")
+                .role("STUDENT")
+                .isActive(true)
+                .build());
+
+        String studentToken = jwtTokenProvider.generateToken(student.getId(), student.getEmail());
+
+        // Student attempts to export Teacher A's content
+        mockMvc.perform(post("/workspaces/{workspaceId}/export/{generationId}",
+                        workspaceA.getId(), lessonContentA.getId())
+                        .header("Authorization", "Bearer " + studentToken)
+                        .param("format", "DOCX")
+                        .param("exportMode", "TEACHER_KEY"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     @DisplayName("POST /workspaces/{id}/export/{id} - unsupported format returns 400 Bad Request")
     void testExportPost_UnsupportedFormat_Returns400() throws Exception {
         mockMvc.perform(post("/workspaces/{workspaceId}/export/{generationId}",

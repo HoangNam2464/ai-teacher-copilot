@@ -326,16 +326,51 @@ public class PdfQuizExporter {
         title.setSpacingAfter(8f);
         document.add(title);
 
+        int totalQ = (questions != null) ? questions.size() : 0;
+        double pointsPerQ = totalQ > 0 ? (double) Math.round((10.0 / totalQ) * 100) / 100 : 0.0;
+        String pointStr = String.format(java.util.Locale.US, "%.2f", pointsPerQ);
+
+        // I. Nguyên tắc chấm & Biểu điểm
+        Paragraph gHead = new Paragraph("I. NGUYÊN TẮC CHẤM & BIỂU ĐIỂM (GRADING GUIDE)",
+                new Font(baseFont, 10f, Font.BOLD, COLOR_PRIMARY));
+        gHead.setSpacingBefore(8f);
+        gHead.setSpacingAfter(4f);
+        document.add(gHead);
+
+        Paragraph g1 = new Paragraph("• Thang điểm chuẩn: 10.0 điểm toàn bài (" + totalQ + " câu hỏi, trung bình +" + pointStr + " điểm/câu).",
+                new Font(baseFont, 8.5f, Font.NORMAL, COLOR_TEXT_DARK));
+        g1.setIndentationLeft(8f);
+        document.add(g1);
+
+        Paragraph g2 = new Paragraph("• Câu hỏi trắc nghiệm (MCQ): Chọn đúng đáp án nhận trọn số điểm câu hỏi; chọn sai nhận 0 điểm.",
+                new Font(baseFont, 8.5f, Font.NORMAL, COLOR_TEXT_DARK));
+        g2.setIndentationLeft(8f);
+        document.add(g2);
+
+        Paragraph g3 = new Paragraph("• Câu hỏi tự luận ngắn: Đúng khái niệm cốt lõi (60%), lập luận logic (30%), trình bày khoa học (10%). Chấp nhận cách giải đúng khác.",
+                new Font(baseFont, 8.5f, Font.NORMAL, COLOR_TEXT_DARK));
+        g3.setIndentationLeft(8f);
+        g3.setSpacingAfter(6f);
+        document.add(g3);
+
+        // II. Ma trận đáp án & Biểu điểm chi tiết
+        Paragraph aHead = new Paragraph("II. MA TRẬN ĐÁP ÁN & BIỂU ĐIỂM CHI TIẾT",
+                new Font(baseFont, 10f, Font.BOLD, COLOR_PRIMARY));
+        aHead.setSpacingBefore(6f);
+        aHead.setSpacingAfter(4f);
+        document.add(aHead);
+
         if (questions != null && !questions.isEmpty()) {
-            PdfPTable table = new PdfPTable(4);
+            PdfPTable table = new PdfPTable(5);
             table.setWidthPercentage(100f);
-            table.setWidths(new float[]{15f, 25f, 30f, 30f});
-            table.setSpacingAfter(10f);
+            table.setWidths(new float[]{10f, 20f, 32f, 23f, 15f});
+            table.setSpacingAfter(8f);
 
             table.addCell(createHeaderCell("Câu"));
             table.addCell(createHeaderCell("Dạng câu hỏi"));
             table.addCell(createHeaderCell("Đáp án đúng"));
-            table.addCell(createHeaderCell("Cấp độ nhận thức (Bloom)"));
+            table.addCell(createHeaderCell("Cấp độ Bloom"));
+            table.addCell(createHeaderCell("Biểu điểm"));
 
             for (int i = 0; i < questions.size(); i++) {
                 DocxQuizExporter.QuizQuestionItem q = questions.get(i);
@@ -346,14 +381,58 @@ public class PdfQuizExporter {
                 table.addCell(createBodyCell(typeLabel, false));
                 table.addCell(createBodyCell(q.correctAnswer != null ? q.correctAnswer : "—", true));
                 table.addCell(createBodyCell(q.bloomLevel != null ? q.bloomLevel : "Understand", false));
+                table.addCell(createBodyCell("+" + pointStr + " đ", true));
             }
             document.add(table);
         }
 
+        // III. Phân bổ mức độ nhận thức theo Bloom
+        Paragraph bHead = new Paragraph("III. PHÂN BỔ MỨC ĐỘ NHẬN THỨC THEO BLOOM",
+                new Font(baseFont, 10f, Font.BOLD, COLOR_PRIMARY));
+        bHead.setSpacingBefore(6f);
+        bHead.setSpacingAfter(4f);
+        document.add(bHead);
+
+        int rememberCount = 0;
+        int understandCount = 0;
+        int applyCount = 0;
+        int higherCount = 0;
+        if (questions != null) {
+            for (DocxQuizExporter.QuizQuestionItem q : questions) {
+                String bl = (q.bloomLevel != null) ? q.bloomLevel.trim().toLowerCase() : "";
+                if (bl.contains("remember") || bl.contains("nhận biết") || bl.contains("nhan biet")) {
+                    rememberCount++;
+                } else if (bl.contains("understand") || bl.contains("thông hiểu") || bl.contains("thong hieu")) {
+                    understandCount++;
+                } else if (bl.contains("apply") || bl.contains("vận dụng thấp") || bl.contains("van dung thap") || bl.equals("vận dụng")) {
+                    applyCount++;
+                } else {
+                    higherCount++;
+                }
+            }
+        }
+
+        PdfPTable mTable = new PdfPTable(4);
+        mTable.setWidthPercentage(100f);
+        mTable.setWidths(new float[]{25f, 45f, 15f, 15f});
+        mTable.setSpacingAfter(8f);
+
+        mTable.addCell(createHeaderCell("Mức độ nhận thức"));
+        mTable.addCell(createHeaderCell("Đặc trưng yêu cầu cần đạt"));
+        mTable.addCell(createHeaderCell("Số câu"));
+        mTable.addCell(createHeaderCell("Tỷ lệ"));
+
+        addMatrixPdfRow(mTable, "Nhận biết (Remember)", "Tái hiện định nghĩa, công thức cơ bản", rememberCount, totalQ);
+        addMatrixPdfRow(mTable, "Thông hiểu (Understand)", "Hiểu bản chất, giải thích, phân biệt", understandCount, totalQ);
+        addMatrixPdfRow(mTable, "Vận dụng (Apply)", "Giải quyết bài tập, tình huống cơ bản", applyCount, totalQ);
+        addMatrixPdfRow(mTable, "Vận dụng cao (Higher)", "Phân tích, tổng hợp, giải bài toán phức hợp", higherCount, totalQ);
+        document.add(mTable);
+
+        // IV. Citations references appendix
         if (includeCitations && citations != null && !citations.isEmpty()) {
-            Paragraph citH = new Paragraph("TÀI LIỆU NGUỒN CĂN CỨ BIÊN SOẠN (PROVENANCE CITATIONS)",
-                    new Font(baseFont, 10.5f, Font.BOLD, COLOR_PRIMARY));
-            citH.setSpacingBefore(10f);
+            Paragraph citH = new Paragraph("IV. TÀI LIỆU NGUỒN CĂN CỨ BIÊN SOẠN (PROVENANCE CITATIONS)",
+                    new Font(baseFont, 10f, Font.BOLD, COLOR_PRIMARY));
+            citH.setSpacingBefore(8f);
             citH.setSpacingAfter(4f);
             document.add(citH);
 
@@ -371,6 +450,14 @@ public class PdfQuizExporter {
                 document.add(cP);
             }
         }
+    }
+
+    private void addMatrixPdfRow(PdfPTable table, String level, String desc, int count, int total) {
+        int percent = total > 0 ? (int) Math.round(((double) count / total) * 100) : 0;
+        table.addCell(createBodyCell(level, true));
+        table.addCell(createBodyCell(desc, false));
+        table.addCell(createBodyCell(String.valueOf(count), false));
+        table.addCell(createBodyCell(percent + "%", true));
     }
 
     private PdfPCell createHeaderCell(String text) {

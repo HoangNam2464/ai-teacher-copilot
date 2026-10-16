@@ -185,9 +185,17 @@ class DocxQuizExporterTest {
             // Verify teacher headers and answer information
             assertThat(fullText).contains("HƯỚNG DẪN CHẤM & ĐÁP ÁN");
             assertThat(fullText).contains("HƯỚNG DẪN CHẤM & MA TRẬN ĐÁP ÁN (DÀNH CHO GIÁO VIÊN)");
-            assertThat(fullText).contains("▶ Đáp án đúng:");
+            assertThat(fullText).contains("▶ Đáp án đúng: A");
+            assertThat(fullText).contains("▶ Đáp án đúng: B");
             assertThat(fullText).contains("Lời giải / Hướng dẫn: Theo SGK Toán 10, véc tơ là một đoạn thẳng có hướng.");
             assertThat(fullText).contains("[Mức độ Bloom: Remember]");
+
+            // Verify Grading Guide and Scoring
+            assertThat(fullText).contains("I. NGUYÊN TẮC CHẤM & BIỂU ĐIỂM (GRADING GUIDE)");
+            assertThat(fullText).contains("Thang điểm chuẩn: 10.0 điểm toàn bài");
+            assertThat(fullText).contains("II. MA TRẬN ĐÁP ÁN & BIỂU ĐIỂM CHI TIẾT");
+            assertThat(fullText).contains("Biểu điểm");
+            assertThat(fullText).contains("III. PHÂN BỔ MỨC ĐỘ NHẬN THỨC THEO BLOOM");
 
             // Check Matrix Table
             assertThat(fullText).contains("Cấp độ nhận thức (Bloom)");

@@ -77,6 +77,15 @@ public class ExportService {
             throw new ForbiddenException("Cross-workspace content access is forbidden: " + contentId);
         }
 
+        // 3.1 Verify requesting user has teacher privileges (BE-031 AC: Chỉ giáo viên được phép export)
+        User requestingUser = (userId != null) ? userRepository.findById(userId).orElse(null) : null;
+        if (requestingUser != null && requestingUser.getRole() != null
+                && !"TEACHER".equalsIgnoreCase(requestingUser.getRole())
+                && !"ADMIN".equalsIgnoreCase(requestingUser.getRole())) {
+            log.warn("Unauthorized export attempt by non-teacher user {}: role={}", userId, requestingUser.getRole());
+            throw new ForbiddenException("Chỉ giáo viên mới có quyền export học liệu");
+        }
+
         // 4. Validate export format
         String targetFormat = (format != null && !format.isBlank()) ? format.trim().toUpperCase() : "DOCX";
         if (!"DOCX".equals(targetFormat) && !"PDF".equals(targetFormat)) {

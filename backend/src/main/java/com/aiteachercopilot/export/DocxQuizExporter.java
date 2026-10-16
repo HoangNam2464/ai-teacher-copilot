@@ -428,18 +428,89 @@ public class DocxQuizExporter {
         rTitle.setBold(true);
         rTitle.setColor(COLOR_PRIMARY);
 
-        // Answer Key Table
+        int totalQ = (questions != null) ? questions.size() : 0;
+        double pointsPerQ = totalQ > 0 ? (double) Math.round((10.0 / totalQ) * 100) / 100 : 0.0;
+        String pointStr = String.format(java.util.Locale.US, "%.2f", pointsPerQ);
+
+        // I. Nguyên tắc chấm & Biểu điểm tổng quát
+        renderGradingGuideSubsection(document, totalQ, pointStr);
+
+        // II. Ma trận đáp án & Biểu điểm chi tiết
+        renderAnswerKeyTableSubsection(document, questions, pointStr);
+
+        // III. Ma trận phân bổ cấp độ nhận thức theo Bloom
+        renderBloomDistributionSubsection(document, questions, totalQ);
+
+        // IV. Tài liệu nguồn căn cứ biên soạn
+        if (includeCitations && citations != null && !citations.isEmpty()) {
+            renderCitationsSubsection(document, citations);
+        }
+    }
+
+    private void renderGradingGuideSubsection(XWPFDocument document, int totalQuestions, String pointPerQuestion) {
+        XWPFParagraph hPara = document.createParagraph();
+        hPara.setSpacingBefore(100);
+        hPara.setSpacingAfter(40);
+        XWPFRun rH = hPara.createRun();
+        rH.setText("I. NGUYÊN TẮC CHẤM & BIỂU ĐIỂM (GRADING GUIDE)");
+        rH.setFontFamily(FONT_FAMILY);
+        rH.setFontSize(11);
+        rH.setBold(true);
+        rH.setColor(COLOR_PRIMARY);
+
+        XWPFParagraph p1 = document.createParagraph();
+        p1.setIndentationLeft(240);
+        p1.setSpacingAfter(30);
+        XWPFRun r1 = p1.createRun();
+        r1.setText("• Thang điểm chuẩn: 10.0 điểm toàn bài (" + totalQuestions + " câu hỏi, trung bình +" + pointPerQuestion + " điểm/câu).");
+        r1.setFontFamily(FONT_FAMILY);
+        r1.setFontSize(9.5);
+        r1.setColor(COLOR_TEXT_DARK);
+
+        XWPFParagraph p2 = document.createParagraph();
+        p2.setIndentationLeft(240);
+        p2.setSpacingAfter(30);
+        XWPFRun r2 = p2.createRun();
+        r2.setText("• Câu hỏi trắc nghiệm (MCQ): Chọn đúng đáp án nhận trọn số điểm câu hỏi; chọn sai hoặc bỏ trống nhận 0 điểm.");
+        r2.setFontFamily(FONT_FAMILY);
+        r2.setFontSize(9.5);
+        r2.setColor(COLOR_TEXT_DARK);
+
+        XWPFParagraph p3 = document.createParagraph();
+        p3.setIndentationLeft(240);
+        p3.setSpacingAfter(80);
+        XWPFRun r3 = p3.createRun();
+        r3.setText("• Câu hỏi tự luận ngắn: Chấm điểm linh hoạt theo các bước: Đúng từ khóa/khái niệm cốt lõi (60%), Lập luận & giải thích logic (30%), Trình bày khoa học, ký hiệu chuẩn xác (10%). Chấp nhận các cách giải đúng khác.");
+        r3.setFontFamily(FONT_FAMILY);
+        r3.setFontSize(9.5);
+        r3.setColor(COLOR_TEXT_DARK);
+    }
+
+    private void renderAnswerKeyTableSubsection(XWPFDocument document,
+                                                List<QuizQuestionItem> questions,
+                                                String pointPerQuestion) {
+        XWPFParagraph hPara = document.createParagraph();
+        hPara.setSpacingBefore(100);
+        hPara.setSpacingAfter(60);
+        XWPFRun rH = hPara.createRun();
+        rH.setText("II. MA TRẬN ĐÁP ÁN & BIỂU ĐIỂM CHI TIẾT");
+        rH.setFontFamily(FONT_FAMILY);
+        rH.setFontSize(11);
+        rH.setBold(true);
+        rH.setColor(COLOR_PRIMARY);
+
         if (questions != null && !questions.isEmpty()) {
-            XWPFTable ansTable = document.createTable(questions.size() + 1, 4);
+            XWPFTable ansTable = document.createTable(questions.size() + 1, 5);
             ansTable.setWidth("100%");
             styleTableBorders(ansTable);
 
             // Header row
             XWPFTableRow hRow = ansTable.getRow(0);
-            fillTableHeaderCell(hRow.getCell(0), "Câu", "15%");
-            fillTableHeaderCell(hRow.getCell(1), "Dạng câu hỏi", "25%");
-            fillTableHeaderCell(hRow.getCell(2), "Đáp án đúng", "30%");
-            fillTableHeaderCell(hRow.getCell(3), "Cấp độ nhận thức (Bloom)", "30%");
+            fillTableHeaderCell(hRow.getCell(0), "Câu", "10%");
+            fillTableHeaderCell(hRow.getCell(1), "Dạng câu hỏi", "20%");
+            fillTableHeaderCell(hRow.getCell(2), "Đáp án đúng", "32%");
+            fillTableHeaderCell(hRow.getCell(3), "Cấp độ nhận thức (Bloom)", "23%");
+            fillTableHeaderCell(hRow.getCell(4), "Biểu điểm", "15%");
 
             for (int i = 0; i < questions.size(); i++) {
                 QuizQuestionItem q = questions.get(i);
@@ -454,37 +525,94 @@ public class DocxQuizExporter {
                 fillTableCell(row.getCell(1), typeLabel, false);
                 fillTableCell(row.getCell(2), answerLabel, true);
                 fillTableCell(row.getCell(3), bloomLabel, false);
+                fillTableCell(row.getCell(4), "+" + pointPerQuestion + " đ", true);
+            }
+        }
+    }
+
+    private void renderBloomDistributionSubsection(XWPFDocument document,
+                                                   List<QuizQuestionItem> questions,
+                                                   int totalQuestions) {
+        XWPFParagraph hPara = document.createParagraph();
+        hPara.setSpacingBefore(120);
+        hPara.setSpacingAfter(60);
+        XWPFRun rH = hPara.createRun();
+        rH.setText("III. PHÂN BỔ MỨC ĐỘ NHẬN THỨC THEO BLOOM");
+        rH.setFontFamily(FONT_FAMILY);
+        rH.setFontSize(11);
+        rH.setBold(true);
+        rH.setColor(COLOR_PRIMARY);
+
+        int rememberCount = 0;
+        int understandCount = 0;
+        int applyCount = 0;
+        int higherCount = 0;
+
+        if (questions != null) {
+            for (QuizQuestionItem q : questions) {
+                String bl = (q.bloomLevel != null) ? q.bloomLevel.trim().toLowerCase() : "";
+                if (bl.contains("remember") || bl.contains("nhận biết") || bl.contains("nhan biet")) {
+                    rememberCount++;
+                } else if (bl.contains("understand") || bl.contains("thông hiểu") || bl.contains("thong hieu")) {
+                    understandCount++;
+                } else if (bl.contains("apply") || bl.contains("vận dụng thấp") || bl.contains("van dung thap") || bl.equals("vận dụng")) {
+                    applyCount++;
+                } else {
+                    higherCount++;
+                }
             }
         }
 
-        // Citations references appendix
-        if (includeCitations && citations != null && !citations.isEmpty()) {
-            XWPFParagraph citHeader = document.createParagraph();
-            citHeader.setSpacingBefore(180);
-            citHeader.setSpacingAfter(60);
-            XWPFRun rCit = citHeader.createRun();
-            rCit.setText("TÀI LIỆU NGUỒN CĂN CỨ BIÊN SOẠN (PROVENANCE CITATIONS)");
-            rCit.setFontFamily(FONT_FAMILY);
-            rCit.setFontSize(11);
-            rCit.setBold(true);
-            rCit.setColor(COLOR_PRIMARY);
+        XWPFTable matrixTable = document.createTable(5, 4);
+        matrixTable.setWidth("100%");
+        styleTableBorders(matrixTable);
 
-            for (int i = 0; i < citations.size(); i++) {
-                CitationResolutionDto c = citations.get(i);
-                XWPFParagraph cPara = document.createParagraph();
-                cPara.setIndentationLeft(360);
-                cPara.setSpacingAfter(40);
-                XWPFRun rC = cPara.createRun();
-                String fileName = c.getFileName() != null ? c.getFileName() : "Tài liệu nguồn";
-                String page = c.getSourcePage() != null ? " (Trang " + c.getSourcePage() + ")" : "";
-                String excerpt = (c.getExcerpt() != null && !c.getExcerpt().isBlank())
-                        ? " — \"" + c.getExcerpt() + "\""
-                        : "";
-                rC.setText("[" + (i + 1) + "] " + fileName + page + excerpt);
-                rC.setFontFamily(FONT_FAMILY);
-                rC.setFontSize(9);
-                rC.setColor(COLOR_MUTED);
-            }
+        XWPFTableRow hRow = matrixTable.getRow(0);
+        fillTableHeaderCell(hRow.getCell(0), "Mức độ nhận thức", "25%");
+        fillTableHeaderCell(hRow.getCell(1), "Đặc trưng yêu cầu cần đạt", "45%");
+        fillTableHeaderCell(hRow.getCell(2), "Số câu", "15%");
+        fillTableHeaderCell(hRow.getCell(3), "Tỷ lệ", "15%");
+
+        fillMatrixRow(matrixTable.getRow(1), "Nhận biết (Remember)", "Tái hiện định nghĩa, công thức, khái niệm", rememberCount, totalQuestions);
+        fillMatrixRow(matrixTable.getRow(2), "Thông hiểu (Understand)", "Hiểu bản chất, giải thích và phân biệt kiến thức", understandCount, totalQuestions);
+        fillMatrixRow(matrixTable.getRow(3), "Vận dụng (Apply)", "Giải quyết tình huống toán học, bài tập cơ bản", applyCount, totalQuestions);
+        fillMatrixRow(matrixTable.getRow(4), "Vận dụng cao (Higher)", "Phân tích, tổng hợp, giải quyết bài toán phức hợp", higherCount, totalQuestions);
+    }
+
+    private void fillMatrixRow(XWPFTableRow row, String level, String desc, int count, int total) {
+        int percent = total > 0 ? (int) Math.round(((double) count / total) * 100) : 0;
+        fillTableCell(row.getCell(0), level, true);
+        fillTableCell(row.getCell(1), desc, false);
+        fillTableCell(row.getCell(2), String.valueOf(count), false);
+        fillTableCell(row.getCell(3), percent + "%", true);
+    }
+
+    private void renderCitationsSubsection(XWPFDocument document, List<CitationResolutionDto> citations) {
+        XWPFParagraph citHeader = document.createParagraph();
+        citHeader.setSpacingBefore(140);
+        citHeader.setSpacingAfter(60);
+        XWPFRun rCit = citHeader.createRun();
+        rCit.setText("IV. TÀI LIỆU NGUỒN CĂN CỨ BIÊN SOẠN (PROVENANCE CITATIONS)");
+        rCit.setFontFamily(FONT_FAMILY);
+        rCit.setFontSize(11);
+        rCit.setBold(true);
+        rCit.setColor(COLOR_PRIMARY);
+
+        for (int i = 0; i < citations.size(); i++) {
+            CitationResolutionDto c = citations.get(i);
+            XWPFParagraph cPara = document.createParagraph();
+            cPara.setIndentationLeft(360);
+            cPara.setSpacingAfter(40);
+            XWPFRun rC = cPara.createRun();
+            String fileName = c.getFileName() != null ? c.getFileName() : "Tài liệu nguồn";
+            String page = c.getSourcePage() != null ? " (Trang " + c.getSourcePage() + ")" : "";
+            String excerpt = (c.getExcerpt() != null && !c.getExcerpt().isBlank())
+                    ? " — \"" + c.getExcerpt() + "\""
+                    : "";
+            rC.setText("[" + (i + 1) + "] " + fileName + page + excerpt);
+            rC.setFontFamily(FONT_FAMILY);
+            rC.setFontSize(9);
+            rC.setColor(COLOR_MUTED);
         }
     }
 
