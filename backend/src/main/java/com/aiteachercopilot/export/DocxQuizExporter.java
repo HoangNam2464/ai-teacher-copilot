@@ -19,8 +19,6 @@ import org.springframework.stereotype.Component;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -41,9 +39,6 @@ public class DocxQuizExporter {
     private static final String COLOR_MUTED = "4B5563";     // Muted Gray
     private static final String COLOR_BORDER = "CBD5E1";    // Soft Slate
     private static final String COLOR_BG_HEADER = "F1F5F9"; // Light Header Tint
-
-    private static final DateTimeFormatter DATE_FORMATTER =
-            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm").withZone(ZoneId.of("Asia/Ho_Chi_Minh"));
 
     /**
      * Exports a quiz into a professional DOCX document byte array.
@@ -82,7 +77,7 @@ public class DocxQuizExporter {
             int estimatedDuration = calculateDuration(questions.size());
 
             // 1. Header Information & Student Identification Table
-            renderStudentExamHeader(document, title, subject, gradeLevel, topic, estimatedDuration, teacher, isStudentExam);
+            renderStudentExamHeader(document, title, subject, gradeLevel, topic, estimatedDuration, isStudentExam);
 
             // 2. Questions Section
             renderQuestionsSection(document, questions, isStudentExam);
@@ -134,7 +129,6 @@ public class DocxQuizExporter {
                                         String gradeLevel,
                                         String topic,
                                         int durationMinutes,
-                                        User teacher,
                                         boolean isStudentExam) {
         // Upper banner: School / Exam title 2-column table
         XWPFTable headerTable = document.createTable(1, 2);
@@ -574,7 +568,6 @@ public class DocxQuizExporter {
         return 90;
     }
 
-    @SuppressWarnings("unchecked")
     private List<QuizQuestionItem> extractQuestions(Map<String, Object> data) {
         List<QuizQuestionItem> result = new ArrayList<>();
         if (data == null) return result;
