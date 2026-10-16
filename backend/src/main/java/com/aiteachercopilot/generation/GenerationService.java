@@ -566,7 +566,6 @@ public class GenerationService {
         String combinedInstructions = (parent.getPromptInput() != null ? parent.getPromptInput() : "")
                 + (instructions != null && !instructions.isBlank() ? "\n[Refinement]: " + instructions.trim() : "");
 
-        @SuppressWarnings("unchecked")
         Map<String, Object> contentData = parent.getContentData() != null
                 ? new HashMap<>(parent.getContentData())
                 : new HashMap<>();
@@ -596,9 +595,15 @@ public class GenerationService {
 
                 if (responseBody != null) {
                     if (responseBody.get("data") instanceof Map<?, ?> dataMap) {
-                        contentData = (Map<String, Object>) dataMap;
+                        contentData = new HashMap<>();
+                        for (Map.Entry<?, ?> entry : dataMap.entrySet()) {
+                            contentData.put(String.valueOf(entry.getKey()), entry.getValue());
+                        }
                     } else if (responseBody.get("contentData") instanceof Map<?, ?> cdMap) {
-                        contentData = (Map<String, Object>) cdMap;
+                        contentData = new HashMap<>();
+                        for (Map.Entry<?, ?> entry : cdMap.entrySet()) {
+                            contentData.put(String.valueOf(entry.getKey()), entry.getValue());
+                        }
                     } else if (!responseBody.isEmpty() && !responseBody.containsKey("error")) {
                         contentData = responseBody;
                     }

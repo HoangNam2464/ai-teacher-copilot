@@ -41,10 +41,19 @@ public class ExportController {
             @PathVariable UUID workspaceId,
             @PathVariable UUID generationId,
             @RequestParam(value = "format", defaultValue = "DOCX") String format,
+            @RequestParam(value = "exportMode", required = false) String exportMode,
             @RequestBody(required = false) ExportRequestDto request) {
 
-        log.info("Export POST requested for generation {} in workspace {} by user {} (format={})",
-                generationId, workspaceId, user != null ? user.getId() : "anonymous", format);
+        log.info("Export POST requested for generation {} in workspace {} by user {} (format={}, mode={})",
+                generationId, workspaceId, user != null ? user.getId() : "anonymous", format, exportMode);
+
+        if (request == null) {
+            request = ExportRequestDto.builder()
+                    .exportMode(exportMode != null ? exportMode : "STUDENT_EXAM")
+                    .build();
+        } else if (exportMode != null && !exportMode.isBlank()) {
+            request.setExportMode(exportMode);
+        }
 
         ExportResult result = exportService.exportDocument(workspaceId, generationId, user.getId(), format, request);
         return buildFileResponse(result);
@@ -60,13 +69,15 @@ public class ExportController {
             @PathVariable UUID workspaceId,
             @PathVariable UUID generationId,
             @RequestParam(value = "format", defaultValue = "DOCX") String format,
+            @RequestParam(value = "exportMode", defaultValue = "STUDENT_EXAM") String exportMode,
             @RequestParam(value = "includeCitations", defaultValue = "true") Boolean includeCitations) {
 
-        log.info("Export GET requested for generation {} in workspace {} by user {} (format={})",
-                generationId, workspaceId, user != null ? user.getId() : "anonymous", format);
+        log.info("Export GET requested for generation {} in workspace {} by user {} (format={}, mode={})",
+                generationId, workspaceId, user != null ? user.getId() : "anonymous", format, exportMode);
 
         ExportRequestDto request = ExportRequestDto.builder()
                 .includeCitations(includeCitations)
+                .exportMode(exportMode)
                 .build();
 
         ExportResult result = exportService.exportDocument(workspaceId, generationId, user.getId(), format, request);

@@ -21,6 +21,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -48,6 +49,8 @@ public class ExportService {
     private final CitationService citationService;
     private final DocxLessonExporter docxLessonExporter;
     private final PdfLessonExporter pdfLessonExporter;
+    private final DocxQuizExporter docxQuizExporter;
+    private final PdfQuizExporter pdfQuizExporter;
     private final UserRepository userRepository;
 
     /**
@@ -74,14 +77,43 @@ public class ExportService {
             throw new ForbiddenException("Cross-workspace content access is forbidden: " + contentId);
         }
 
+        // 3.1 Verify requesting user has teacher privileges (BE-031 AC: Chỉ giáo viên được phép export)
+        User requestingUser = (userId != null) ? userRepository.findById(userId).orElse(null) : null;
+        if (requestingUser != null && requestingUser.getRole() != null
+                && !"TEACHER".equalsIgnoreCase(requestingUser.getRole())
+                && !"ADMIN".equalsIgnoreCase(requestingUser.getRole())) {
+            log.warn("Unauthorized export attempt by non-teacher user {}: role={}", userId, requestingUser.getRole());
+            throw new ForbiddenException("Chỉ giáo viên mới có quyền export học liệu");
+        }
+
         // 4. Validate export format
         String targetFormat = (format != null && !format.isBlank()) ? format.trim().toUpperCase() : "DOCX";
         if (!"DOCX".equals(targetFormat) && !"PDF".equals(targetFormat)) {
             throw new IllegalArgumentException("Unsupported export format: " + targetFormat + ". Currently supported: DOCX, PDF");
         }
 
-        // 5. Citations resolution
+        // 5. Detect if content is a Quiz
+        String contentType = content.getContentType();
+        if (request != null && request.getContentType() != null && !request.getContentType().isBlank()) {
+            contentType = request.getContentType();
+        }
+
+        Map<String, Object> data = (request != null && request.getContentData() != null && !request.getContentData().isEmpty())
+                ? request.getContentData()
+                : (content != null && content.getContentData() != null ? content.getContentData() : Collections.emptyMap());
+
+        boolean isQuiz = "QUIZ".equalsIgnoreCase(contentType) || data.containsKey("questions");
+        String exportMode = (request != null && request.getExportMode() != null && !request.getExportMode().isBlank())
+                ? request.getExportMode().trim().toUpperCase()
+                : "STUDENT_EXAM";
+
+        // 6. Citations resolution
         boolean includeCitations = (request == null || request.getIncludeCitations() == null) || request.getIncludeCitations();
+        if (isQuiz && "STUDENT_EXAM".equals(exportMode)) {
+            // Student exam sheet must NOT contain internal teacher citations
+            includeCitations = false;
+        }
+
         List<CitationResolutionDto> citations = Collections.emptyList();
         if (includeCitations) {
             try {
@@ -91,7 +123,7 @@ public class ExportService {
             }
         }
 
-        // 6. Teacher details
+        // 7. Teacher details
         User teacher = null;
         if (content.getCreatedBy() != null) {
             teacher = userRepository.findById(content.getCreatedBy()).orElse(null);
@@ -100,34 +132,62 @@ public class ExportService {
             teacher = userRepository.findById(userId).orElse(null);
         }
 
-        // 7. Render document binary based on requested format
+        // 8. Render document binary based on content type and requested format
         String extension = targetFormat.toLowerCase();
-        String fileName = resolveFileName(request, content, extension);
+        String fileName = resolveFileName(request, content, extension, isQuiz, exportMode);
         byte[] exportBytes;
         String mimeType;
 
-        if ("PDF".equals(targetFormat)) {
-            exportBytes = pdfLessonExporter.exportLessonPlan(
-                    content,
-                    request != null ? request.getContentData() : null,
-                    citations,
-                    includeCitations,
-                    teacher
-            );
-            mimeType = PDF_MIME_TYPE;
-            log.info("Successfully exported lesson plan {} to PDF ({} bytes) in workspace {}",
-                    contentId, exportBytes.length, workspaceId);
+        if (isQuiz) {
+            if ("PDF".equals(targetFormat)) {
+                exportBytes = pdfQuizExporter.exportQuiz(
+                        content,
+                        request != null ? request.getContentData() : null,
+                        citations,
+                        includeCitations,
+                        exportMode,
+                        teacher
+                );
+                mimeType = PDF_MIME_TYPE;
+                log.info("Successfully exported quiz {} to PDF ({} bytes, mode={}) in workspace {}",
+                        contentId, exportBytes.length, exportMode, workspaceId);
+            } else {
+                exportBytes = docxQuizExporter.exportQuiz(
+                        content,
+                        request != null ? request.getContentData() : null,
+                        citations,
+                        includeCitations,
+                        exportMode,
+                        teacher
+                );
+                mimeType = DOCX_MIME_TYPE;
+                log.info("Successfully exported quiz {} to DOCX ({} bytes, mode={}) in workspace {}",
+                        contentId, exportBytes.length, exportMode, workspaceId);
+            }
         } else {
-            exportBytes = docxLessonExporter.exportLessonPlan(
-                    content,
-                    request != null ? request.getContentData() : null,
-                    citations,
-                    includeCitations,
-                    teacher
-            );
-            mimeType = DOCX_MIME_TYPE;
-            log.info("Successfully exported lesson plan {} to DOCX ({} bytes) in workspace {}",
-                    contentId, exportBytes.length, workspaceId);
+            if ("PDF".equals(targetFormat)) {
+                exportBytes = pdfLessonExporter.exportLessonPlan(
+                        content,
+                        request != null ? request.getContentData() : null,
+                        citations,
+                        includeCitations,
+                        teacher
+                );
+                mimeType = PDF_MIME_TYPE;
+                log.info("Successfully exported lesson plan {} to PDF ({} bytes) in workspace {}",
+                        contentId, exportBytes.length, workspaceId);
+            } else {
+                exportBytes = docxLessonExporter.exportLessonPlan(
+                        content,
+                        request != null ? request.getContentData() : null,
+                        citations,
+                        includeCitations,
+                        teacher
+                );
+                mimeType = DOCX_MIME_TYPE;
+                log.info("Successfully exported lesson plan {} to DOCX ({} bytes) in workspace {}",
+                        contentId, exportBytes.length, workspaceId);
+            }
         }
 
         return ExportResult.builder()
@@ -137,7 +197,11 @@ public class ExportService {
                 .build();
     }
 
-    private String resolveFileName(ExportRequestDto request, GeneratedContent content, String extension) {
+    private String resolveFileName(ExportRequestDto request,
+                                    GeneratedContent content,
+                                    String extension,
+                                    boolean isQuiz,
+                                    String exportMode) {
         if (request != null && request.getFileName() != null && !request.getFileName().isBlank()) {
             String clientName = request.getFileName().trim();
             if (!clientName.toLowerCase().endsWith("." + extension)) {
@@ -146,9 +210,13 @@ public class ExportService {
             return sanitizeFileName(clientName);
         }
 
-        String contentTypePrefix = "lesson-plan";
-        if (content.getContentType() != null && !content.getContentType().isBlank()) {
+        String contentTypePrefix;
+        if (isQuiz) {
+            contentTypePrefix = "TEACHER_KEY".equalsIgnoreCase(exportMode) ? "dap-an" : "de-thi";
+        } else if (content.getContentType() != null && !content.getContentType().isBlank()) {
             contentTypePrefix = slugify(content.getContentType());
+        } else {
+            contentTypePrefix = "lesson-plan";
         }
 
         String topicSlug = "tai-lieu";
