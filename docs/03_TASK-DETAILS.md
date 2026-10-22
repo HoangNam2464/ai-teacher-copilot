@@ -1604,7 +1604,7 @@ Bản ghi mới có version tăng dần, parent_id trỏ về bản cũ; dữ li
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** High
 - **Assignee Type:** QA Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-401, ATC-306
 
 **Description:**
@@ -1613,7 +1613,7 @@ Kiểm thử sinh lại nhiều lần (v1 -> v2 -> v3) và xác minh tính toàn
 **Acceptance Criteria:**
 Bản ghi cũ không bị ghi đè; liên kết parent_id chính xác 100%.
 
-**Deliverable:** Versioning Test Report
+**Deliverable:** [Versioning Test Report](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/docs/4.Test_Case/TC_QA-025_Content_Regeneration_Version_Increment_Lineage.md) & `scripts/qa/test_qa025_content_regeneration_lineage.ps1`
 
 ---
 
