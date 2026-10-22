@@ -1,7 +1,6 @@
 package com.aiteachercopilot.export;
 
 import com.aiteachercopilot.user.User;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
@@ -26,10 +25,13 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequestMapping("/workspaces/{workspaceId}/export")
-@RequiredArgsConstructor
 public class ExportController {
 
     private final ExportService exportService;
+
+    public ExportController(ExportService exportService) {
+        this.exportService = exportService;
+    }
 
     /**
      * POST /api/workspaces/{workspaceId}/export/{generationId}?format=DOCX
