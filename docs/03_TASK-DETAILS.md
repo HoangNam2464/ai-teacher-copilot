@@ -1680,7 +1680,7 @@ Trả về danh sách bài soạn kèm thông tin phiên bản và chuỗi phả
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** Medium
 - **Assignee Type:** QA Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-403
 
 **Description:**
@@ -1689,7 +1689,7 @@ Kiểm thử truy xuất lịch sử và mở xem nội dung các phiên bản c
 **Acceptance Criteria:**
 API trả về đúng danh sách bài soạn của workspace; không lẫn lộn dữ liệu.
 
-**Deliverable:** History API Test Report
+**Deliverable:** [History API Test Report](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/docs/4.Test_Case/TC_QA-026_Generation_History_Retrieval_Version_Tree_Navigation.md) & `scripts/qa/test_qa026_history_version_tree.ps1`
 
 ---
 
