@@ -132,3 +132,8 @@ docker-compose.override.yml
 data/
 *.bak
 frontend1/
+
+# Internal developer blueprints & notes (Do not push to VCS)
+docs/ADMIN_ROLE_INTEGRATION_GUIDE.md
+docs/internal/
+*.blueprint.md

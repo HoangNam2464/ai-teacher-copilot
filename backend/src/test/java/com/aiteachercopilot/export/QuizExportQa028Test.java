@@ -72,9 +72,6 @@ public class QuizExportQa028Test {
     private PdfQuizExporter pdfQuizExporter;
 
     @Autowired
-    private ExportService exportService;
-
-    @Autowired
     private UserRepository userRepository;
 
     @Autowired
