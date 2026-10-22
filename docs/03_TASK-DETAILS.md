@@ -1760,7 +1760,7 @@ Xây dựng pipeline sinh Rubric đánh giá có cấu trúc qua RubricSchema, c
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** Medium
 - **Assignee Type:** QA Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-304, ATC-401
 
 **Description:**
@@ -1769,7 +1769,7 @@ Kiểm thử tính logic của thang điểm Rubric và độ bám sát yêu c�
 **Acceptance Criteria:**
 Tổng trọng số điểm = 100% hoặc thang điểm 10 chuẩn; tiêu chí rõ ràng.
 
-**Deliverable:** Rubric Test Report
+**Deliverable:** [Rubric Test Report](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/docs/4.Test_Case/TC_QA-027_Rubric_Scoring_Matrix_Curriculum_Alignment.md) & `scripts/qa/test_qa027_rubric_scoring_curriculum.ps1`
 
 ---
 
