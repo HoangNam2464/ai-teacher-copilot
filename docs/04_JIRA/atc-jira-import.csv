@@ -1283,7 +1283,7 @@ Thực hiện kiểm thử tải (Load Testing) đo độ trễ truy vấn vecto
 
 Acceptance Criteria:
 Độ trễ truy vấn vector trung bình < 200ms; tổng thời gian sinh giáo án < 15s.",,,,,,,,,,,,,,,Sprint 5 - Testing & Optimization,,,Quality Assurance,,To Do,
-[FE-020] Implement Error Boundary and Toast Notifications for Upload Failures,FE-020,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Frontend Engineer
+[FE-020] Implement Error Boundary and Toast Notifications for Upload Failures,FE-020,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Frontend Engineer
 Master Task: ATC-504
 Sprint: Sprint 5 - Testing & Optimization
 Priority: High

@@ -2045,7 +2045,7 @@ Thực hiện kiểm thử tải (Load Testing) đo độ trễ truy vấn vecto
 - **Sprint:** Sprint 5 - Testing & Optimization
 - **Priority:** High
 - **Assignee Type:** Frontend Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-206
 
 **Description:**
@@ -2054,7 +2054,7 @@ Cải thiện thông báo lỗi trên UI khi tài liệu bị lỗi phân tích 
 **Acceptance Criteria:**
 Hiển thị Toast lỗi rõ ràng kèm hướng dẫn khắc phục khi file không thể xử lý.
 
-**Deliverable:** ErrorBoundary.jsx & ToastNotification.jsx
+**Deliverable:** [ErrorBoundary.jsx & Toast Notification](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/frontend/src/components/feedback/ErrorBoundary.jsx)
 
 ---
 
