@@ -1547,7 +1547,7 @@ Nhãn Bloom phản ánh đúng độ khó của câu hỏi; bộ lọc UI hoạt
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** High
 - **Assignee Type:** Designer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-401, ATC-306
 
 **Description:**
@@ -1556,7 +1556,7 @@ Thiết kế modal nhập chỉ dẫn sinh lại (Regenerate) và giao diện so
 **Acceptance Criteria:**
 Bản vẽ Figma cho Regeneration Modal và Diff Viewer so sánh bài soạn.
 
-**Deliverable:** Figma Regeneration Screens
+**Deliverable:** [Figma Regeneration Screens (Code: RegenerationModal.jsx & VersionSelector.jsx)](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/frontend/src/components/generation/RegenerationModal.jsx)
 
 ---
 
@@ -1566,7 +1566,7 @@ Bản vẽ Figma cho Regeneration Modal và Diff Viewer so sánh bài soạn.
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** High
 - **Assignee Type:** Frontend Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-401, ATC-306
 
 **Description:**
@@ -1623,7 +1623,7 @@ Bản ghi cũ không bị ghi đè; liên kết parent_id chính xác 100%.
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** Medium
 - **Assignee Type:** Designer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-403
 
 **Description:**
@@ -1632,7 +1632,7 @@ Thiết kế trang danh sách lịch sử bài soạn và sơ đồ cây phiên 
 **Acceptance Criteria:**
 Bản vẽ Figma cho History List Page, Version Timeline và Revert Action.
 
-**Deliverable:** Figma History Screens
+**Deliverable:** [Figma History Screens (Code: VersionTimeline.jsx & HistoryListPage.jsx)](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/frontend/src/components/history/VersionTimeline.jsx)
 
 ---
 
@@ -1642,7 +1642,7 @@ Bản vẽ Figma cho History List Page, Version Timeline và Revert Action.
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** Medium
 - **Assignee Type:** Frontend Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-403
 
 **Description:**
@@ -1699,7 +1699,7 @@ API trả về đúng danh sách bài soạn của workspace; không lẫn lộn
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** Medium
 - **Assignee Type:** Designer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-304, ATC-401
 
 **Description:**
@@ -1708,7 +1708,7 @@ Thiết kế bảng ma trận Rubric đánh giá (tiêu chí, trọng số, các
 **Acceptance Criteria:**
 Bản vẽ Figma cho Rubric Matrix Table và thanh chỉnh sửa tiêu chí.
 
-**Deliverable:** Figma Rubric Screens
+**Deliverable:** [Figma Rubric Screens (Code: RubricTableView.jsx)](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/frontend/src/components/rubric/RubricTableView.jsx)
 
 ---
 
@@ -1718,7 +1718,7 @@ Bản vẽ Figma cho Rubric Matrix Table và thanh chỉnh sửa tiêu chí.
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** Medium
 - **Assignee Type:** Frontend Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-304, ATC-401
 
 **Description:**
@@ -1779,7 +1779,7 @@ Tổng trọng số điểm = 100% hoặc thang điểm 10 chuẩn; tiêu chí r
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** Medium
 - **Assignee Type:** Designer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-307, ATC-401
 
 **Description:**
@@ -1788,7 +1788,7 @@ Thiết kế layout phiếu đề thi cho học sinh và phiếu đáp án / hư
 **Acceptance Criteria:**
 Bản vẽ Figma cho mẫu đề thi học sinh (không đáp án) và phiếu hướng dẫn chấm.
 
-**Deliverable:** Figma Quiz Export Layouts
+**Deliverable:** [Figma Quiz Export Layouts (Code: QuizExportControls.jsx & Exporters)](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/frontend/src/components/export/QuizExportControls.jsx)
 
 ---
 
@@ -1798,7 +1798,7 @@ Bản vẽ Figma cho mẫu đề thi học sinh (không đáp án) và phiếu h
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** Medium
 - **Assignee Type:** Frontend Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-307, ATC-401
 
 **Description:**
