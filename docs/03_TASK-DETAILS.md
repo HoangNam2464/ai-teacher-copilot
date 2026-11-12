@@ -1376,7 +1376,7 @@ File mở không bị lỗi format; bảng biểu và trích dẫn hiển thị 
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** High
 - **Assignee Type:** Designer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-303, ATC-304
 
 **Description:**
@@ -1385,7 +1385,7 @@ Thiết kế form tạo đề thi (số lượng câu, trắc nghiệm, tự lu�
 **Acceptance Criteria:**
 Bản vẽ Figma cho Quiz Generator, Question Card và hiển thị đáp án đúng/sai.
 
-**Deliverable:** Figma Quiz Screens
+**Deliverable:** [Figma Quiz Screens (Code: QuizGeneratorPage.jsx)](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/frontend/src/pages/quiz-generator/QuizGeneratorPage.jsx)
 
 ---
 
@@ -1471,7 +1471,7 @@ Kiểm thử sinh đề thi với các mức số lượng câu hỏi (3 - 20 c�
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** High
 - **Assignee Type:** Designer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-401
 
 **Description:**
@@ -1480,7 +1480,7 @@ Thiết kế hệ thống badge màu sắc cho 6 cấp độ Bloom (Nhận biế
 **Acceptance Criteria:**
 Bản vẽ Figma cho 6 Bloom Badges và widget thống kê ma trận nhận thức.
 
-**Deliverable:** Figma Bloom Badges
+**Deliverable:** [Figma Bloom Badges (Code: BloomBadge.jsx & BloomFilter.jsx)](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/frontend/src/components/quiz/BloomFilter.jsx)
 
 ---
 

@@ -863,7 +863,7 @@ Kiểm thử tải và mở file DOCX/PDF trên Microsoft Word và Adobe Acrobat
 
 Acceptance Criteria:
 File mở không bị lỗi format; bảng biểu và trích dẫn hiển thị rõ ràng.",,,,,,,,,,,,,,,Sprint 3 - RAG & Lesson,,,Quality Assurance,,To Do,
-[DES-010] Design Quiz Generator Form and Preview Interface in Figma,DES-010,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Designer
+[DES-010] Design Quiz Generator Form and Preview Interface in Figma,DES-010,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Designer
 Master Task: ATC-401
 Sprint: Sprint 4 - Quiz & Versioning
 Priority: High
@@ -923,7 +923,7 @@ Kiểm thử sinh đề thi với các mức số lượng câu hỏi (3 - 20 c�
 
 Acceptance Criteria:
 100% câu hỏi trắc nghiệm có đúng 1 đáp án chính xác và lời giải thích hợp lý.",,,,,,,,,,,,,,,Sprint 4 - Quiz & Versioning,,,Quality Assurance,,To Do,
-[DES-011] Design Bloom Taxonomy Level Badges and Distribution in Figma,DES-011,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Designer
+[DES-011] Design Bloom Taxonomy Level Badges and Distribution in Figma,DES-011,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Designer
 Master Task: ATC-402
 Sprint: Sprint 4 - Quiz & Versioning
 Priority: High
