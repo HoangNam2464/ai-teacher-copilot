@@ -1259,7 +1259,7 @@ Tinh chỉnh tham số HNSW index (m=16, ef_construction=64) và tối ưu Hikar
 
 Acceptance Criteria:
 Thời gian truy xuất vector pgvector giảm xuống < 200ms cho mỗi request tìm kiếm.",,,,,,,,,,,,,,,Sprint 5 - Testing & Optimization,,,Backend,,To Do,
-[OPS-006] Tune PostgreSQL Memory and pgvector Worker Configuration,OPS-006,,Task,To Do,ATC,AI Teacher Copilot,software,,,,Medium,,,,,,,,,,,,,0,"Role: DevOps Engineer
+[OPS-006] Tune PostgreSQL Memory and pgvector Worker Configuration,OPS-006,,Task,Done,ATC,AI Teacher Copilot,software,,,,Medium,,,,,,,,,,,,,0,"Role: DevOps Engineer
 Master Task: ATC-503
 Sprint: Sprint 5 - Testing & Optimization
 Priority: Medium
