@@ -1931,7 +1931,7 @@ Chạy và ghi nhận kết quả kiểm thử tự động trên luồng tích 
 - **Sprint:** Sprint 5 - Testing & Optimization
 - **Priority:** High
 - **Assignee Type:** Backend Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-303, ATC-401
 
 **Description:**
@@ -1940,7 +1940,7 @@ Xây dựng module ghi nhận metrics đánh giá chất lượng RAG trong Fast
 **Acceptance Criteria:**
 Ghi log độ tương đồng Cosine, thời gian truy xuất và số lượng chunk đạt chuẩn.
 
-**Deliverable:** evaluation_logger.py
+**Deliverable:** evaluation_logger.py (ai-service/app/evaluation/evaluation_logger.py, TC_BE-033_RAG_Retrieval_Quality_Metrics_Logging.md)
 
 ---
 

@@ -16,7 +16,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.logging import setup_logging
 from app.core.database import init_db, close_db
-from app.api.routes import health, ingestion, retrieval, generation
+from app.api.routes import health, ingestion, retrieval, generation, evaluation
 
 
 @asynccontextmanager
@@ -49,3 +49,4 @@ app.include_router(health.router, tags=["Health"])
 app.include_router(ingestion.router, prefix="/ingestion", tags=["Ingestion"])
 app.include_router(retrieval.router, prefix="/retrieval", tags=["Retrieval"])
 app.include_router(generation.router, prefix="/generation", tags=["Generation"])
+app.include_router(evaluation.router, prefix="/evaluation", tags=["Evaluation"])
