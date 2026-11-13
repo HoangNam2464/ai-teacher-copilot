@@ -51,6 +51,12 @@ class ExportServiceTest {
     private PdfLessonExporter pdfLessonExporter;
 
     @Mock
+    private DocxQuizExporter docxQuizExporter;
+
+    @Mock
+    private PdfQuizExporter pdfQuizExporter;
+
+    @Mock
     private UserRepository userRepository;
 
     @InjectMocks

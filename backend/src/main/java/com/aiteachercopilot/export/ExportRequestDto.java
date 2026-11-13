@@ -21,5 +21,10 @@ public class ExportRequestDto {
 
     private String fileName;
 
+    @Builder.Default
+    private String exportMode = "STUDENT_EXAM";
+
+    private String contentType;
+
     private Map<String, Object> contentData;
 }

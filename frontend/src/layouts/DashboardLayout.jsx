@@ -9,6 +9,7 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { cn } from '@/lib/utils';
 import { PATHS } from '@/routes/paths';
+import { ErrorBoundary } from '@/components/feedback/ErrorBoundary';
 import {
   LayoutDashboard,
   Settings,
@@ -354,7 +355,9 @@ export function DashboardLayout({ children }) {
 
         {/* Page content */}
         <main className="p-4 lg:p-6">
-          {children || <Outlet />}
+          <ErrorBoundary>
+            {children || <Outlet />}
+          </ErrorBoundary>
         </main>
       </div>
     </div>

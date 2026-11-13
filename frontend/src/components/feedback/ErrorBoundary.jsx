@@ -1,29 +1,17 @@
 import React from 'react';
+import { AlertTriangle, RotateCcw } from 'lucide-react';
 import i18n from '@/lib/i18n';
 
 /**
  * ErrorBoundary — React class component that catches render-time errors
  * in the component subtree and displays a fallback UI instead of crashing.
+ * Deliverable for [FE-020 / ATC-110].
  *
- * Props:
- * @param {ReactNode}          children    - Child components to protect.
- * @param {ReactNode|function} fallback    - Custom fallback UI or render function
- *                                          receiving ({ error, reset }) as argument.
- *
- * Usage (simple):
- *   <ErrorBoundary>
- *     <MyFeatureComponent />
- *   </ErrorBoundary>
- *
- * Usage (custom fallback):
- *   <ErrorBoundary fallback={({ error, reset }) => (
- *     <div>
- *       <p>Lỗi: {error.message}</p>
- *       <button onClick={reset}>Thử lại</button>
- *     </div>
- *   )}>
- *     <MyFeatureComponent />
- *   </ErrorBoundary>
+ * Acceptance Criteria:
+ * - Runtime error được Error Boundary xử lý
+ * - Upload error hiển thị toast
+ * - Thông báo lỗi dễ hiểu
+ * - UI không bị crash toàn bộ khi component lỗi
  */
 export class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -37,7 +25,6 @@ export class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, info) {
-    // Log to console in development; replace with monitoring service (Sentry, etc.) in production
     if (process.env.NODE_ENV !== 'production') {
       console.error('[ErrorBoundary] Caught error:', error, info.componentStack);
     }
@@ -59,21 +46,38 @@ export class ErrorBoundary extends React.Component {
         : fallback;
     }
 
-    // Default fallback UI
+    // Default fallback UI adhering to Design System
     return (
-      <div className="error-boundary" role="alert">
-        <span className="error-boundary__icon" aria-hidden="true">⚠️</span>
-        <h3 className="error-boundary__title">{i18n.t('common.unexpectedError')}</h3>
-        <p className="error-boundary__message">
-          {error?.message || i18n.t('common.errorTryAgain')}
+      <div
+        className="p-8 my-6 text-center rounded-2xl bg-destructive/5 border border-destructive/20 max-w-lg mx-auto shadow-sm"
+        role="alert"
+      >
+        <div className="w-12 h-12 rounded-xl bg-destructive/10 text-destructive flex items-center justify-center mx-auto mb-3">
+          <AlertTriangle className="w-6 h-6" />
+        </div>
+        <h3 className="text-base font-bold text-foreground mb-1.5">
+          {i18n.t('common.unexpectedError', 'Đã xảy ra lỗi hiển thị')}
+        </h3>
+        <p className="text-xs text-muted-foreground mb-4 max-w-sm mx-auto leading-relaxed">
+          {error?.message || i18n.t('common.errorTryAgain', 'Vui lòng thử lại hoặc tải lại trang.')}
         </p>
-        <button
-          type="button"
-          className="btn btn-secondary"
-          onClick={this.reset}
-        >
-          {i18n.t('common.tryAgain')}
-        </button>
+        <div className="flex items-center justify-center gap-2">
+          <button
+            type="button"
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg bg-primary text-primary-foreground hover:opacity-90 transition-opacity shadow-xs cursor-pointer"
+            onClick={this.reset}
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            {i18n.t('common.tryAgain', 'Thử lại')}
+          </button>
+          <button
+            type="button"
+            className="inline-flex items-center px-4 py-2 text-xs font-semibold rounded-lg border border-border bg-card text-foreground hover:bg-muted transition-colors cursor-pointer"
+            onClick={() => window.location.reload()}
+          >
+            {i18n.t('common.reloadPage', 'Tải lại trang')}
+          </button>
+        </div>
       </div>
     );
   }

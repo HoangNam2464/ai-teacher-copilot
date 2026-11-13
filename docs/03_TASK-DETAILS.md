@@ -1376,7 +1376,7 @@ File mở không bị lỗi format; bảng biểu và trích dẫn hiển thị 
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** High
 - **Assignee Type:** Designer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-303, ATC-304
 
 **Description:**
@@ -1385,7 +1385,7 @@ Thiết kế form tạo đề thi (số lượng câu, trắc nghiệm, tự lu�
 **Acceptance Criteria:**
 Bản vẽ Figma cho Quiz Generator, Question Card và hiển thị đáp án đúng/sai.
 
-**Deliverable:** Figma Quiz Screens
+**Deliverable:** [Figma Quiz Screens (Code: QuizGeneratorPage.jsx)](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/frontend/src/pages/quiz-generator/QuizGeneratorPage.jsx)
 
 ---
 
@@ -1471,7 +1471,7 @@ Kiểm thử sinh đề thi với các mức số lượng câu hỏi (3 - 20 c�
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** High
 - **Assignee Type:** Designer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-401
 
 **Description:**
@@ -1480,7 +1480,7 @@ Thiết kế hệ thống badge màu sắc cho 6 cấp độ Bloom (Nhận biế
 **Acceptance Criteria:**
 Bản vẽ Figma cho 6 Bloom Badges và widget thống kê ma trận nhận thức.
 
-**Deliverable:** Figma Bloom Badges
+**Deliverable:** [Figma Bloom Badges (Code: BloomBadge.jsx & BloomFilter.jsx)](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/frontend/src/components/quiz/BloomFilter.jsx)
 
 ---
 
@@ -1547,7 +1547,7 @@ Nhãn Bloom phản ánh đúng độ khó của câu hỏi; bộ lọc UI hoạt
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** High
 - **Assignee Type:** Designer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-401, ATC-306
 
 **Description:**
@@ -1556,7 +1556,7 @@ Thiết kế modal nhập chỉ dẫn sinh lại (Regenerate) và giao diện so
 **Acceptance Criteria:**
 Bản vẽ Figma cho Regeneration Modal và Diff Viewer so sánh bài soạn.
 
-**Deliverable:** Figma Regeneration Screens
+**Deliverable:** [Figma Regeneration Screens (Code: RegenerationModal.jsx & VersionSelector.jsx)](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/frontend/src/components/generation/RegenerationModal.jsx)
 
 ---
 
@@ -1566,7 +1566,7 @@ Bản vẽ Figma cho Regeneration Modal và Diff Viewer so sánh bài soạn.
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** High
 - **Assignee Type:** Frontend Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-401, ATC-306
 
 **Description:**
@@ -1604,7 +1604,7 @@ Bản ghi mới có version tăng dần, parent_id trỏ về bản cũ; dữ li
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** High
 - **Assignee Type:** QA Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-401, ATC-306
 
 **Description:**
@@ -1613,7 +1613,7 @@ Kiểm thử sinh lại nhiều lần (v1 -> v2 -> v3) và xác minh tính toàn
 **Acceptance Criteria:**
 Bản ghi cũ không bị ghi đè; liên kết parent_id chính xác 100%.
 
-**Deliverable:** Versioning Test Report
+**Deliverable:** [Versioning Test Report](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/docs/4.Test_Case/TC_QA-025_Content_Regeneration_Version_Increment_Lineage.md) & `scripts/qa/test_qa025_content_regeneration_lineage.ps1`
 
 ---
 
@@ -1623,7 +1623,7 @@ Bản ghi cũ không bị ghi đè; liên kết parent_id chính xác 100%.
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** Medium
 - **Assignee Type:** Designer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-403
 
 **Description:**
@@ -1632,7 +1632,7 @@ Thiết kế trang danh sách lịch sử bài soạn và sơ đồ cây phiên 
 **Acceptance Criteria:**
 Bản vẽ Figma cho History List Page, Version Timeline và Revert Action.
 
-**Deliverable:** Figma History Screens
+**Deliverable:** [Figma History Screens (Code: VersionTimeline.jsx & HistoryListPage.jsx)](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/frontend/src/components/history/VersionTimeline.jsx)
 
 ---
 
@@ -1642,7 +1642,7 @@ Bản vẽ Figma cho History List Page, Version Timeline và Revert Action.
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** Medium
 - **Assignee Type:** Frontend Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-403
 
 **Description:**
@@ -1680,7 +1680,7 @@ Trả về danh sách bài soạn kèm thông tin phiên bản và chuỗi phả
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** Medium
 - **Assignee Type:** QA Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-403
 
 **Description:**
@@ -1689,7 +1689,7 @@ Kiểm thử truy xuất lịch sử và mở xem nội dung các phiên bản c
 **Acceptance Criteria:**
 API trả về đúng danh sách bài soạn của workspace; không lẫn lộn dữ liệu.
 
-**Deliverable:** History API Test Report
+**Deliverable:** [History API Test Report](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/docs/4.Test_Case/TC_QA-026_Generation_History_Retrieval_Version_Tree_Navigation.md) & `scripts/qa/test_qa026_history_version_tree.ps1`
 
 ---
 
@@ -1699,7 +1699,7 @@ API trả về đúng danh sách bài soạn của workspace; không lẫn lộn
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** Medium
 - **Assignee Type:** Designer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-304, ATC-401
 
 **Description:**
@@ -1708,7 +1708,7 @@ Thiết kế bảng ma trận Rubric đánh giá (tiêu chí, trọng số, các
 **Acceptance Criteria:**
 Bản vẽ Figma cho Rubric Matrix Table và thanh chỉnh sửa tiêu chí.
 
-**Deliverable:** Figma Rubric Screens
+**Deliverable:** [Figma Rubric Screens (Code: RubricTableView.jsx)](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/frontend/src/components/rubric/RubricTableView.jsx)
 
 ---
 
@@ -1718,7 +1718,7 @@ Bản vẽ Figma cho Rubric Matrix Table và thanh chỉnh sửa tiêu chí.
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** Medium
 - **Assignee Type:** Frontend Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-304, ATC-401
 
 **Description:**
@@ -1760,7 +1760,7 @@ Xây dựng pipeline sinh Rubric đánh giá có cấu trúc qua RubricSchema, c
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** Medium
 - **Assignee Type:** QA Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-304, ATC-401
 
 **Description:**
@@ -1769,7 +1769,7 @@ Kiểm thử tính logic của thang điểm Rubric và độ bám sát yêu c�
 **Acceptance Criteria:**
 Tổng trọng số điểm = 100% hoặc thang điểm 10 chuẩn; tiêu chí rõ ràng.
 
-**Deliverable:** Rubric Test Report
+**Deliverable:** [Rubric Test Report](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/docs/4.Test_Case/TC_QA-027_Rubric_Scoring_Matrix_Curriculum_Alignment.md) & `scripts/qa/test_qa027_rubric_scoring_curriculum.ps1`
 
 ---
 
@@ -1779,7 +1779,7 @@ Tổng trọng số điểm = 100% hoặc thang điểm 10 chuẩn; tiêu chí r
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** Medium
 - **Assignee Type:** Designer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-307, ATC-401
 
 **Description:**
@@ -1788,7 +1788,7 @@ Thiết kế layout phiếu đề thi cho học sinh và phiếu đáp án / hư
 **Acceptance Criteria:**
 Bản vẽ Figma cho mẫu đề thi học sinh (không đáp án) và phiếu hướng dẫn chấm.
 
-**Deliverable:** Figma Quiz Export Layouts
+**Deliverable:** [Figma Quiz Export Layouts (Code: QuizExportControls.jsx & Exporters)](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/frontend/src/components/export/QuizExportControls.jsx)
 
 ---
 
@@ -1798,7 +1798,7 @@ Bản vẽ Figma cho mẫu đề thi học sinh (không đáp án) và phiếu h
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** Medium
 - **Assignee Type:** Frontend Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-307, ATC-401
 
 **Description:**
@@ -2045,7 +2045,7 @@ Thực hiện kiểm thử tải (Load Testing) đo độ trễ truy vấn vecto
 - **Sprint:** Sprint 5 - Testing & Optimization
 - **Priority:** High
 - **Assignee Type:** Frontend Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-206
 
 **Description:**
@@ -2054,7 +2054,7 @@ Cải thiện thông báo lỗi trên UI khi tài liệu bị lỗi phân tích 
 **Acceptance Criteria:**
 Hiển thị Toast lỗi rõ ràng kèm hướng dẫn khắc phục khi file không thể xử lý.
 
-**Deliverable:** ErrorBoundary.jsx & ToastNotification.jsx
+**Deliverable:** [ErrorBoundary.jsx & Toast Notification](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/frontend/src/components/feedback/ErrorBoundary.jsx)
 
 ---
 

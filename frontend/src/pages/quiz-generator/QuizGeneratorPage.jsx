@@ -422,7 +422,7 @@ export function QuizGeneratorPage() {
                     <Target className="w-3.5 h-3.5 text-orange-500" />
                     {t('quizGenerator.bloomFocus', 'Cấp độ Bloom trọng tâm')}
                   </span>
-                  <BloomTaxonomyTag level={targetBloomLevel} />
+                  <BloomBadge level={targetBloomLevel} size="sm" />
                 </label>
                 <select
                   className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-all"

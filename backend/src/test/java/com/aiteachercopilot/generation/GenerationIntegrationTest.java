@@ -847,7 +847,7 @@ public class GenerationIntegrationTest {
                 .parentId(v1.getId())
                 .build());
 
-        GeneratedContent v3 = generatedContentRepository.save(GeneratedContent.builder()
+        generatedContentRepository.save(GeneratedContent.builder()
                 .workspaceId(workspaceA.getId())
                 .createdBy(teacherA.getId())
                 .title("Giáo án Hóa học 10 v3")
