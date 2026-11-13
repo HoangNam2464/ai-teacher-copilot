@@ -1175,7 +1175,7 @@ Kiểm thử đối chiếu file học sinh và file giáo viên để đảm b�
 
 Acceptance Criteria:
 File học sinh sạch 100%; file giáo viên có lời giải và đáp án chính xác.",,,,,,,,,,,,,,,Sprint 4 - Quiz & Versioning,,,Quality Assurance,,To Do,
-[BE-032] Set Up Spring Boot and FastAPI Testcontainers Integration Harness,BE-032,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Backend Engineer
+[BE-032] Set Up Spring Boot and FastAPI Testcontainers Integration Harness,BE-032,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Backend Engineer
 Master Task: ATC-501
 Sprint: Sprint 5 - Testing & Optimization
 Priority: High
