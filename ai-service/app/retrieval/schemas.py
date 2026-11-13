@@ -52,6 +52,12 @@ class RetrievalRequest(BaseModel):
         le=1.0,
         description="Minimum cosine similarity threshold to consider evidence relevant",
     )
+    ef_search: int = Field(
+        default=100,
+        ge=10,
+        le=1000,
+        description="HNSW exploration depth factor for index query performance tuning (default: 100)",
+    )
 
 
 class RetrievedChunk(BaseModel):

@@ -44,6 +44,7 @@ async def search_chunks(
             topic=request.topic,
             top_k=request.top_k,
             similarity_threshold=request.similarity_threshold,
+            ef_search=request.ef_search,
             session=db,
         )
         return response

@@ -1988,7 +1988,7 @@ Báo cáo chi tiết các trường hợp đạt chuẩn và các trường hợ
 - **Sprint:** Sprint 5 - Testing & Optimization
 - **Priority:** Medium
 - **Assignee Type:** Backend Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-302, ATC-502
 
 **Description:**
@@ -1997,7 +1997,7 @@ Tinh chỉnh tham số HNSW index (m=16, ef_construction=64) và tối ưu Hikar
 **Acceptance Criteria:**
 Thời gian truy xuất vector pgvector giảm xuống < 200ms cho mỗi request tìm kiếm.
 
-**Deliverable:** V2__optimize_hnsw_index.sql
+**Deliverable:** V4__optimize_hnsw_and_retrieval_indexes.sql (backend/src/main/resources/db/migration/V4__optimize_hnsw_and_retrieval_indexes.sql, TC_BE-034_pgvector_Query_Plan_HNSW_Optimization.md)
 
 ---
 
