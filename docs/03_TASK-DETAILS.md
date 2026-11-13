@@ -1874,16 +1874,25 @@ File học sinh sạch 100%; file giáo viên có lời giải và đáp án ch�
 - **Sprint:** Sprint 5 - Testing & Optimization
 - **Priority:** High
 - **Assignee Type:** Backend Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-307, ATC-404
 
 **Description:**
 Cấu hình môi trường test tích hợp sử dụng Testcontainers (Postgres + MinIO) cho CI.
 
 **Acceptance Criteria:**
-Bộ test harness tự động khởi chạy containers sạch và dọn dẹp sau khi chạy test.
+- [x] Testcontainers khởi tạo được dependency (PostgreSQL 16 with pgvector + MinIO S3 object storage).
+- [x] Spring Boot integration test chạy được (`TestcontainersConfig.java`, dynamic datasource/MinIO injection, `@SpringBootTest`).
+- [x] FastAPI integration test chạy được (`test_testcontainers_harness.py`, async pgvector similarity search, MinIO upload/download).
+- [x] Database test được isolation giữa các test (tự động dọn dẹp hoặc table truncation giữa các test, không rò rỉ dữ liệu).
 
-**Deliverable:** TestcontainersConfig.java
+**Deliverables:**
+- `backend/src/test/java/com/aiteachercopilot/testcontainers/TestcontainersConfig.java`
+- `backend/src/test/java/com/aiteachercopilot/testcontainers/AbstractTestcontainersIntegrationTest.java`
+- `backend/src/test/java/com/aiteachercopilot/testcontainers/TestcontainersHarnessIntegrationTest.java`
+- `ai-service/tests/test_testcontainers_harness.py`
+- `scripts/qa/test_be032_testcontainers_harness.ps1`
+- `docs/4.Test_Case/TC_BE-032_Testcontainers_Integration_Harness.md`
 
 ---
 
