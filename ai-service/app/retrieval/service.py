@@ -37,6 +37,7 @@ async def search_similar_chunks(
     topic: Optional[str] = None,
     top_k: int = 5,
     similarity_threshold: float = 0.3,
+    ef_search: int = 100,
     provider: Optional[BaseAIProvider] = None,
     session: Optional[AsyncSession] = None,
 ) -> RetrievalResponse:
@@ -85,6 +86,15 @@ async def search_similar_chunks(
 
     # 3. Vector Similarity Search with pgvector and Mandatory Workspace Isolation
     async def _execute_search(db_session: AsyncSession) -> RetrievalResponse:
+        # Dynamically tune HNSW index exploration depth factor (BE-034)
+        if ef_search:
+            try:
+                from sqlalchemy import text
+                bounded_ef = min(max(int(ef_search), 10), 1000)
+                await db_session.execute(text(f"SET hnsw.ef_search = {bounded_ef}"))
+            except Exception:
+                pass
+
         # Distance calculation via pgvector cosine distance (<=> operator)
         distance_col = DocumentChunk.embedding.cosine_distance(query_vector).label("distance")
 

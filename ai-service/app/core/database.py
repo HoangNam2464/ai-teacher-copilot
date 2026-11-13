@@ -13,8 +13,15 @@ logger = structlog.get_logger()
 engine = create_async_engine(
     settings.database_url,
     echo=settings.FASTAPI_ENV == "development",
-    pool_size=5,
-    max_overflow=10,
+    pool_size=10,
+    max_overflow=20,
+    pool_recycle=1800,
+    pool_pre_ping=True,
+    connect_args={
+        "server_settings": {
+            "hnsw.ef_search": "100",
+        }
+    },
 )
 
 async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)

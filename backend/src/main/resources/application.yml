@@ -13,8 +13,13 @@ spring:
     password: ${POSTGRES_PASSWORD:changeme_db_password}
     driver-class-name: org.postgresql.Driver
     hikari:
-      maximum-pool-size: 10
-      minimum-idle: 2
+      pool-name: HikariPool-AiTeacherCopilot
+      maximum-pool-size: 20
+      minimum-idle: 5
+      idle-timeout: 300000
+      max-lifetime: 1800000
+      connection-timeout: 20000
+      leak-detection-threshold: 60000
 
   # --- JPA ---
   jpa:

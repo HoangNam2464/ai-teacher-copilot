@@ -1247,7 +1247,7 @@ Description:
 
 Acceptance Criteria:
 Báo cáo chi tiết các trường hợp đạt chuẩn và các trường hợp cần tinh chỉnh prompt.",,,,,,,,,,,,,,,Sprint 5 - Testing & Optimization,,,Quality Assurance,,To Do,
-[BE-034] Optimize pgvector Query Plans and HNSW Index Performance,BE-034,,Task,To Do,ATC,AI Teacher Copilot,software,,,,Medium,,,,,,,,,,,,,0,"Role: Backend Engineer
+[BE-034] Optimize pgvector Query Plans and HNSW Index Performance,BE-034,,Task,Done,ATC,AI Teacher Copilot,software,,,,Medium,,,,,,,,,,,,,0,"Role: Backend Engineer
 Master Task: ATC-503
 Sprint: Sprint 5 - Testing & Optimization
 Priority: Medium
