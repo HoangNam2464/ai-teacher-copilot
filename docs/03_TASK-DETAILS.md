@@ -2007,7 +2007,7 @@ Thời gian truy xuất vector pgvector giảm xuống < 200ms cho mỗi request
 - **Sprint:** Sprint 5 - Testing & Optimization
 - **Priority:** Medium
 - **Assignee Type:** DevOps Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-302, ATC-502
 
 **Description:**
@@ -2016,7 +2016,7 @@ Cấu hình shared_buffers, work_mem và max_parallel_workers cho PostgreSQL con
 **Acceptance Criteria:**
 Tối ưu hóa tài nguyên phần cứng, tránh nghẽn I/O khi tính toán vector.
 
-**Deliverable:** postgresql.conf tuning
+**Deliverable:** postgresql.conf tuning (infrastructure/postgres/conf/postgresql.conf, TC_OPS-006_PostgreSQL_pgvector_Tuning_Benchmark.md)
 
 ---
 
