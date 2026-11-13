@@ -12,6 +12,7 @@ Implements:
 """
 
 from typing import List, Optional, Union
+import time
 import uuid
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -19,6 +20,7 @@ import structlog
 
 from app.core.database import async_session
 from app.core.models import DocumentChunk
+from app.evaluation.evaluation_logger import evaluation_logger
 from app.providers.base import BaseAIProvider
 from app.providers.factory import get_ai_provider
 from app.retrieval.schemas import RetrievalResponse, RetrievedChunk
@@ -57,6 +59,7 @@ async def search_similar_chunks(
         RetrievalResponse containing filtered top-k chunks and insufficient_evidence flag.
     """
     # 1. Validation & Input Sanitization
+    start_time = time.perf_counter()
     if not workspace_id:
         raise ValueError("workspace_id is mandatory for workspace-isolated retrieval")
 
@@ -139,18 +142,28 @@ async def search_similar_chunks(
         # 4. Insufficient Evidence Detection (Rule 3.4)
         insufficient_evidence = len(retrieved_chunks) == 0
 
-        # 5. Telemetry & Evaluation Logging (Rule 3.5)
-        top_score = retrieved_chunks[0].similarity_score if retrieved_chunks else 0.0
-        logger.info(
-            "retrieval_query_completed",
-            workspace_id=str(workspace_uuid),
-            query_length=len(clean_query),
+        # 5. Telemetry & Evaluation Logging (Rule 3.5 & BE-033)
+        latency_ms = (time.perf_counter() - start_time) * 1000.0
+        applied_filters = {}
+        if document_ids:
+            applied_filters["document_ids_count"] = len(document_ids)
+        if subject:
+            applied_filters["subject"] = subject
+        if grade_level:
+            applied_filters["grade_level"] = grade_level
+        if topic:
+            applied_filters["topic"] = topic
+
+        metric = evaluation_logger.log_retrieval(
+            query=clean_query,
+            workspace_id=workspace_uuid,
+            latency_ms=latency_ms,
             top_k=bounded_top_k,
-            threshold=bounded_threshold,
-            raw_matches=len(rows),
-            relevant_chunks=len(retrieved_chunks),
-            top_similarity_score=top_score,
+            similarity_threshold=bounded_threshold,
+            raw_matches_count=len(rows),
+            retrieved_chunks=retrieved_chunks,
             insufficient_evidence=insufficient_evidence,
+            filters_applied=applied_filters,
         )
 
         return RetrievalResponse(
@@ -158,6 +171,8 @@ async def search_similar_chunks(
             insufficient_evidence=insufficient_evidence,
             query=clean_query,
             total_retrieved=len(retrieved_chunks),
+            trace_id=metric.trace_id,
+            latency_ms=metric.latency_ms,
         )
 
     if session is not None:

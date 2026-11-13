@@ -1211,7 +1211,7 @@ Chạy và ghi nhận kết quả kiểm thử tự động trên luồng tích 
 
 Acceptance Criteria:
 100% kịch bản kiểm thử E2E pass xanh trên môi trường test tích hợp.",,,,,,,,,,,,,,,Sprint 5 - Testing & Optimization,,,Quality Assurance,,To Do,
-[BE-033] Implement RAG Retrieval Quality Metrics Logging,BE-033,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Backend Engineer
+[BE-033] Implement RAG Retrieval Quality Metrics Logging,BE-033,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Backend Engineer
 Master Task: ATC-502
 Sprint: Sprint 5 - Testing & Optimization
 Priority: High

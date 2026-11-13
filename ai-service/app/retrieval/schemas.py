@@ -88,6 +88,8 @@ class RetrievalResponse(BaseModel):
     )
     query: Optional[str] = Field(default=None, description="Original query text")
     total_retrieved: int = Field(default=0, description="Number of relevant chunks returned")
+    trace_id: Optional[str] = Field(default=None, description="Telemetry trace UUID for quality evaluation")
+    latency_ms: Optional[float] = Field(default=None, description="Retrieval execution time in milliseconds")
 
     def __iter__(self) -> Iterator[RetrievedChunk]:
         return iter(self.chunks)
