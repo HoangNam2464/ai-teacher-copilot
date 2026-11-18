@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme_db_password}
     command: postgres -c config_file=/etc/postgresql/postgresql.conf
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "${POSTGRES_HOST_PORT:-5433}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ../../infrastructure/postgres/conf/postgresql.conf:/etc/postgresql/postgresql.conf:ro
@@ -30,8 +30,8 @@ services:
       MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-changeme_minio_password}
     command: server /data --console-address ":9001"
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "${MINIO_HOST_PORT:-9002}:9000"
+      - "${MINIO_CONSOLE_HOST_PORT:-9003}:9001"
     volumes:
       - minio_data:/data
     healthcheck:

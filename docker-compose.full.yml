@@ -26,7 +26,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme_db_password}
     command: postgres -c config_file=/etc/postgresql/postgresql.conf
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "${POSTGRES_HOST_PORT:-5433}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./infrastructure/postgres/conf/postgresql.conf:/etc/postgresql/postgresql.conf:ro
@@ -51,8 +51,8 @@ services:
       MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-changeme_minio_password}
     command: server /data --console-address ":9001"
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "${MINIO_HOST_PORT:-9002}:9000"
+      - "${MINIO_CONSOLE_HOST_PORT:-9003}:9001"
     volumes:
       - minio_data:/data
     healthcheck:
@@ -108,7 +108,7 @@ services:
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
     ports:
-      - "8000:8000"
+      - "${AI_SERVICE_HOST_PORT:-8001}:8000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -151,7 +151,7 @@ services:
     env_file:
       - .env
     ports:
-      - "8080:8080"
+      - "${BACKEND_HOST_PORT:-8081}:8080"
     depends_on:
       postgres:
         condition: service_healthy
@@ -172,7 +172,7 @@ services:
       dockerfile: ../infrastructure/docker/frontend.Dockerfile
     container_name: atc-frontend
     ports:
-      - "3000:80"
+      - "${FRONTEND_HOST_PORT:-3000}:80"
     depends_on:
       backend:
         condition: service_started
