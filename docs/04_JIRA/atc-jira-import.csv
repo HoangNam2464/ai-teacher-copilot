@@ -1295,7 +1295,7 @@ Cải thiện thông báo lỗi trên UI khi tài liệu bị lỗi phân tích 
 
 Acceptance Criteria:
 Hiển thị Toast lỗi rõ ràng kèm hướng dẫn khắc phục khi file không thể xử lý.",,,,,,,,,,,,,,,Sprint 5 - Testing & Optimization,,,Frontend,,To Do,
-[BE-035] Implement Exception Handlers for Corrupt Files and Empty Text,BE-035,,Task,To Do,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Backend Engineer
+[BE-035] Implement Exception Handlers for Corrupt Files and Empty Text,BE-035,,Task,Done,ATC,AI Teacher Copilot,software,,,,High,,,,,,,,,,,,,0,"Role: Backend Engineer
 Master Task: ATC-504
 Sprint: Sprint 5 - Testing & Optimization
 Priority: High

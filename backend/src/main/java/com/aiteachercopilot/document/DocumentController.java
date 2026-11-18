@@ -13,10 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Document REST controller.
- * Handles file upload and document listing within a workspace.
- */
 @RestController
 @RequestMapping("/workspaces/{workspaceId}/documents")
 @RequiredArgsConstructor
@@ -48,9 +44,6 @@ public class DocumentController {
                 .body(ApiResponse.success("Document uploaded", response));
     }
 
-    /**
-     * GET /api/workspaces/{workspaceId}/documents — List documents.
-     */
     @GetMapping
     public ResponseEntity<ApiResponse<List<DocumentDto.ListResponse>>> list(
             @AuthenticationPrincipal User user,

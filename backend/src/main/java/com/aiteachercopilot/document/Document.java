@@ -8,10 +8,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.Instant;
 import java.util.UUID;
 
-/**
- * Document entity — metadata for uploaded teaching materials.
- * The actual file is stored in MinIO. Processing is handled by FastAPI.
- */
 @Entity
 @Table(name = "documents")
 @Data
@@ -56,6 +52,9 @@ public class Document {
     @Column(name = "chunk_count")
     @Builder.Default
     private Integer chunkCount = 0;
+
+    @Column(name = "error_message", length = 1000)
+    private String errorMessage;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

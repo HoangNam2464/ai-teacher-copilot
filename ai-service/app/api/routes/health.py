@@ -10,7 +10,6 @@ from app.core.database import engine
 
 router = APIRouter()
 
-
 @router.get("/health")
 async def health_check():
     """

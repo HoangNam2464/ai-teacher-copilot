@@ -50,6 +50,27 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error("File exceeds maximum size of 50MB"));
     }
 
+    @ExceptionHandler(CorruptFileException.class)
+    public ResponseEntity<ApiResponse<Void>> handleCorruptFile(CorruptFileException ex) {
+        log.warn("Corrupt file rejected: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    @ExceptionHandler(EmptyFileException.class)
+    public ResponseEntity<ApiResponse<Void>> handleEmptyFile(EmptyFileException ex) {
+        log.warn("Empty file rejected: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    @ExceptionHandler(DocumentProcessingException.class)
+    public ResponseEntity<ApiResponse<Void>> handleDocumentProcessing(DocumentProcessingException ex) {
+        log.error("Document processing error: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
     @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<ApiResponse<Void>> handleForbidden(ForbiddenException ex) {
         log.warn("Access denied: {}", ex.getMessage());

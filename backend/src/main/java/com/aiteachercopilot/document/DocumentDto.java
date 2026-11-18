@@ -5,9 +5,6 @@ import lombok.Data;
 import java.time.Instant;
 import java.util.UUID;
 
-/**
- * DTOs for Document operations.
- */
 public final class DocumentDto {
 
     private DocumentDto() {}
@@ -20,6 +17,7 @@ public final class DocumentDto {
         private String fileType;
         private Long fileSize;
         private String processingStatus;
+        private String errorMessage;
         private Instant createdAt;
 
         public static UploadResponse fromEntity(Document doc) {
@@ -30,6 +28,7 @@ public final class DocumentDto {
             r.setFileType(doc.getFileType());
             r.setFileSize(doc.getFileSize());
             r.setProcessingStatus(doc.getProcessingStatus());
+            r.setErrorMessage(doc.getErrorMessage());
             r.setCreatedAt(doc.getCreatedAt());
             return r;
         }
@@ -42,6 +41,7 @@ public final class DocumentDto {
         private String fileType;
         private Long fileSize;
         private String processingStatus;
+        private String errorMessage;
         private String subject;
         private String gradeLevel;
         private String topic;
@@ -55,6 +55,7 @@ public final class DocumentDto {
             r.setFileType(doc.getFileType());
             r.setFileSize(doc.getFileSize());
             r.setProcessingStatus(doc.getProcessingStatus());
+            r.setErrorMessage(doc.getErrorMessage());
             r.setSubject(doc.getSubject());
             r.setGradeLevel(doc.getGradeLevel());
             r.setTopic(doc.getTopic());
