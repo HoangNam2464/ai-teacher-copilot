@@ -2073,16 +2073,27 @@ Hiển thị Toast lỗi rõ ràng kèm hướng dẫn khắc phục khi file kh
 - **Sprint:** Sprint 5 - Testing & Optimization
 - **Priority:** High
 - **Assignee Type:** Backend Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-206
 
 **Description:**
 Bổ sung xử lý ngoại lệ khi file PDF là file scan không có text layer hoặc file DOCX lỗi.
 
 **Acceptance Criteria:**
-Tự động đánh dấu tài liệu trạng thái FAILED kèm thông điệp lỗi chi tiết trong DB.
+- [x] Corrupt file được phát hiện (PDF thiếu %PDF, DOCX hỏng zip, encrypted PDF, binary text).
+- [x] Empty text được xử lý (trang trắng, PDF scan không có OCR, file 0 bytes).
+- [x] API trả lỗi rõ ràng (thông điệp lỗi chi tiết tiếng Việt/Anh chuẩn xác).
+- [x] Không làm crash ingestion service (pipeline bắt lỗi an toàn, cập nhật FAILED và error_message vào DB).
 
-**Deliverable:** GlobalExceptionHandler.java & parsers.py
+**Deliverables:**
+- [GlobalExceptionHandler.java](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/backend/src/main/java/com/aiteachercopilot/common/exception/GlobalExceptionHandler.java)
+- [CorruptFileException.java](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/backend/src/main/java/com/aiteachercopilot/common/exception/CorruptFileException.java)
+- [EmptyFileException.java](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/backend/src/main/java/com/aiteachercopilot/common/exception/EmptyFileException.java)
+- [parser.py](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/ai-service/app/ingestion/parser.py)
+- [exceptions.py](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/ai-service/app/ingestion/exceptions.py)
+- [service.py](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/ai-service/app/ingestion/service.py)
+- [scripts/qa/test_be035_corrupt_files_empty_text.ps1](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/scripts/qa/test_be035_corrupt_files_empty_text.ps1)
+- [docs/4.Test_Case/TC_BE-035_Corrupt_Files_Empty_Text_Handling.md](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/docs/4.Test_Case/TC_BE-035_Corrupt_Files_Empty_Text_Handling.md)
 
 ---
 

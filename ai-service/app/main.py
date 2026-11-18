@@ -10,13 +10,19 @@ Responsible for:
 
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.core.logging import setup_logging
 from app.core.database import init_db, close_db
 from app.api.routes import health, ingestion, retrieval, generation, evaluation
+from app.ingestion.exceptions import (
+    DocumentIngestionError,
+    CorruptFileError,
+    EmptyTextError,
+)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -40,6 +46,31 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.exception_handler(CorruptFileError)
+async def corrupt_file_handler(request: Request, exc: CorruptFileError):
+    return JSONResponse(
+        status_code=400,
+        content={"success": False, "error": exc.message, "error_code": exc.error_code}
+    )
+
+
+@app.exception_handler(EmptyTextError)
+async def empty_text_handler(request: Request, exc: EmptyTextError):
+    return JSONResponse(
+        status_code=422,
+        content={"success": False, "error": exc.message, "error_code": exc.error_code}
+    )
+
+
+@app.exception_handler(DocumentIngestionError)
+async def document_ingestion_handler(request: Request, exc: DocumentIngestionError):
+    return JSONResponse(
+        status_code=400,
+        content={"success": False, "error": exc.message, "error_code": exc.error_code}
+    )
+
 
 app.include_router(health.router, tags=["Health"])
 app.include_router(ingestion.router, prefix="/ingestion", tags=["Ingestion"])

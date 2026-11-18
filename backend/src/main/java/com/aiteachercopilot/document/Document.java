@@ -53,6 +53,9 @@ public class Document {
     @Builder.Default
     private Integer chunkCount = 0;
 
+    @Column(name = "error_message", length = 1000)
+    private String errorMessage;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;

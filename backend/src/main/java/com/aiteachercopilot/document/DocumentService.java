@@ -1,5 +1,7 @@
 package com.aiteachercopilot.document;
 
+import com.aiteachercopilot.common.exception.CorruptFileException;
+import com.aiteachercopilot.common.exception.EmptyFileException;
 import com.aiteachercopilot.common.exception.ResourceNotFoundException;
 import com.aiteachercopilot.workspace.WorkspaceService;
 import io.minio.MinioClient;
@@ -49,7 +51,7 @@ public class DocumentService {
         workspaceService.findAndAuthorize(workspaceId, userId);
 
         if (file.isEmpty()) {
-            throw new IllegalArgumentException("File is empty");
+            throw new EmptyFileException("File is empty");
         }
         if (file.getSize() > MAX_FILE_SIZE) {
             throw new IllegalArgumentException("File exceeds maximum size of 50MB");
@@ -74,6 +76,8 @@ public class DocumentService {
             throw new IllegalArgumentException(
                     "Unsupported file type. Allowed: PDF, DOCX, TXT");
         }
+
+        validateFileIntegrity(file, contentType);
 
         String objectKey = String.format("%s/%s/%s_%s",
                 workspaceId, userId, UUID.randomUUID(),
@@ -177,5 +181,42 @@ public class DocumentService {
     private String sanitizeFileName(String fileName) {
         if (fileName == null) return "unnamed";
         return fileName.replaceAll("[^a-zA-Z0-9._-]", "_");
+    }
+
+    /**
+     * Validates file signatures and basic structural integrity [BE-035].
+     * Detects corrupt files before upload to MinIO.
+     */
+    private void validateFileIntegrity(MultipartFile file, String contentType) {
+        try (InputStream is = file.getInputStream()) {
+            byte[] header = new byte[Math.min(1024, (int) file.getSize())];
+            int read = is.read(header);
+            if (read <= 0) {
+                throw new EmptyFileException("File is empty");
+            }
+
+            if ("application/pdf".equalsIgnoreCase(contentType)) {
+                String headerStr = new String(header, 0, read, java.nio.charset.StandardCharsets.ISO_8859_1);
+                if (!headerStr.contains("%PDF")) {
+                    throw new CorruptFileException("Tập tin PDF không hợp lệ hoặc bị hỏng (thiếu header %PDF)");
+                }
+            } else if ("application/vnd.openxmlformats-officedocument.wordprocessingml.document".equalsIgnoreCase(contentType)) {
+                // ZIP signature: PK\x03\x04 or PK\x05\x06
+                if (read < 2 || header[0] != 0x50 || header[1] != 0x4B) {
+                    throw new CorruptFileException("Tập tin DOCX không hợp lệ hoặc bị hỏng (thiếu header ZIP OpenXML)");
+                }
+            } else if ("text/plain".equalsIgnoreCase(contentType)) {
+                for (int i = 0; i < read; i++) {
+                    if (header[i] == 0) {
+                        throw new CorruptFileException("Tập tin văn bản chứa ký tự nhị phân không hợp lệ");
+                    }
+                }
+            }
+        } catch (CorruptFileException | EmptyFileException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Failed to inspect file stream", e);
+            throw new CorruptFileException("Không thể đọc cấu trúc tập tin tải lên: " + e.getMessage(), e);
+        }
     }
 }
