@@ -20,8 +20,12 @@ class Settings(BaseSettings):
     AI_SERVICE_API_KEY: str = "changeme_internal_api_key"
 
     AI_PROVIDER: str = "gemini"
+    AI_FALLBACK_PROVIDER: str = ""
     OPENAI_API_KEY: str = ""
     GEMINI_API_KEY: str = ""
+    GEMINI_MODEL: str = "gemini-1.5-flash"
+    OPENAI_MODEL: str = "gpt-4o-mini"
+    EMBEDDING_DIMENSION: int = 768
 
     MINIO_ENDPOINT: str = "http://localhost:9000"
     MINIO_ACCESS_KEY: str = "minioadmin"

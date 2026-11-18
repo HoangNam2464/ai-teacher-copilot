@@ -920,7 +920,7 @@ Hỗ trợ chuyển đổi qua biến môi trường AI_PROVIDER mà không cầ
 - **Sprint:** Sprint 3 - RAG & Lesson
 - **Priority:** High
 - **Assignee Type:** QA Engineer
-- **Status:** IN PROGRESS
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-207
 
 **Description:**
@@ -929,7 +929,7 @@ Kiểm thử chuyển đổi linh hoạt giữa Gemini và OpenAI; xử lý time
 **Acceptance Criteria:**
 Hệ thống tự động bắt lỗi API provider và trả về mã lỗi nội bộ thích hợp.
 
-**Deliverable:** Provider Test Report
+**Deliverable:** [TC_QA-016_AI_Provider_Switching_API_Error_Fallback.md](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/docs/4.Test_Case/TC_QA-016_AI_Provider_Switching_API_Error_Fallback.md)
 
 ---
 
@@ -958,7 +958,7 @@ Trả về Top-K (5-8) chunks phù hợp nhất; bắt buộc lọc workspace_id
 - **Sprint:** Sprint 3 - RAG & Lesson
 - **Priority:** High
 - **Assignee Type:** QA Engineer
-- **Status:** IN PROGRESS
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-301
 
 **Description:**
@@ -967,7 +967,7 @@ Kiểm thử truy vấn vector bảo đảm không rò rỉ dữ liệu chunk gi
 **Acceptance Criteria:**
 Truy vấn từ Workspace A không bao giờ trả về chunk thuộc Workspace B.
 
-**Deliverable:** Retrieval Isolation Test Report
+**Deliverable:** [TC_QA-017_TopK_Vector_Retrieval_Workspace_Data_Isolation.md](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/docs/4.Test_Case/TC_QA-017_TopK_Vector_Retrieval_Workspace_Data_Isolation.md)
 
 ---
 
@@ -1015,7 +1015,7 @@ Trả về mã HTTP 422 với mã lỗi INSUFFICIENT_EVIDENCE thay vì để LLM
 - **Sprint:** Sprint 3 - RAG & Lesson
 - **Priority:** High
 - **Assignee Type:** QA Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-302
 
 **Description:**
@@ -1110,7 +1110,7 @@ Giáo án được lưu với content_type='LESSON_PLAN', version=1 và liên k�
 - **Sprint:** Sprint 3 - RAG & Lesson
 - **Priority:** High
 - **Assignee Type:** QA Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-303
 
 **Description:**
@@ -1186,7 +1186,7 @@ Truy vấn trả về đầy đủ metadata nguồn gốc từ bảng document_c
 - **Sprint:** Sprint 3 - RAG & Lesson
 - **Priority:** High
 - **Assignee Type:** QA Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-304
 
 **Description:**
@@ -1195,7 +1195,7 @@ Kiểm thử đối chiếu dữ liệu trích dẫn từ giao diện ngược v
 **Acceptance Criteria:**
 100% trích dẫn trỏ đúng tài liệu và vị trí trang đã tải lên.
 
-**Deliverable:** Citation Traceability Test Report
+**Deliverable:** [Citation Traceability Test Report](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/docs/4.Test_Case/TC_QA-020_Citation_Provenance_Resolution_Page_Chunk.md)
 
 ---
 
@@ -1262,7 +1262,7 @@ Cập nhật thành công nội dung bài giảng và chuyển trạng thái DRA
 - **Sprint:** Sprint 3 - RAG & Lesson
 - **Priority:** High
 - **Assignee Type:** QA Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-304
 
 **Description:**
@@ -1271,7 +1271,7 @@ Kiểm thử lưu nội dung chỉnh sửa, cập nhật trạng thái và bảo
 **Acceptance Criteria:**
 Dữ liệu chỉnh sửa được lưu chính xác vào DB mà không làm hỏng cấu trúc schema.
 
-**Deliverable:** Review Edit Test Report
+**Deliverable:** [Review Edit Test Report](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/docs/4.Test_Case/TC_QA-021_Inline_Content_Editing_Review_Status_Transitions.md)
 
 ---
 
@@ -1357,7 +1357,7 @@ Tạo file .pdf chuẩn trang in A4, có header/footer và đánh số trang.
 - **Sprint:** Sprint 3 - RAG & Lesson
 - **Priority:** High
 - **Assignee Type:** QA Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-306
 
 **Description:**
@@ -1366,7 +1366,7 @@ Kiểm thử tải và mở file DOCX/PDF trên Microsoft Word và Adobe Acrobat
 **Acceptance Criteria:**
 File mở không bị lỗi format; bảng biểu và trích dẫn hiển thị rõ ràng.
 
-**Deliverable:** Export Quality Test Report
+**Deliverable:** [Export Quality Test Report](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/docs/4.Test_Case/TC_QA-022_DOCX_PDF_Lesson_Export_Formatting_Citations.md)
 
 ---
 
@@ -1376,7 +1376,7 @@ File mở không bị lỗi format; bảng biểu và trích dẫn hiển thị 
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** High
 - **Assignee Type:** Designer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-303, ATC-304
 
 **Description:**
@@ -1385,7 +1385,7 @@ Thiết kế form tạo đề thi (số lượng câu, trắc nghiệm, tự lu�
 **Acceptance Criteria:**
 Bản vẽ Figma cho Quiz Generator, Question Card và hiển thị đáp án đúng/sai.
 
-**Deliverable:** Figma Quiz Screens
+**Deliverable:** [Figma Quiz Screens (Code: QuizGeneratorPage.jsx)](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/frontend/src/pages/quiz-generator/QuizGeneratorPage.jsx)
 
 ---
 
@@ -1433,7 +1433,7 @@ Sinh đúng số lượng câu hỏi yêu cầu; câu trắc nghiệm có đủ 
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** High
 - **Assignee Type:** Backend Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-303, ATC-304
 
 **Description:**
@@ -1442,7 +1442,7 @@ Lưu đề thi vào bảng generated_contents với content_type='QUIZ'.
 **Acceptance Criteria:**
 Đề thi được lưu vào CSDL kèm metadata câu hỏi và mảng source_chunk_ids.
 
-**Deliverable:** QuizService.java in backend
+**Deliverable:** `GenerationService.java` & `GenerationController.java` in backend
 
 ---
 
@@ -1452,7 +1452,7 @@ Lưu đề thi vào bảng generated_contents với content_type='QUIZ'.
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** High
 - **Assignee Type:** QA Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-303, ATC-304
 
 **Description:**
@@ -1461,7 +1461,7 @@ Kiểm thử sinh đề thi với các mức số lượng câu hỏi (3 - 20 c�
 **Acceptance Criteria:**
 100% câu hỏi trắc nghiệm có đúng 1 đáp án chính xác và lời giải thích hợp lý.
 
-**Deliverable:** Quiz Generation Test Report
+**Deliverable:** [Quiz Generation Test Report](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/docs/4.Test_Case/TC_QA-023_Quiz_Question_Completeness_Options_Answer_Keys.md)
 
 ---
 
@@ -1471,7 +1471,7 @@ Kiểm thử sinh đề thi với các mức số lượng câu hỏi (3 - 20 c�
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** High
 - **Assignee Type:** Designer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-401
 
 **Description:**
@@ -1480,7 +1480,7 @@ Thiết kế hệ thống badge màu sắc cho 6 cấp độ Bloom (Nhận biế
 **Acceptance Criteria:**
 Bản vẽ Figma cho 6 Bloom Badges và widget thống kê ma trận nhận thức.
 
-**Deliverable:** Figma Bloom Badges
+**Deliverable:** [Figma Bloom Badges (Code: BloomBadge.jsx & BloomFilter.jsx)](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/frontend/src/components/quiz/BloomFilter.jsx)
 
 ---
 
@@ -1490,7 +1490,7 @@ Bản vẽ Figma cho 6 Bloom Badges và widget thống kê ma trận nhận th�
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** High
 - **Assignee Type:** Frontend Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-401
 
 **Description:**
@@ -1499,7 +1499,7 @@ Gắn badge cấp độ Bloom vào từng câu hỏi và thêm bộ lọc câu h
 **Acceptance Criteria:**
 Giáo viên lọc được câu hỏi theo cấp độ nhận thức; xem tỷ lệ phân bổ ma trận đề.
 
-**Deliverable:** BloomBadge.jsx & BloomFilter.jsx
+**Deliverable:** `frontend/src/components/quiz/BloomBadge.jsx` & `frontend/src/components/quiz/BloomFilter.jsx`
 
 ---
 
@@ -1509,16 +1509,16 @@ Giáo viên lọc được câu hỏi theo cấp độ nhận thức; xem tỷ l
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** High
 - **Assignee Type:** Backend Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-401
 
 **Description:**
-Tích hợp chỉ thị phân loại cấp độ Bloom trực tiếp vào prompt sinh câu hỏi.
+Tích hợp chỉ thị phân loại cấp độ Bloom trực tiếp vào prompt sinh câu hỏi và xây dựng cơ chế tự động phân loại theo 6 cấp độ Bloom.
 
 **Acceptance Criteria:**
 Mỗi câu hỏi có trường bloom_taxonomy_level hợp lệ (REMEMBER, UNDERSTAND, APPLY, ANALYZE, EVALUATE, CREATE).
 
-**Deliverable:** bloom_classifier.py
+**Deliverable:** `ai-service/app/generation/bloom_classifier.py`
 
 ---
 
@@ -1528,7 +1528,7 @@ Mỗi câu hỏi có trường bloom_taxonomy_level hợp lệ (REMEMBER, UNDERS
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** High
 - **Assignee Type:** QA Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-401
 
 **Description:**
@@ -1537,7 +1537,7 @@ Kiểm thử tính chính xác của việc gắn nhãn cấp độ Bloom trên 
 **Acceptance Criteria:**
 Nhãn Bloom phản ánh đúng độ khó của câu hỏi; bộ lọc UI hoạt động chính xác.
 
-**Deliverable:** Bloom Tagging Test Report
+**Deliverable:** `docs/4.Test_Case/TC_QA-024_Bloom_Taxonomy_Question_Tagging_Filtering.md` & `scripts/qa/test_qa024_bloom_tagging_filtering.ps1`
 
 ---
 
@@ -1547,7 +1547,7 @@ Nhãn Bloom phản ánh đúng độ khó của câu hỏi; bộ lọc UI hoạt
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** High
 - **Assignee Type:** Designer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-401, ATC-306
 
 **Description:**
@@ -1556,7 +1556,7 @@ Thiết kế modal nhập chỉ dẫn sinh lại (Regenerate) và giao diện so
 **Acceptance Criteria:**
 Bản vẽ Figma cho Regeneration Modal và Diff Viewer so sánh bài soạn.
 
-**Deliverable:** Figma Regeneration Screens
+**Deliverable:** [Figma Regeneration Screens (Code: RegenerationModal.jsx & VersionSelector.jsx)](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/frontend/src/components/generation/RegenerationModal.jsx)
 
 ---
 
@@ -1566,7 +1566,7 @@ Bản vẽ Figma cho Regeneration Modal và Diff Viewer so sánh bài soạn.
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** High
 - **Assignee Type:** Frontend Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-401, ATC-306
 
 **Description:**
@@ -1585,7 +1585,7 @@ Gửi yêu cầu sinh lại kèm parent_id; hiển thị phiên bản mới mà 
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** High
 - **Assignee Type:** Backend Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-401, ATC-306
 
 **Description:**
@@ -1594,7 +1594,7 @@ Tạo endpoint POST /api/workspaces/{id}/generation/{id}/regenerate tạo bản 
 **Acceptance Criteria:**
 Bản ghi mới có version tăng dần, parent_id trỏ về bản cũ; dữ liệu cũ được bảo toàn.
 
-**Deliverable:** RegenerationService.java
+**Deliverable:** `backend/src/main/java/com/aiteachercopilot/generation/GenerationService.java` & `GenerationController.java`
 
 ---
 
@@ -1604,7 +1604,7 @@ Bản ghi mới có version tăng dần, parent_id trỏ về bản cũ; dữ li
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** High
 - **Assignee Type:** QA Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-401, ATC-306
 
 **Description:**
@@ -1613,7 +1613,7 @@ Kiểm thử sinh lại nhiều lần (v1 -> v2 -> v3) và xác minh tính toàn
 **Acceptance Criteria:**
 Bản ghi cũ không bị ghi đè; liên kết parent_id chính xác 100%.
 
-**Deliverable:** Versioning Test Report
+**Deliverable:** [Versioning Test Report](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/docs/4.Test_Case/TC_QA-025_Content_Regeneration_Version_Increment_Lineage.md) & `scripts/qa/test_qa025_content_regeneration_lineage.ps1`
 
 ---
 
@@ -1623,7 +1623,7 @@ Bản ghi cũ không bị ghi đè; liên kết parent_id chính xác 100%.
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** Medium
 - **Assignee Type:** Designer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-403
 
 **Description:**
@@ -1632,7 +1632,7 @@ Thiết kế trang danh sách lịch sử bài soạn và sơ đồ cây phiên 
 **Acceptance Criteria:**
 Bản vẽ Figma cho History List Page, Version Timeline và Revert Action.
 
-**Deliverable:** Figma History Screens
+**Deliverable:** [Figma History Screens (Code: VersionTimeline.jsx & HistoryListPage.jsx)](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/frontend/src/components/history/VersionTimeline.jsx)
 
 ---
 
@@ -1642,7 +1642,7 @@ Bản vẽ Figma cho History List Page, Version Timeline và Revert Action.
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** Medium
 - **Assignee Type:** Frontend Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-403
 
 **Description:**
@@ -1661,7 +1661,7 @@ Giáo viên xem được toàn bộ các bài soạn trong workspace và mở l�
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** Medium
 - **Assignee Type:** Backend Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-403
 
 **Description:**
@@ -1670,7 +1670,7 @@ Tạo endpoint GET /api/workspaces/{id}/generation/history và GET /api/workspac
 **Acceptance Criteria:**
 Trả về danh sách bài soạn kèm thông tin phiên bản và chuỗi phả hệ version.
 
-**Deliverable:** HistoryController.java
+**Deliverable:** HistoryController.java, VersionTreeDto.java
 
 ---
 
@@ -1680,7 +1680,7 @@ Trả về danh sách bài soạn kèm thông tin phiên bản và chuỗi phả
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** Medium
 - **Assignee Type:** QA Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-403
 
 **Description:**
@@ -1689,7 +1689,7 @@ Kiểm thử truy xuất lịch sử và mở xem nội dung các phiên bản c
 **Acceptance Criteria:**
 API trả về đúng danh sách bài soạn của workspace; không lẫn lộn dữ liệu.
 
-**Deliverable:** History API Test Report
+**Deliverable:** [History API Test Report](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/docs/4.Test_Case/TC_QA-026_Generation_History_Retrieval_Version_Tree_Navigation.md) & `scripts/qa/test_qa026_history_version_tree.ps1`
 
 ---
 
@@ -1699,7 +1699,7 @@ API trả về đúng danh sách bài soạn của workspace; không lẫn lộn
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** Medium
 - **Assignee Type:** Designer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-304, ATC-401
 
 **Description:**
@@ -1708,7 +1708,7 @@ Thiết kế bảng ma trận Rubric đánh giá (tiêu chí, trọng số, các
 **Acceptance Criteria:**
 Bản vẽ Figma cho Rubric Matrix Table và thanh chỉnh sửa tiêu chí.
 
-**Deliverable:** Figma Rubric Screens
+**Deliverable:** [Figma Rubric Screens (Code: RubricTableView.jsx)](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/frontend/src/components/rubric/RubricTableView.jsx)
 
 ---
 
@@ -1718,7 +1718,7 @@ Bản vẽ Figma cho Rubric Matrix Table và thanh chỉnh sửa tiêu chí.
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** Medium
 - **Assignee Type:** Frontend Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-304, ATC-401
 
 **Description:**
@@ -1737,16 +1737,20 @@ Hiển thị bảng Rubric rõ ràng; hỗ trợ sửa trọng số và tiêu ch
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** Medium
 - **Assignee Type:** Backend Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-304, ATC-401
 
 **Description:**
-Xây dựng pipeline sinh Rubric đánh giá có cấu trúc qua RubricSchema.
+Xây dựng pipeline sinh Rubric đánh giá có cấu trúc qua RubricSchema, chuẩn hóa trọng số tiêu chí (tổng = 100%), đối chiếu YCCĐ Chương trình GDPT 2018 và tích hợp lưu trữ CSDL với content_type='RUBRIC' cùng nguồn trích dẫn provenance.
 
 **Acceptance Criteria:**
-Sinh Rubric đánh giá phù hợp với mục tiêu bài giảng; lưu vào CSDL với content_type='RUBRIC'.
+- Rubric được sinh theo RubricSchema (title, scale_type, levels L4-L1, criteria, curriculum_alignment, source_chunk_ids).
+- Criteria đầy đủ (name, description, weight, descriptors cho từng mức điểm).
+- Trọng số tiêu chí được tự động cân đối tổng bằng 100%.
+- Ngắt sinh và trả về HTTP 422 khi phát hiện ngữ cảnh tài liệu thiếu (InsufficientEvidenceError).
+- Spring Boot backend lưu trữ bản thảo trong `generated_contents` với `content_type='RUBRIC'` và trích xuất lưu `content_citations`.
 
-**Deliverable:** rubric_generator.py
+**Deliverable:** rubric_generator.py, GenerationService.java, GenerationController.java
 
 ---
 
@@ -1756,7 +1760,7 @@ Sinh Rubric đánh giá phù hợp với mục tiêu bài giảng; lưu vào CSD
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** Medium
 - **Assignee Type:** QA Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-304, ATC-401
 
 **Description:**
@@ -1765,7 +1769,7 @@ Kiểm thử tính logic của thang điểm Rubric và độ bám sát yêu c�
 **Acceptance Criteria:**
 Tổng trọng số điểm = 100% hoặc thang điểm 10 chuẩn; tiêu chí rõ ràng.
 
-**Deliverable:** Rubric Test Report
+**Deliverable:** [Rubric Test Report](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/docs/4.Test_Case/TC_QA-027_Rubric_Scoring_Matrix_Curriculum_Alignment.md) & `scripts/qa/test_qa027_rubric_scoring_curriculum.ps1`
 
 ---
 
@@ -1775,7 +1779,7 @@ Tổng trọng số điểm = 100% hoặc thang điểm 10 chuẩn; tiêu chí r
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** Medium
 - **Assignee Type:** Designer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-307, ATC-401
 
 **Description:**
@@ -1784,7 +1788,7 @@ Thiết kế layout phiếu đề thi cho học sinh và phiếu đáp án / hư
 **Acceptance Criteria:**
 Bản vẽ Figma cho mẫu đề thi học sinh (không đáp án) và phiếu hướng dẫn chấm.
 
-**Deliverable:** Figma Quiz Export Layouts
+**Deliverable:** [Figma Quiz Export Layouts (Code: QuizExportControls.jsx & Exporters)](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/frontend/src/components/export/QuizExportControls.jsx)
 
 ---
 
@@ -1794,7 +1798,7 @@ Bản vẽ Figma cho mẫu đề thi học sinh (không đáp án) và phiếu h
 - **Sprint:** Sprint 4 - Quiz & Versioning
 - **Priority:** Medium
 - **Assignee Type:** Frontend Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-307, ATC-401
 
 **Description:**
@@ -1870,16 +1874,25 @@ File học sinh sạch 100%; file giáo viên có lời giải và đáp án ch�
 - **Sprint:** Sprint 5 - Testing & Optimization
 - **Priority:** High
 - **Assignee Type:** Backend Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-307, ATC-404
 
 **Description:**
 Cấu hình môi trường test tích hợp sử dụng Testcontainers (Postgres + MinIO) cho CI.
 
 **Acceptance Criteria:**
-Bộ test harness tự động khởi chạy containers sạch và dọn dẹp sau khi chạy test.
+- [x] Testcontainers khởi tạo được dependency (PostgreSQL 16 with pgvector + MinIO S3 object storage).
+- [x] Spring Boot integration test chạy được (`TestcontainersConfig.java`, dynamic datasource/MinIO injection, `@SpringBootTest`).
+- [x] FastAPI integration test chạy được (`test_testcontainers_harness.py`, async pgvector similarity search, MinIO upload/download).
+- [x] Database test được isolation giữa các test (tự động dọn dẹp hoặc table truncation giữa các test, không rò rỉ dữ liệu).
 
-**Deliverable:** TestcontainersConfig.java
+**Deliverables:**
+- `backend/src/test/java/com/aiteachercopilot/testcontainers/TestcontainersConfig.java`
+- `backend/src/test/java/com/aiteachercopilot/testcontainers/AbstractTestcontainersIntegrationTest.java`
+- `backend/src/test/java/com/aiteachercopilot/testcontainers/TestcontainersHarnessIntegrationTest.java`
+- `ai-service/tests/test_testcontainers_harness.py`
+- `scripts/qa/test_be032_testcontainers_harness.ps1`
+- `docs/4.Test_Case/TC_BE-032_Testcontainers_Integration_Harness.md`
 
 ---
 
@@ -1927,7 +1940,7 @@ Chạy và ghi nhận kết quả kiểm thử tự động trên luồng tích 
 - **Sprint:** Sprint 5 - Testing & Optimization
 - **Priority:** High
 - **Assignee Type:** Backend Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-303, ATC-401
 
 **Description:**
@@ -1936,7 +1949,7 @@ Xây dựng module ghi nhận metrics đánh giá chất lượng RAG trong Fast
 **Acceptance Criteria:**
 Ghi log độ tương đồng Cosine, thời gian truy xuất và số lượng chunk đạt chuẩn.
 
-**Deliverable:** evaluation_logger.py
+**Deliverable:** evaluation_logger.py (ai-service/app/evaluation/evaluation_logger.py, TC_BE-033_RAG_Retrieval_Quality_Metrics_Logging.md)
 
 ---
 
@@ -1984,7 +1997,7 @@ Báo cáo chi tiết các trường hợp đạt chuẩn và các trường hợ
 - **Sprint:** Sprint 5 - Testing & Optimization
 - **Priority:** Medium
 - **Assignee Type:** Backend Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-302, ATC-502
 
 **Description:**
@@ -1993,7 +2006,7 @@ Tinh chỉnh tham số HNSW index (m=16, ef_construction=64) và tối ưu Hikar
 **Acceptance Criteria:**
 Thời gian truy xuất vector pgvector giảm xuống < 200ms cho mỗi request tìm kiếm.
 
-**Deliverable:** V2__optimize_hnsw_index.sql
+**Deliverable:** V4__optimize_hnsw_and_retrieval_indexes.sql (backend/src/main/resources/db/migration/V4__optimize_hnsw_and_retrieval_indexes.sql, TC_BE-034_pgvector_Query_Plan_HNSW_Optimization.md)
 
 ---
 
@@ -2003,7 +2016,7 @@ Thời gian truy xuất vector pgvector giảm xuống < 200ms cho mỗi request
 - **Sprint:** Sprint 5 - Testing & Optimization
 - **Priority:** Medium
 - **Assignee Type:** DevOps Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-302, ATC-502
 
 **Description:**
@@ -2012,7 +2025,7 @@ Cấu hình shared_buffers, work_mem và max_parallel_workers cho PostgreSQL con
 **Acceptance Criteria:**
 Tối ưu hóa tài nguyên phần cứng, tránh nghẽn I/O khi tính toán vector.
 
-**Deliverable:** postgresql.conf tuning
+**Deliverable:** postgresql.conf tuning (infrastructure/postgres/conf/postgresql.conf, TC_OPS-006_PostgreSQL_pgvector_Tuning_Benchmark.md)
 
 ---
 
@@ -2041,7 +2054,7 @@ Thực hiện kiểm thử tải (Load Testing) đo độ trễ truy vấn vecto
 - **Sprint:** Sprint 5 - Testing & Optimization
 - **Priority:** High
 - **Assignee Type:** Frontend Engineer
-- **Status:** TO DO
+- **Status:** DONE
 - **Dependencies:** is blocked by ATC-206
 
 **Description:**
@@ -2050,7 +2063,7 @@ Cải thiện thông báo lỗi trên UI khi tài liệu bị lỗi phân tích 
 **Acceptance Criteria:**
 Hiển thị Toast lỗi rõ ràng kèm hướng dẫn khắc phục khi file không thể xử lý.
 
-**Deliverable:** ErrorBoundary.jsx & ToastNotification.jsx
+**Deliverable:** [ErrorBoundary.jsx & Toast Notification](file:///d:/DU_AN_2026/Python/ai-teacher-copilot/frontend/src/components/feedback/ErrorBoundary.jsx)
 
 ---
 

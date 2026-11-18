@@ -1,6 +1,6 @@
 # AI Teacher Copilot — Đặc Tả Kiến Trúc & Quy Chuẩn Tổ Chức Frontend
 
-> **Tài liệu tham chiếu kiến trúc chính thức cho Frontend Client**
+> ⚠️ Token màu, radius, phân loại trang, và công thức craft/polish đã chuyển về SOURCE_OF_TRUTH.md. File này chỉ giữ phần đặc tả nghiệp vụ/component logic riêng, không được định nghĩa lại token hay quy tắc composition.
 > Stack: React 18, Vite, Zustand, React Router v6, Axios, Vanilla CSS / SCSS Tokens.
 
 ---
@@ -29,7 +29,7 @@ frontend/src/
 │
 ├── core/                                   # TẦNG 2: SHARED CORE (Zero-Domain-Logic)
 │   ├── components/                         # UI Primitives & Shared Widgets
-│   │   ├── ui/                             # Button, Input, Dropdown, Card, Badge, Spinner
+│   │   ├── ui/                             # Button, Input, Dropdown, Card, Badge, Spinner, Alert
 │   │   ├── feedback/                       # Toast, ConfirmModal, EmptyState, ErrorBoundary
 │   │   ├── datatable/                      # DataTableWrapper (Table bọc phân trang & lọc)
 │   │   ├── export/                         # ExportDropdown.jsx (Nút bấm xuất file PDF/Word)
@@ -37,7 +37,7 @@ frontend/src/
 │   │
 │   ├── layouts/                            # Master Layouts (React Router Outlet)
 │   │   ├── DashboardLayout.jsx             # Sidebar + Header + Workspace Selector + <Outlet />
-│   │   ├── AuthLayout.jsx                  # Clean centered layout cho Login/Register
+│   │   ├── AuthLayout.jsx                  # Clean centered layout cho Login/Register (Nhóm A - xem SOURCE_OF_TRUTH.md)
 │   │   └── FocusLayout.jsx                 # Fullscreen layout cho editor soạn giáo án/đề thi
 │   │
 │   ├── services/                           # Shared Infrastructure Services
@@ -71,7 +71,7 @@ frontend/src/
 ├── features/                               # TẦNG 3: DOMAIN-DRIVEN FEATURE MODULES
 │   │
 │   ├── auth/                               # Phân hệ Xác thực
-│   │   ├── components/                     # LoginForm.jsx, RegisterForm.jsx
+│   │   ├── components/                     # LoginForm.jsx, RegisterForm.jsx, PasswordStrengthMeter.jsx
 │   │   ├── services/                       # authApi.js (login, register)
 │   │   ├── types/                          # auth.types.js (LoginRequest, AuthResponse)
 │   │   └── pages/                          # LoginPage.jsx, RegisterPage.jsx
@@ -109,7 +109,7 @@ frontend/src/
 │       └── pages/                          # HistoryListPage.jsx
 │
 ├── styles/                                 # TẦNG 4: DESIGN SYSTEM & TOKENS
-│   ├── variables.css                       # Color tokens, Typography, Spacing, Shadows
+│   ├── variables.css                       # HSL Color tokens, Typography, Spacing, Shadows
 │   ├── base.css                            # CSS Reset & base element styling
 │   ├── components.css                      # Styling cho các shared UI components
 │   ├── layout.css                          # Styling cho Header, Sidebar, Dashboard grid
@@ -127,9 +127,9 @@ frontend/src/
 ┌─────────────────────────────────────────────────────────────┐
 │                          app/                               │
 │              (Bootstrap, Routing, Providers)                │
-└───────────────┬─────────────────────────────┬───────────────┘
-                │                             │
-                ▼                             ▼
+│└───────────────┬─────────────────────────────┬──────────────┘
+│                │                             │
+│                ▼                             ▼
 ┌───────────────────────────────┐     ┌───────────────────────┐
 │          features/*           │ ──> │         core/         │
 │ (auth, workspace, lesson,...) │     │ (UI, services, store) │

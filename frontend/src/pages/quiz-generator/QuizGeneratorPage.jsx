@@ -1,0 +1,718 @@
+import React, { useState, useEffect, useMemo } from 'react';
+import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
+import { quizApi } from '@/services/generation';
+import { useWorkspaceStore } from '@/stores/workspaceStore';
+import { Button } from '@/components/ui/Button';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
+import { Spinner } from '@/components/ui/Spinner';
+import { BloomBadge, BloomFilter, normalizeBloomLevel } from '@/components/quiz';
+import { CitationBadge } from '@/components/citation/CitationBadge';
+import { CitationDrawer } from '@/components/citation/CitationDrawer';
+import { ExportDropdown } from '@/components/export/ExportDropdown';
+import { RegenerationModal } from '@/components/generation/RegenerationModal';
+import { VersionSelector } from '@/components/generation/VersionSelector';
+import { PATHS } from '@/routes/paths';
+import {
+  FileQuestion,
+  AlertCircle,
+  Sparkles,
+  CheckCircle2,
+  Lightbulb,
+  FolderOpen,
+  Plus,
+  BookOpen,
+  Layers,
+  Target,
+  HelpCircle,
+  Filter,
+  RotateCcw,
+} from 'lucide-react';
+import { APP_CONFIG } from '@/config/appConfig';
+
+export function QuizGeneratorPage() {
+  const { t } = useTranslation();
+  const { activeWorkspace, isInitialized, isLoading: isWorkspaceLoading } = useWorkspaceStore();
+
+  const [topic, setTopic] = useState('');
+  const [subject, setSubject] = useState('');
+  const [gradeLevel, setGradeLevel] = useState('');
+  const [questionCount, setQuestionCount] = useState(5);
+  const [difficulty, setDifficulty] = useState('MEDIUM');
+  const [targetBloomLevel, setTargetBloomLevel] = useState('Understand');
+  const [instructions, setInstructions] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [result, setResult] = useState(null);
+
+  // Versioning & Regeneration State (FE-016 / ATC-403)
+  const [versions, setVersions] = useState([]);
+  const [currentVersion, setCurrentVersion] = useState(1);
+  const [isRegenerateModalOpen, setIsRegenerateModalOpen] = useState(false);
+  const [isRegenerating, setIsRegenerating] = useState(false);
+
+  // Bloom's Taxonomy filter state: 'ALL' or a normalized Bloom level ('remember', 'understand', etc.)
+  const [bloomFilter, setBloomFilter] = useState('ALL');
+
+  // Citation Drawer State
+  const [isCitationOpen, setIsCitationOpen] = useState(false);
+  const [activeCitations, setActiveCitations] = useState([]);
+
+  // Sync subject & grade from activeWorkspace when it changes
+  useEffect(() => {
+    if (activeWorkspace) {
+      setSubject(activeWorkspace.subject || '');
+      setGradeLevel(activeWorkspace.gradeLevel || '');
+    }
+  }, [activeWorkspace]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!activeWorkspace?.id) {
+      toast.error(t('workspace.selectFirst', 'Vui lòng chọn không gian làm việc trước.'));
+      return;
+    }
+
+    if (!topic.trim()) {
+      toast.error(t('quizGenerator.topicRequired', 'Vui lòng nhập chủ đề hoặc bài học cần tạo câu hỏi.'));
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError('');
+      setResult(null);
+
+      const payload = {
+        subject: subject.trim() || activeWorkspace.subject || t('common.defaultSubject', 'Toán học'),
+        gradeLevel: gradeLevel.trim() || activeWorkspace.gradeLevel || t('common.defaultGrade', 'Lớp 10'),
+        topic: topic.trim(),
+        numQuestions: Number(questionCount),
+        questionCount: Number(questionCount),
+        difficulty,
+        targetBloomLevel,
+        instructions: instructions.trim(),
+      };
+
+      const res = await quizApi.generateQuiz(activeWorkspace.id, payload);
+      const quizData = res?.data?.data || res?.data || res;
+      setResult(quizData);
+      setBloomFilter('ALL');
+
+      // Initialize version history with v1 (FE-016)
+      const initialVer = Number(quizData?.version) || 1;
+      const initialEntry = {
+        id: quizData?.id || 'v1',
+        version: initialVer,
+        data: quizData,
+        instructions: instructions.trim() || '',
+        createdAt: quizData?.createdAt || new Date().toISOString(),
+      };
+      setVersions([initialEntry]);
+      setCurrentVersion(initialVer);
+
+      toast.success(t('common.success', 'Đã tạo bộ câu hỏi kiểm tra thành công!'));
+    } catch (err) {
+      console.error('Quiz generation failed:', err);
+      if (err.response?.status === 422) {
+        const msg = t(
+          'quizGenerator.insufficientEvidence',
+          'Hệ thống không tìm thấy đủ tài liệu trong kho tri thức để tạo đề kiểm tra này. Vui lòng nạp thêm tài liệu liên quan.'
+        );
+        setError(msg);
+        toast.error(msg);
+      } else {
+        const msg = err.response?.data?.message || t('quizGenerator.failed', 'Tạo đề kiểm tra thất bại. Vui lòng thử lại.');
+        setError(msg);
+        toast.error(msg);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Switch between existing versions without mutating or losing history
+  const handleSelectVersion = (versionObj) => {
+    if (!versionObj) return;
+    setCurrentVersion(versionObj.version);
+    setResult(versionObj.data);
+    setBloomFilter('ALL');
+  };
+
+  // Trigger instruction-based refinement and create a new versioned entry
+  const handleRegenerate = async (refinementInstructions) => {
+    if (!activeWorkspace?.id) return;
+
+    try {
+      setIsRegenerating(true);
+      let newResult = null;
+
+      // Call backend regenerate endpoint if an existing content ID is present
+      if (result?.id) {
+        try {
+          const res = await quizApi.regenerateQuiz(activeWorkspace.id, result.id, {
+            instructions: refinementInstructions,
+          });
+          newResult = res?.data?.data || res?.data || res;
+        } catch (apiErr) {
+          console.warn('Backend regenerate endpoint error, falling back to generateQuiz:', apiErr);
+        }
+      }
+
+      // Fallback: generate new quiz with combined refinement instructions
+      if (!newResult) {
+        const combined = [instructions, refinementInstructions].filter(Boolean).join('. ');
+        const payload = {
+          subject: subject.trim() || activeWorkspace.subject || t('common.defaultSubject', 'Toán học'),
+          gradeLevel: gradeLevel.trim() || activeWorkspace.gradeLevel || t('common.defaultGrade', 'Lớp 10'),
+          topic: topic.trim(),
+          numQuestions: Number(questionCount),
+          questionCount: Number(questionCount),
+          difficulty,
+          targetBloomLevel,
+          instructions: combined,
+        };
+        const res = await quizApi.generateQuiz(activeWorkspace.id, payload);
+        newResult = res?.data?.data || res?.data || res;
+      }
+
+      const nextVerNum = (Number(currentVersion) || versions.length || 1) + 1;
+      const versionedResult = {
+        ...newResult,
+        version: newResult?.version || nextVerNum,
+      };
+
+      const newVersionEntry = {
+        id: versionedResult?.id || `v${nextVerNum}`,
+        version: nextVerNum,
+        data: versionedResult,
+        instructions: refinementInstructions,
+        createdAt: versionedResult?.createdAt || new Date().toISOString(),
+      };
+
+      setVersions((prev) => [...prev, newVersionEntry]);
+      setCurrentVersion(nextVerNum);
+      setResult(versionedResult);
+      setBloomFilter('ALL');
+      setIsRegenerateModalOpen(false);
+      toast.success(
+        t('generation.regenerateSuccess', `Đã tạo thành công phiên bản v${nextVerNum}!`, { version: nextVerNum })
+      );
+    } catch (err) {
+      console.error('Quiz regeneration failed:', err);
+      toast.error(
+        err.response?.data?.message ||
+          t('generation.regenerateFailed', 'Tạo lại nội dung thất bại. Vui lòng thử lại.')
+      );
+    } finally {
+      setIsRegenerating(false);
+    }
+  };
+
+  // Resolve actual quiz object safely
+  const quiz = useMemo(() => {
+    if (!result) return null;
+    let data = result;
+    if (typeof data.contentData === 'string') {
+      try {
+        data = { ...data, contentData: JSON.parse(data.contentData) };
+      } catch (e) {
+        // ignore parse error
+      }
+    }
+    return (
+      data.questions ? data :
+      data.data?.questions ? data.data :
+      data.contentData?.questions ? data.contentData :
+      data.contentData || data.quiz
+    );
+  }, [result]);
+
+  // Stable normalized list with original question indices
+  const allQuestions = useMemo(() => {
+    const raw = quiz?.questions || [];
+    return raw.map((q, idx) => ({
+      ...q,
+      originalIndex: q.question_number || idx + 1,
+    }));
+  }, [quiz?.questions]);
+
+  // Derived filtered question list according to selected Bloom's level
+  const filteredQuestions = useMemo(() => {
+    if (bloomFilter === 'ALL') {
+      return allQuestions;
+    }
+    if (bloomFilter === 'HOT') {
+      return allQuestions.filter((q) => {
+        const norm = normalizeBloomLevel(q?.bloom_taxonomy_level);
+        return ['analyze', 'evaluate', 'create'].includes(norm);
+      });
+    }
+    return allQuestions.filter((q) => {
+      const norm = normalizeBloomLevel(q?.bloom_taxonomy_level);
+      return norm === bloomFilter;
+    });
+  }, [allQuestions, bloomFilter]);
+
+  // Initial loading spinner
+  if (isWorkspaceLoading && !isInitialized) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Spinner message={t('common.loading', 'Đang tải dữ liệu...')} />
+      </div>
+    );
+  }
+
+  // If no active workspace
+  if (!activeWorkspace) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <div className="w-16 h-16 rounded-2xl bg-orange-500/10 flex items-center justify-center mb-4 text-orange-600">
+          <FolderOpen className="w-8 h-8" />
+        </div>
+        <h2 className="text-xl font-bold tracking-tight mb-2">
+          {t('quizGenerator.selectWorkspaceFirst', 'Chưa chọn không gian làm việc')}
+        </h2>
+        <p className="text-muted-foreground text-sm max-w-md mb-6">
+          {t(
+            'quizGenerator.emptyDesc',
+            'Vui lòng chọn hoặc tạo một không gian làm việc để bắt đầu tạo câu hỏi trắc nghiệm.'
+          )}
+        </p>
+        <Link to={PATHS.WORKSPACES}>
+          <Button className="gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-medium shadow-md shadow-emerald-500/15">
+            <Plus className="w-4 h-4" />
+            {t('workspace.createFirst', 'Quản lý không gian làm việc')}
+          </Button>
+        </Link>
+      </div>
+    );
+  }
+
+  const optionLabels = ['A', 'B', 'C', 'D'];
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">{t('quizGenerator.title', 'Tạo bài tập & Đề kiểm tra')}</h1>
+          <p className="text-muted-foreground text-sm mt-1">
+            {t('quizGenerator.subtitle', 'Tạo câu hỏi trắc nghiệm chuẩn Bloom dựa trên kho tài liệu đã tải lên.')}
+          </p>
+        </div>
+
+        {activeWorkspace && (
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted/60 border border-border text-xs text-muted-foreground w-fit">
+            <FolderOpen className="w-4 h-4 text-primary" />
+            <span>{t('workspace.title', 'Không gian')}:</span>
+            <strong className="text-foreground font-semibold">{activeWorkspace.name}</strong>
+          </div>
+        )}
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-[1fr_1.3fr]">
+        {/* Input Form */}
+        <Card className="h-fit">
+          <CardHeader className="pb-4 border-b border-border/40">
+            <CardTitle className="text-base font-semibold flex items-center gap-2">
+              <FileQuestion className="w-5 h-5 text-orange-500" />
+              {t('quizGenerator.formTitle', 'Cấu hình bài kiểm tra')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-5">
+            <form onSubmit={handleSubmit} noValidate className="space-y-4">
+              {/* Topic / Unit */}
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-foreground flex items-center gap-1">
+                  {t('quizGenerator.topic', 'Chủ đề / Bài học')} <span className="text-destructive">*</span>
+                </label>
+                <input
+                  type="text"
+                  className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-all"
+                  placeholder={t('quizGenerator.topicPlaceholder', 'Ví dụ: Đạo hàm cấp 1 và ứng dụng hình học')}
+                  required
+                  value={topic}
+                  onChange={(e) => setTopic(e.target.value)}
+                />
+              </div>
+
+              {/* Subject & Grade Level */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-foreground flex items-center gap-1.5">
+                    <BookOpen className="w-3.5 h-3.5 text-primary" />
+                    {t('common.subject', 'Môn học')}
+                  </label>
+                  <input
+                    type="text"
+                    className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-all"
+                    placeholder={t('common.defaultSubject', 'Toán học')}
+                    value={subject}
+                    onChange={(e) => setSubject(e.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-foreground flex items-center gap-1.5">
+                    <Layers className="w-3.5 h-3.5 text-primary" />
+                    {t('common.grade', 'Khối lớp')}
+                  </label>
+                  <input
+                    type="text"
+                    className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-all"
+                    placeholder={t('common.defaultGrade', 'Lớp 10')}
+                    value={gradeLevel}
+                    onChange={(e) => setGradeLevel(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Question Count & Difficulty */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-foreground">
+                    {t('quizGenerator.questionCount', 'Số lượng câu hỏi')}
+                  </label>
+                  <div className="flex items-center gap-2">
+                    {[3, 5, 10].map((num) => (
+                      <button
+                        key={num}
+                        type="button"
+                        onClick={() => setQuestionCount(num)}
+                        className={`flex-1 py-1.5 text-xs font-semibold rounded-lg border transition-all ${
+                          Number(questionCount) === num
+                            ? 'bg-primary text-primary-foreground border-primary shadow-sm'
+                            : 'bg-muted/40 hover:bg-muted text-muted-foreground border-input'
+                        }`}
+                      >
+                        {num} câu
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-foreground">
+                    {t('quizGenerator.difficulty', 'Độ khó')}
+                  </label>
+                  <select
+                    className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-all"
+                    value={difficulty}
+                    onChange={(e) => setDifficulty(e.target.value)}
+                  >
+                    {APP_CONFIG.DIFFICULTY_LEVELS.map((d) => (
+                      <option key={d.value} value={d.value}>
+                        {d.value === 'EASY'
+                          ? t('quizGenerator.difficultyEasy', 'Dễ')
+                          : d.value === 'MEDIUM'
+                          ? t('quizGenerator.difficultyMedium', 'Trung bình')
+                          : t('quizGenerator.difficultyHard', 'Nâng cao')}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Target Bloom Taxonomy Level */}
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-foreground flex items-center justify-between">
+                  <span className="flex items-center gap-1.5">
+                    <Target className="w-3.5 h-3.5 text-orange-500" />
+                    {t('quizGenerator.bloomFocus', 'Cấp độ Bloom trọng tâm')}
+                  </span>
+                  <BloomBadge level={targetBloomLevel} size="sm" />
+                </label>
+                <select
+                  className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-all"
+                  value={targetBloomLevel}
+                  onChange={(e) => setTargetBloomLevel(e.target.value)}
+                >
+                  {APP_CONFIG.BLOOM_LEVELS.map((b) => (
+                    <option key={b.value} value={b.value}>
+                      {t(`bloom.${b.value.toLowerCase()}`, b.value)} ({b.value})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Additional Teacher Instructions */}
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-foreground flex items-center justify-between">
+                  <span>{t('quizGenerator.instructions', 'Yêu cầu sư phạm bổ sung (tuỳ chọn)')}</span>
+                </label>
+                <textarea
+                  className="flex min-h-[70px] w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-all resize-none"
+                  rows={2}
+                  placeholder={t(
+                    'quizGenerator.instructionsPlaceholder',
+                    'Ví dụ: Trọng tâm vào bài toán thực tế, bẫy các lỗi học sinh hay nhầm lẫn dấu...'
+                  )}
+                  value={instructions}
+                  onChange={(e) => setInstructions(e.target.value)}
+                />
+              </div>
+
+              {error && (
+                <div className="p-3 bg-destructive/10 text-destructive rounded-lg text-sm flex items-start gap-2 border border-destructive/20">
+                  <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+                  <span>{error}</span>
+                </div>
+              )}
+
+              <Button
+                type="submit"
+                disabled={loading}
+                className="w-full h-11 gap-2 text-base font-semibold bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white shadow-md shadow-orange-500/15"
+              >
+                <Sparkles className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
+                {loading
+                  ? t('quizGenerator.generating', 'AI đang tạo đề kiểm tra...')
+                  : t('quizGenerator.generate', 'Tạo đề kiểm tra với AI')}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+
+        {/* Output Preview */}
+        {quiz ? (
+          <div className="h-fit">
+            <Card className="overflow-hidden border-orange-500/20 shadow-md shadow-orange-500/5">
+              <CardHeader className="bg-orange-50/60 dark:bg-orange-950/20 border-b border-border pb-4">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                  <div className="space-y-1">
+                    <CardTitle className="text-xl text-orange-800 dark:text-orange-400 font-bold">
+                      {quiz.title || topic}
+                    </CardTitle>
+                    <p className="text-xs text-muted-foreground flex items-center gap-2">
+                      <span>{t('quizGenerator.totalQuestions', 'Số câu')}: <strong className="text-foreground">{quiz.questions?.length || questionCount}</strong></span>
+                      <span>•</span>
+                      <span>{t('quizGenerator.difficulty', 'Độ khó')}: <strong className="text-foreground">{difficulty}</strong></span>
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 flex-wrap shrink-0">
+                    <VersionSelector
+                      versions={versions}
+                      currentVersion={currentVersion}
+                      onSelectVersion={handleSelectVersion}
+                      onOpenRegenerate={() => setIsRegenerateModalOpen(true)}
+                    />
+                    <ExportDropdown
+                      workspaceId={activeWorkspace?.id}
+                      generationId={result.id || 'current'}
+                      defaultFileName={`de-thi-${topic || 'trac-nghiem'}-v${currentVersion}`}
+                      planData={
+                        quiz
+                          ? {
+                              ...quiz,
+                              title: topic ? `Đề kiểm tra: ${topic}` : quiz.title,
+                              questions: allQuestions,
+                            }
+                          : result
+                      }
+                      subject={subject || activeWorkspace?.subject || ''}
+                      gradeLevel={gradeLevel || activeWorkspace?.gradeLevel || ''}
+                      contentType="QUIZ"
+                    />
+                  </div>
+                </div>
+              </CardHeader>
+
+              <CardContent className="p-6 overflow-y-auto max-h-[calc(100vh-16rem)] space-y-5">
+                {/* Bloom's Taxonomy Filter & Matrix Distribution */}
+                <BloomFilter
+                  questions={allQuestions}
+                  selectedFilter={bloomFilter}
+                  onSelectFilter={(newFilter) => setBloomFilter(newFilter)}
+                />
+
+                {filteredQuestions.length === 0 ? (
+                  <div className="py-12 px-4 text-center rounded-xl border border-dashed border-border bg-muted/20">
+                    <div className="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center mx-auto mb-3 text-orange-500">
+                      <Filter className="w-6 h-6" />
+                    </div>
+                    <h4 className="text-sm font-semibold text-foreground mb-1">
+                      {t('quizGenerator.filterEmptyTitle', 'Không có câu hỏi nào thuộc cấp độ này')}
+                    </h4>
+                    <p className="text-xs text-muted-foreground max-w-sm mx-auto mb-4">
+                      {t(
+                        'quizGenerator.filterEmptyDesc',
+                        'Thử chọn một cấp độ Bloom khác hoặc hiển thị lại toàn bộ câu hỏi.'
+                      )}
+                    </p>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setBloomFilter('ALL')}
+                      className="gap-1.5 text-xs border-orange-500/30 hover:bg-orange-50 dark:hover:bg-orange-950/20"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5 text-orange-500" />
+                      {t('quizGenerator.showAllQuestions', 'Xem tất cả câu hỏi')}
+                    </Button>
+                  </div>
+                ) : (
+                  filteredQuestions.map((q, i) => {
+                    const correctIdx = q.correct_answer_index;
+                    const correctText =
+                      q.correct_answer ||
+                      q.correctAnswer ||
+                      (correctIdx !== undefined && q.options?.[correctIdx]
+                        ? `${optionLabels[correctIdx] || ''}. ${q.options[correctIdx]}`
+                        : '');
+
+                    const qNum = q.originalIndex || q.question_number || i + 1;
+                    const isLevelActive = bloomFilter === normalizeBloomLevel(q.bloom_taxonomy_level);
+
+                    return (
+                      <div
+                        key={q.id || qNum}
+                        className="p-5 rounded-xl bg-card border border-border/80 shadow-xs hover:border-orange-500/30 transition-all"
+                      >
+                        {/* Question Header */}
+                        <div className="flex justify-between items-start mb-4 gap-3">
+                          <div className="flex items-start gap-2.5 flex-1">
+                            <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-orange-100 text-orange-800 dark:bg-orange-950/60 dark:text-orange-300 text-xs font-bold shrink-0 mt-0.5">
+                              {qNum}
+                            </span>
+                            <span className="text-sm font-semibold leading-relaxed text-foreground">
+                              {q.question_text || q.question}
+                            </span>
+                          </div>
+                          <div className="flex gap-2 flex-wrap justify-end shrink-0">
+                            {q.bloom_taxonomy_level && (
+                              <BloomBadge
+                                level={q.bloom_taxonomy_level}
+                                interactive={true}
+                                active={isLevelActive}
+                                onClick={() => {
+                                  const norm = normalizeBloomLevel(q.bloom_taxonomy_level);
+                                  setBloomFilter((prev) => (prev === norm ? 'ALL' : norm));
+                                }}
+                              />
+                            )}
+                            <CitationBadge
+                              count={q.source_chunk_ids?.length || 1}
+                              onClick={() => {
+                                setActiveCitations(
+                                  q.source_chunk_ids?.map((id, idx) => ({
+                                    chunkId: String(id || idx),
+                                    fileName: `${activeWorkspace?.name || 'Tài liệu bài học'} (Mục ${idx + 1})`,
+                                    sourcePage: idx + 1,
+                                    excerpt: `Trích đoạn tham khảo phục vụ biên soạn câu hỏi #${qNum}`,
+                                  })) || [
+                                    {
+                                      chunkId: '1',
+                                      fileName: activeWorkspace?.name || 'Tài liệu học liệu',
+                                      sourcePage: 1,
+                                      excerpt: 'Trích đoạn tham khảo từ tài liệu bài học trong không gian làm việc.',
+                                    },
+                                  ]
+                                );
+                                setIsCitationOpen(true);
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Options Grid */}
+                        {q.options && Array.isArray(q.options) && (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-4">
+                            {q.options.map((opt, optIndex) => {
+                              const isCorrect =
+                                optIndex === correctIdx ||
+                                opt === q.correct_answer ||
+                                opt === q.correctAnswer;
+                              const label = optionLabels[optIndex] || String.fromCharCode(65 + optIndex);
+                              const text = typeof opt === 'string' ? opt : opt?.text || opt?.label;
+
+                              return (
+                                <div
+                                  key={optIndex}
+                                  className={`p-3 rounded-lg border text-xs flex items-start gap-2.5 transition-all ${
+                                    isCorrect
+                                      ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-950 dark:text-emerald-200 font-medium'
+                                      : 'bg-muted/20 border-border text-foreground'
+                                  }`}
+                                >
+                                  <span
+                                    className={`w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${
+                                      isCorrect
+                                        ? 'bg-emerald-600 text-white'
+                                        : 'bg-muted text-muted-foreground'
+                                    }`}
+                                  >
+                                    {label}
+                                  </span>
+                                  <span className="leading-relaxed mt-0.5">{text}</span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+
+                        {/* Explanation & Answer Key */}
+                        <div className="pt-3 border-t border-dashed border-border/80 text-xs space-y-2">
+                          {correctText && (
+                            <div className="text-emerald-700 dark:text-emerald-400 font-semibold flex items-center gap-1.5">
+                              <CheckCircle2 className="w-4 h-4 shrink-0" />
+                              <span>
+                                {t('quizGenerator.correctAnswer', 'Đáp án đúng')}: {correctText}
+                              </span>
+                            </div>
+                          )}
+                          {q.explanation && (
+                            <div className="text-muted-foreground flex items-start gap-1.5 leading-relaxed bg-muted/30 p-2.5 rounded-lg border border-border/40">
+                              <Lightbulb className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                              <span>
+                                <strong className="text-foreground font-medium">
+                                  {t('quizGenerator.explanation', 'Lời giải chi tiết')}:
+                                </strong>{' '}
+                                {q.explanation}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </CardContent>
+            </Card>
+
+            <CitationDrawer
+              isOpen={isCitationOpen}
+              onClose={() => setIsCitationOpen(false)}
+              citations={activeCitations}
+            />
+          </div>
+        ) : (
+          <div className="hidden lg:flex flex-col items-center justify-center p-8 text-center bg-muted/20 border-2 border-dashed border-border rounded-2xl h-[calc(100vh-16rem)] sticky top-24">
+            <div className="w-16 h-16 rounded-2xl bg-orange-500/10 flex items-center justify-center mb-4">
+              <FileQuestion className="w-8 h-8 text-orange-500 opacity-80" />
+            </div>
+            <h3 className="text-base font-semibold mb-1 text-foreground">
+              {t('quizGenerator.emptyTitle', 'Chưa có đề thi')}
+            </h3>
+            <p className="text-xs text-muted-foreground max-w-xs leading-relaxed">
+              {t(
+                'quizGenerator.emptyDesc',
+                'Điền chủ đề và cấu hình yêu cầu ở khung bên trái, sau đó nhấn "Tạo đề kiểm tra với AI" để sinh câu hỏi.'
+              )}
+            </p>
+          </div>
+        )}
+      </div>
+
+      <RegenerationModal
+        isOpen={isRegenerateModalOpen}
+        onClose={() => setIsRegenerateModalOpen(false)}
+        onRegenerate={handleRegenerate}
+        currentVersion={currentVersion}
+        contentType="QUIZ"
+        isLoading={isRegenerating}
+      />
+    </div>
+  );
+}

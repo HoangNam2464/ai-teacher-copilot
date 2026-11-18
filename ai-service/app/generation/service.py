@@ -1,50 +1,147 @@
+from typing import List, Literal, Optional, Union
+import uuid
+from app.generation.evidence_validator import validate_retrieval_evidence
+from app.generation.lesson_planner import lesson_planner_pipeline
+from app.generation.quiz_generator import QuizGeneratorPipeline, quiz_generator_pipeline
+from app.generation.rubric_generator import rubric_generator_pipeline
+from app.generation.schemas import (
+    LessonPlanGenerationRequest,
+    LessonPlanSchema,
+    QuizGenerationRequest,
+    QuizSchema,
+    RubricGenerationRequest,
+    RubricSchema,
+)
+from app.providers.factory import get_ai_provider
 from app.retrieval.service import search_similar_chunks
-from app.providers.gemini import generate_structured_output
-from app.generation.schemas import LessonPlan, Quiz
 
-async def generate_lesson_plan_service(workspace_id: str, subject: str, grade_level: str, topic: str, instructions: str):
-    # 1. Retrieve context
-    query = f"{subject} {grade_level} {topic} {instructions or ''}"
-    chunks = await search_similar_chunks(query, workspace_id, top_k=5)
-    
-    context_text = "\n\n".join([f"Source [{i}]: {c.content}" for i, c in enumerate(chunks)])
-    
-    # 2. Build prompt
-    prompt = f"""
-    Create a lesson plan for:
-    Subject: {subject}
-    Grade Level: {grade_level}
-    Topic: {topic}
-    Additional Instructions: {instructions or 'None'}
-    
-    Use the following retrieved knowledge context (RAG) to ground your lesson plan:
-    ---
-    {context_text}
-    ---
-    """
-    
-    # 3. Call LLM
-    result = await generate_structured_output(prompt, LessonPlan)
-    return result
 
-async def generate_quiz_service(workspace_id: str, subject: str, grade_level: str, topic: str, num_questions: int, instructions: str):
-    query = f"{subject} {grade_level} {topic} {instructions or ''}"
-    chunks = await search_similar_chunks(query, workspace_id, top_k=5)
-    
-    context_text = "\n\n".join([f"Source [{i}]: {c.content}" for i, c in enumerate(chunks)])
-    
-    prompt = f"""
-    Create a quiz with {num_questions} questions for:
-    Subject: {subject}
-    Grade Level: {grade_level}
-    Topic: {topic}
-    Additional Instructions: {instructions or 'None'}
-    
-    Use the following retrieved knowledge context (RAG):
-    ---
-    {context_text}
-    ---
+async def generate_lesson_plan_service(
+    workspace_id: Union[str, uuid.UUID],
+    subject: str,
+    grade_level: str,
+    topic: str,
+    instructions: Optional[str] = None,
+    objectives: Optional[List[str]] = None,
+    duration_minutes: int = 45,
+    document_ids: Optional[List[uuid.UUID]] = None,
+    min_similarity: float = 0.30,
+) -> LessonPlanSchema:
     """
+    Delegate lesson plan generation to the structured LessonPlannerPipeline.
+    """
+    ws_uuid = workspace_id if isinstance(workspace_id, uuid.UUID) else uuid.UUID(str(workspace_id))
+    request = LessonPlanGenerationRequest(
+        workspace_id=ws_uuid,
+        subject=subject,
+        grade_level=grade_level,
+        topic=topic,
+        objectives=objectives,
+        duration_minutes=duration_minutes,
+        instructions=instructions,
+        document_ids=document_ids,
+        min_similarity=min_similarity,
+    )
+    return await lesson_planner_pipeline.generate_lesson_plan(request)
+
+
+async def generate_quiz_service(
+    workspace_id: Union[str, uuid.UUID],
+    subject: str,
+    grade_level: str,
+    topic: str,
+    num_questions: int = 5,
+    instructions: Optional[str] = None,
+    question_types: Optional[List[str]] = None,
+    difficulty: str = "MEDIUM",
+    target_bloom_level: Optional[str] = None,
+    document_ids: Optional[List[uuid.UUID]] = None,
+    min_similarity: float = 0.30,
+) -> QuizSchema:
+    """
+    Delegate quiz generation to the structured QuizGeneratorPipeline (BE-024).
+    """
+    ws_uuid = workspace_id if isinstance(workspace_id, uuid.UUID) else uuid.UUID(str(workspace_id))
     
-    result = await generate_structured_output(prompt, Quiz)
-    return result
+    types = question_types or ["MCQ"]
+    valid_types = [t.upper() for t in types if t.upper() in ("MCQ", "SHORT_ANSWER")]
+    if not valid_types:
+        valid_types = ["MCQ"]
+
+    diff = difficulty.upper() if difficulty.upper() in ("EASY", "MEDIUM", "HARD") else "MEDIUM"
+
+    request = QuizGenerationRequest(
+        workspace_id=ws_uuid,
+        subject=subject,
+        grade_level=grade_level,
+        topic=topic,
+        num_questions=num_questions,
+        question_types=valid_types,  # type: ignore[arg-type]
+        difficulty=diff,  # type: ignore[arg-type]
+        target_bloom_level=target_bloom_level,
+        instructions=instructions,
+        document_ids=document_ids,
+        min_similarity=min_similarity,
+    )
+
+    # 1. Retrieve context with workspace isolation
+    query = f"{subject} Lớp {grade_level} {topic} {instructions or ''}"
+    retrieval_response = await search_similar_chunks(
+        query=query,
+        workspace_id=ws_uuid,
+        document_ids=document_ids,
+        subject=subject,
+        grade_level=grade_level,
+        top_k=max(5, num_questions * 2),
+        similarity_threshold=min_similarity,
+    )
+
+    # 2. Validate evidence sufficiency to prevent ungrounded AI hallucination (Rule 7.7 & BE-017)
+    validated_chunks = validate_retrieval_evidence(
+        retrieval_response=retrieval_response,
+        min_chunks=1,
+        min_similarity=min_similarity,
+        query=query,
+        workspace_id=str(ws_uuid),
+    )
+
+    # 3. Call LLM provider with QuizSchema and response repair
+    provider = get_ai_provider()
+    pipeline = QuizGeneratorPipeline(provider=provider)
+    return await pipeline.generate_quiz_from_chunks(request, validated_chunks)
+
+
+async def generate_rubric_service(
+    workspace_id: Union[str, uuid.UUID],
+    subject: str,
+    grade_level: str,
+    topic: str,
+    objectives: Optional[List[str]] = None,
+    instructions: Optional[str] = None,
+    num_criteria: int = 3,
+    scale_type: str = "PERCENTAGE",
+    document_ids: Optional[List[uuid.UUID]] = None,
+    min_similarity: float = 0.30,
+) -> RubricSchema:
+    """
+    Delegate assessment rubric generation to the structured RubricGeneratorPipeline (BE-029).
+    """
+    ws_uuid = workspace_id if isinstance(workspace_id, uuid.UUID) else uuid.UUID(str(workspace_id))
+    scale: Literal["PERCENTAGE", "POINTS"] = "POINTS" if scale_type.upper() == "POINTS" else "PERCENTAGE"
+
+    request = RubricGenerationRequest(
+        workspace_id=ws_uuid,
+        subject=subject,
+        grade_level=grade_level,
+        topic=topic,
+        objectives=objectives,
+        instructions=instructions,
+        num_criteria=num_criteria,
+        scale_type=scale,
+        document_ids=document_ids,
+        min_similarity=min_similarity,
+    )
+    return await rubric_generator_pipeline.generate_rubric(request)
+
+
+

@@ -4,6 +4,7 @@ import com.aiteachercopilot.common.exception.ResourceNotFoundException;
 import com.aiteachercopilot.workspace.WorkspaceService;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
+import io.minio.RemoveObjectArgs;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,6 +54,21 @@ public class DocumentService {
         if (file.getSize() > MAX_FILE_SIZE) {
             throw new IllegalArgumentException("File exceeds maximum size of 50MB");
         }
+        String originalFilename = file.getOriginalFilename();
+        if (originalFilename == null || originalFilename.isBlank()) {
+            originalFilename = file.getName();
+        }
+        if (originalFilename != null) {
+            if (originalFilename.contains("..") || originalFilename.contains("/") || originalFilename.contains("\\")) {
+                throw new IllegalArgumentException("Suspicious file name detected");
+            }
+            String lower = originalFilename.toLowerCase();
+            if (lower.endsWith(".exe") || lower.endsWith(".bat") || lower.endsWith(".sh")
+                    || lower.endsWith(".dll") || lower.endsWith(".zip") || lower.endsWith(".tar")
+                    || lower.endsWith(".gz") || lower.endsWith(".7z")) {
+                throw new IllegalArgumentException("Unsupported file type. Executable or archive files are not allowed. Allowed: PDF, DOCX, TXT");
+            }
+        }
         String contentType = file.getContentType();
         if (contentType == null || !ALLOWED_TYPES.contains(contentType)) {
             throw new IllegalArgumentException(
@@ -101,8 +117,7 @@ public class DocumentService {
                 .retrieve()
                 .bodyToMono(Void.class)
                 .doOnSuccess(v -> log.info("Successfully triggered AI processing for document: {}", savedDocId))
-                .doOnError(e -> log.error("Failed to trigger AI processing for document: {}", savedDocId, e))
-                .subscribe();
+                .subscribe(v -> {}, e -> log.warn("AI service trigger completed with error: {}", e.getMessage()));
 
         return DocumentDto.UploadResponse.fromEntity(doc);
     }
@@ -124,6 +139,41 @@ public class DocumentService {
                 .orElseThrow(() -> new ResourceNotFoundException("Document", documentId));
     }
 
+    /**
+     * Delete document: verifies workspace ownership, removes object from MinIO,
+     * and deletes database records.
+     */
+    @Transactional
+    public void deleteDocument(UUID documentId, UUID workspaceId, UUID userId) {
+        workspaceService.findAndAuthorize(workspaceId, userId);
+        Document document = documentRepository.findById(documentId)
+                .filter(d -> d.getWorkspaceId().equals(workspaceId))
+                .orElseThrow(() -> new ResourceNotFoundException("Document", documentId));
+
+        // 1. Remove MinIO object if exists
+        if (document.getMinioObjectKey() != null) {
+            try {
+                minioClient.removeObject(
+                        RemoveObjectArgs.builder()
+                                .bucket(bucketName)
+                                .object(document.getMinioObjectKey())
+                                .build()
+                );
+                log.info("Removed MinIO object: {}", document.getMinioObjectKey());
+            } catch (Exception e) {
+                log.warn("Failed to remove MinIO object {}: {}", document.getMinioObjectKey(), e.getMessage());
+            }
+        }
+
+        // 2. Delete database record
+        documentRepository.delete(document);
+        log.info("Document deleted successfully: {}", documentId);
+    }
+
+    /**
+     * Sanitize file name to prevent path traversal.
+     * Uploaded documents are untrusted data.
+     */
     private String sanitizeFileName(String fileName) {
         if (fileName == null) return "unnamed";
         return fileName.replaceAll("[^a-zA-Z0-9._-]", "_");

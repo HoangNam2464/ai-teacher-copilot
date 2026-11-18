@@ -11,10 +11,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.UUID;
 
-/**
- * JWT token provider — generates and validates tokens.
- * Tokens contain the user ID as the subject and email as a claim.
- */
 @Slf4j
 @Component
 public class JwtTokenProvider {
@@ -29,9 +25,6 @@ public class JwtTokenProvider {
         this.expirationMs = expirationMs;
     }
 
-    /**
-     * Generate a JWT token for the given user.
-     */
     public String generateToken(UUID userId, String email) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + expirationMs);
@@ -45,28 +38,73 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    /**
-     * Extract the user ID from a valid token.
-     */
     public UUID getUserIdFromToken(String token) {
         Claims claims = Jwts.parser()
                 .verifyWith(key)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
-        return UUID.fromString(claims.getSubject());
+        String subject = claims.getSubject();
+        if (subject == null || subject.isBlank()) {
+            return null;
+        }
+        try {
+            return UUID.fromString(subject);
+        } catch (IllegalArgumentException e) {
+            log.warn("Invalid UUID in token subject: {}", subject);
+            return null;
+        }
     }
 
-    /**
-     * Validate the given token.
-     */
+    public String getEmailFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+        return claims.get("email", String.class);
+    }
+
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
+            Claims claims = Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
+            String subject = claims.getSubject();
+            if (subject == null || subject.isBlank()) {
+                return false;
+            }
+            UUID.fromString(subject);
             return true;
         } catch (JwtException | IllegalArgumentException ex) {
             log.warn("Invalid JWT token: {}", ex.getMessage());
             return false;
+        }
+    }
+
+    public String generatePurposeToken(String email, String purpose, long customExpirationMs) {
+        Date now = new Date();
+        Date expiry = new Date(now.getTime() + customExpirationMs);
+
+        return Jwts.builder()
+                .subject(email)
+                .claim("purpose", purpose)
+                .issuedAt(now)
+                .expiration(expiry)
+                .signWith(key)
+                .compact();
+    }
+
+    public String validatePurposeToken(String token, String expectedPurpose) {
+        try {
+            Claims claims = Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
+            String purpose = claims.get("purpose", String.class);
+            if (expectedPurpose.equals(purpose)) {
+                return claims.getSubject();
+            }
+            log.warn("Mismatched token purpose: expected {}, got {}", expectedPurpose, purpose);
+            return null;
+        } catch (JwtException | IllegalArgumentException ex) {
+            log.warn("Invalid purpose JWT token: {}", ex.getMessage());
+            return null;
         }
     }
 }

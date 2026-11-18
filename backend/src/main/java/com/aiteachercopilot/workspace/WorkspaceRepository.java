@@ -12,6 +12,8 @@ import java.util.UUID;
 @Repository
 public interface WorkspaceRepository extends JpaRepository<Workspace, UUID> {
 
+    List<Workspace> findByOwnerId(UUID ownerId);
+
     List<Workspace> findByOwnerIdAndIsActiveTrue(UUID ownerId);
 
     boolean existsByIdAndOwnerId(UUID id, UUID ownerId);

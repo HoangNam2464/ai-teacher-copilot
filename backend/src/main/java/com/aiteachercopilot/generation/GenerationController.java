@@ -1,38 +1,145 @@
 package com.aiteachercopilot.generation;
 
+import com.aiteachercopilot.citation.CitationResolutionDto;
+import com.aiteachercopilot.citation.CitationService;
 import com.aiteachercopilot.common.dto.ApiResponse;
 import com.aiteachercopilot.user.User;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/workspaces/{workspaceId}/generate")
+@RequestMapping({
+        "/workspaces/{workspaceId}/generation",
+        "/workspaces/{workspaceId}/generations",
+        "/workspaces/{workspaceId}/generate"
+})
 @RequiredArgsConstructor
 public class GenerationController {
 
     private final GenerationService generationService;
+    private final CitationService citationService;
 
     @PostMapping("/lesson-plan")
-    public ResponseEntity<ApiResponse<Object>> generateLessonPlan(
+    public ResponseEntity<ApiResponse<GenerationResponseDto>> generateLessonPlan(
             @AuthenticationPrincipal User user,
             @PathVariable UUID workspaceId,
-            @RequestBody GenerationRequestDto request) {
-        
-        Object result = generationService.generateLessonPlan(workspaceId, user.getId(), request);
+            @Valid @RequestBody GenerationRequestDto request) {
+
+        GenerationResponseDto result = generationService.generateLessonPlan(workspaceId, user.getId(), request);
         return ResponseEntity.ok(ApiResponse.success(result));
     }
 
     @PostMapping("/quiz")
-    public ResponseEntity<ApiResponse<Object>> generateQuiz(
+    public ResponseEntity<ApiResponse<GenerationResponseDto>> generateQuiz(
             @AuthenticationPrincipal User user,
             @PathVariable UUID workspaceId,
-            @RequestBody GenerationRequestDto request) {
-        
-        Object result = generationService.generateQuiz(workspaceId, user.getId(), request);
+            @Valid @RequestBody GenerationRequestDto request) {
+
+        GenerationResponseDto result = generationService.generateQuiz(workspaceId, user.getId(), request);
         return ResponseEntity.ok(ApiResponse.success(result));
+    }
+
+    @PostMapping("/rubric")
+    public ResponseEntity<ApiResponse<GenerationResponseDto>> generateRubric(
+            @AuthenticationPrincipal User user,
+            @PathVariable UUID workspaceId,
+            @Valid @RequestBody GenerationRequestDto request) {
+
+        GenerationResponseDto result = generationService.generateRubric(workspaceId, user.getId(), request);
+        return ResponseEntity.ok(ApiResponse.success(result));
+    }
+
+    @GetMapping("/{contentId}/citations")
+    public ResponseEntity<ApiResponse<List<CitationResolutionDto>>> getContentCitations(
+            @AuthenticationPrincipal User user,
+            @PathVariable UUID workspaceId,
+            @PathVariable UUID contentId) {
+
+        List<CitationResolutionDto> results = citationService.resolveByContentId(
+                workspaceId, user.getId(), contentId);
+        return ResponseEntity.ok(ApiResponse.success(results));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<GenerationResponseDto>> updateLessonContent(
+            @AuthenticationPrincipal User user,
+            @PathVariable UUID workspaceId,
+            @PathVariable UUID id,
+            @RequestBody UpdateLessonContentRequestDto request) {
+
+        GenerationResponseDto result = generationService.updateLessonContent(
+                workspaceId, id, user.getId(), request);
+        return ResponseEntity.ok(ApiResponse.success("Lesson updated successfully", result));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<GenerationResponseDto>> getGeneratedContentById(
+            @AuthenticationPrincipal User user,
+            @PathVariable UUID workspaceId,
+            @PathVariable UUID id) {
+
+        GenerationResponseDto result = generationService.getGeneratedContentById(
+                workspaceId, id, user.getId());
+        return ResponseEntity.ok(ApiResponse.success(result));
+    }
+
+    @GetMapping({"/history", ""})
+    public ResponseEntity<ApiResponse<List<GenerationResponseDto>>> getGenerationHistory(
+            @AuthenticationPrincipal User user,
+            @PathVariable UUID workspaceId,
+            @RequestParam(required = false) String contentType) {
+
+        List<GenerationResponseDto> history = generationService.getWorkspaceGenerationHistory(
+                workspaceId, user.getId(), contentType);
+        return ResponseEntity.ok(ApiResponse.success(history));
+    }
+
+    @PostMapping("/{id}/regenerate")
+    public ResponseEntity<ApiResponse<GenerationResponseDto>> regenerateContent(
+            @AuthenticationPrincipal User user,
+            @PathVariable UUID workspaceId,
+            @PathVariable UUID id,
+            @RequestBody(required = false) RegenerateRequestDto request) {
+
+        String instructions = request != null ? request.getInstructions() : null;
+        GenerationResponseDto result = generationService.regenerateContent(
+                workspaceId, id, user.getId(), instructions);
+        return ResponseEntity.status(org.springframework.http.HttpStatus.CREATED)
+                .body(ApiResponse.success(result));
+    }
+
+    @GetMapping({"/{id}/versions", "/{id}/lineage"})
+    public ResponseEntity<ApiResponse<List<GenerationResponseDto>>> getContentVersions(
+            @AuthenticationPrincipal User user,
+            @PathVariable UUID workspaceId,
+            @PathVariable UUID id) {
+
+        List<GenerationResponseDto> versions = generationService.getContentVersions(
+                workspaceId, id, user.getId());
+        return ResponseEntity.ok(ApiResponse.success(versions));
+    }
+
+    @GetMapping({"/{id}/tree", "/{id}/version-tree"})
+    public ResponseEntity<ApiResponse<VersionTreeDto>> getVersionTree(
+            @AuthenticationPrincipal User user,
+            @PathVariable UUID workspaceId,
+            @PathVariable UUID id) {
+
+        VersionTreeDto tree = generationService.getVersionTree(
+                workspaceId, id, user.getId());
+        return ResponseEntity.ok(ApiResponse.success(tree));
     }
 }

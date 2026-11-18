@@ -1,0 +1,1051 @@
+package com.aiteachercopilot.generation;
+
+import com.aiteachercopilot.auth.JwtTokenProvider;
+import com.aiteachercopilot.document.Document;
+import com.aiteachercopilot.document.DocumentChunk;
+import com.aiteachercopilot.document.DocumentChunkRepository;
+import com.aiteachercopilot.document.DocumentRepository;
+import com.aiteachercopilot.user.User;
+import com.aiteachercopilot.user.UserRepository;
+import com.aiteachercopilot.workspace.Workspace;
+import com.aiteachercopilot.workspace.WorkspaceRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
+@SuppressWarnings("unchecked")
+public class GenerationIntegrationTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private WorkspaceRepository workspaceRepository;
+
+    @Autowired
+    private DocumentRepository documentRepository;
+
+    @Autowired
+    private DocumentChunkRepository documentChunkRepository;
+
+    @Autowired
+    private GeneratedContentRepository generatedContentRepository;
+
+    @Autowired
+    private ContentCitationRepository contentCitationRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
+    @MockBean
+    private WebClient aiServiceWebClient;
+
+    private User teacherA;
+    private User teacherB;
+    private String tokenA;
+    private String tokenB;
+    private Workspace workspaceA;
+    private DocumentChunk chunk1;
+
+    @BeforeEach
+    void setUp() {
+        contentCitationRepository.deleteAll();
+        generatedContentRepository.deleteAll();
+        documentChunkRepository.deleteAll();
+        documentRepository.deleteAll();
+        workspaceRepository.deleteAll();
+        userRepository.deleteAll();
+
+        teacherA = userRepository.save(User.builder()
+                .email("teacherA@school.edu.vn")
+                .passwordHash(passwordEncoder.encode("Password123@"))
+                .fullName("Cô Nguyễn Thị A")
+                .role("TEACHER")
+                .isActive(true)
+                .build());
+
+        teacherB = userRepository.save(User.builder()
+                .email("teacherB@school.edu.vn")
+                .passwordHash(passwordEncoder.encode("Password123@"))
+                .fullName("Thầy Trần Văn B")
+                .role("TEACHER")
+                .isActive(true)
+                .build());
+
+        tokenA = jwtTokenProvider.generateToken(teacherA.getId(), teacherA.getEmail());
+        tokenB = jwtTokenProvider.generateToken(teacherB.getId(), teacherB.getEmail());
+
+        workspaceA = workspaceRepository.save(Workspace.builder()
+                .name("Toán 10 Chân Trời Sáng Tạo")
+                .ownerId(teacherA.getId())
+                .subject("Toán")
+                .gradeLevel("10")
+                .build());
+
+        Document doc = documentRepository.save(Document.builder()
+                .workspaceId(workspaceA.getId())
+                .uploadedBy(teacherA.getId())
+                .fileName("Toan10_Tap1.pdf")
+                .fileType("application/pdf")
+                .fileSize(1024L)
+                .minioObjectKey("docs/Toan10_Tap1.pdf")
+                .processingStatus("COMPLETED")
+                .build());
+
+        chunk1 = documentChunkRepository.save(DocumentChunk.builder()
+                .documentId(doc.getId())
+                .workspaceId(workspaceA.getId())
+                .chunkIndex(0)
+                .content("Khái niệm cơ bản về véc tơ và các phép toán véc tơ trong mặt phẳng.")
+                .subject("Toán")
+                .gradeLevel("10")
+                .sourcePage(12)
+                .build());
+    }
+
+    @Test
+    @DisplayName("POST /workspaces/{id}/generation/lesson-plan - successfully persists lesson plan and citations [BE-019]")
+    void shouldGenerateAndPersistLessonPlanSuccessfully() throws Exception {
+        // Arrange
+        WebClient.RequestBodyUriSpec requestBodyUriSpec = mock(WebClient.RequestBodyUriSpec.class);
+        WebClient.RequestBodySpec requestBodySpec = mock(WebClient.RequestBodySpec.class);
+        WebClient.RequestHeadersSpec<?> requestHeadersSpec = mock(WebClient.RequestHeadersSpec.class);
+        WebClient.ResponseSpec responseSpec = mock(WebClient.ResponseSpec.class);
+
+        doReturn(requestBodyUriSpec).when(aiServiceWebClient).post();
+        doReturn(requestBodySpec).when(requestBodyUriSpec).uri(anyString());
+        doReturn(requestHeadersSpec).when(requestBodySpec).bodyValue(any());
+        doReturn(responseSpec).when(requestHeadersSpec).retrieve();
+
+        Map<String, Object> aiPlanData = Map.of(
+                "title", "Giáo án: Khái niệm Véc tơ",
+                "subject", "Toán",
+                "grade_level", "10",
+                "duration_minutes", 45,
+                "objectives", List.of("Hiểu khái niệm véc tơ", "Xác định hướng và độ dài"),
+                "sections", List.of(
+                        Map.of("title", "Khởi động", "duration_minutes", 5, "content", "Quan sát mũi tên chỉ hướng gió"),
+                        Map.of("title", "Hình thành kiến thức", "duration_minutes", 20, "content", "Định nghĩa đoạn thẳng có hướng")
+                ),
+                "materials_needed", List.of("Thước kẻ", "SGK"),
+                "source_chunk_ids", List.of(chunk1.getId().toString()),
+                "insufficient_evidence", false
+        );
+
+        Map<String, Object> aiResponse = Map.of(
+                "status", "success",
+                "content_type", "lesson_plan",
+                "data", aiPlanData
+        );
+
+        doReturn(Mono.just(aiResponse)).when(responseSpec).bodyToMono(any(ParameterizedTypeReference.class));
+
+        GenerationRequestDto requestDto = GenerationRequestDto.builder()
+                .subject("Toán")
+                .gradeLevel("10")
+                .topic("Véc tơ")
+                .instructions("Soạn ngắn gọn, sinh động")
+                .build();
+
+        // Act & Assert
+        mockMvc.perform(post("/workspaces/" + workspaceA.getId() + "/generation/lesson-plan")
+                        .header("Authorization", "Bearer " + tokenA)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.data.contentType", is("LESSON_PLAN")))
+                .andExpect(jsonPath("$.data.reviewStatus", is("DRAFT")))
+                .andExpect(jsonPath("$.data.version", is(1)))
+                .andExpect(jsonPath("$.data.title", is("Giáo án: Khái niệm Véc tơ")))
+                .andExpect(jsonPath("$.data.id", notNullValue()));
+
+        // Assert database persistence
+        List<GeneratedContent> allContents = generatedContentRepository.findByWorkspaceIdOrderByCreatedAtDesc(workspaceA.getId());
+        assertThat(allContents).hasSize(1);
+
+        GeneratedContent saved = allContents.get(0);
+        assertThat(saved.getContentType()).isEqualTo("LESSON_PLAN");
+        assertThat(saved.getReviewStatus()).isEqualTo("DRAFT");
+        assertThat(saved.getVersion()).isEqualTo(1);
+        assertThat(saved.getCreatedBy()).isEqualTo(teacherA.getId());
+        assertThat(saved.getWorkspaceId()).isEqualTo(workspaceA.getId());
+        assertThat(saved.getSubject()).isEqualTo("Toán");
+        assertThat(saved.getGradeLevel()).isEqualTo("10");
+        assertThat(saved.getTopic()).isEqualTo("Véc tơ");
+        assertThat(saved.getModelUsed()).isEqualTo("gemini-1.5-flash");
+        assertThat(saved.getGenerationTimeMs()).isNotNull();
+
+        // Assert citation persistence
+        var citations = contentCitationRepository.findByContentId(saved.getId());
+        assertThat(citations).hasSize(1);
+        assertThat(citations.get(0).getChunkId()).isEqualTo(chunk1.getId());
+        assertThat(citations.get(0).getDocumentId()).isEqualTo(chunk1.getDocumentId());
+    }
+
+    @Test
+    @DisplayName("Cross-workspace generation request should return 403 Forbidden")
+    void shouldReturnForbiddenForCrossWorkspaceAccess() throws Exception {
+        GenerationRequestDto requestDto = GenerationRequestDto.builder()
+                .subject("Toán")
+                .gradeLevel("10")
+                .topic("Véc tơ")
+                .build();
+
+        mockMvc.perform(post("/workspaces/" + workspaceA.getId() + "/generation/lesson-plan")
+                        .header("Authorization", "Bearer " + tokenB)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.success", is(false)));
+    }
+
+    @Test
+    @DisplayName("Validation failure on missing required fields should return 400 Bad Request")
+    void shouldReturnBadRequestWhenMissingFields() throws Exception {
+        GenerationRequestDto requestDto = GenerationRequestDto.builder()
+                .subject("") // Invalid blank subject
+                .gradeLevel("10")
+                .topic("")
+                .build();
+
+        mockMvc.perform(post("/workspaces/" + workspaceA.getId() + "/generation/lesson-plan")
+                        .header("Authorization", "Bearer " + tokenA)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success", is(false)));
+    }
+
+    @Test
+    @DisplayName("PUT /workspaces/{workspaceId}/generation/{id} updates lesson plan content and review status [BE-021]")
+    void shouldUpdateLessonContentAndReviewStatusSuccessfully() throws Exception {
+        GeneratedContent existing = generatedContentRepository.save(GeneratedContent.builder()
+                .workspaceId(workspaceA.getId())
+                .createdBy(teacherA.getId())
+                .title("Giáo án Hàm số sơ khai")
+                .contentType("LESSON_PLAN")
+                .reviewStatus("DRAFT")
+                .version(1)
+                .contentData(Map.of("topic", "Cũ", "sections", List.of("Phần mở đầu")))
+                .promptInput("Tạo giáo án")
+                .modelUsed("gemini-1.5-flash")
+                .generationTimeMs(1200)
+                .build());
+
+        UpdateLessonContentRequestDto updateDto = UpdateLessonContentRequestDto.builder()
+                .title("Giáo án Hàm số hoàn thiện")
+                .contentData(Map.of("topic", "Mới hoàn thiện", "sections", List.of("Khởi động", "Khám phá")))
+                .reviewStatus("REVIEWED")
+                .build();
+
+        mockMvc.perform(put("/workspaces/" + workspaceA.getId() + "/generation/" + existing.getId())
+                        .header("Authorization", "Bearer " + tokenA)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.data.id", is(existing.getId().toString())))
+                .andExpect(jsonPath("$.data.title", is("Giáo án Hàm số hoàn thiện")))
+                .andExpect(jsonPath("$.data.reviewStatus", is("REVIEWED")))
+                .andExpect(jsonPath("$.data.contentData.topic", is("Mới hoàn thiện")));
+
+        GeneratedContent reloaded = generatedContentRepository.findById(existing.getId()).orElseThrow();
+        assertThat(reloaded.getTitle()).isEqualTo("Giáo án Hàm số hoàn thiện");
+        assertThat(reloaded.getReviewStatus()).isEqualTo("REVIEWED");
+        assertThat(reloaded.getContentData()).containsEntry("topic", "Mới hoàn thiện");
+    }
+
+    @Test
+    @DisplayName("PUT /workspaces/{workspaceId}/generations/{id} rejects invalid review status with 400 Bad Request [BE-021]")
+    void shouldRejectInvalidReviewStatus() throws Exception {
+        GeneratedContent existing = generatedContentRepository.save(GeneratedContent.builder()
+                .workspaceId(workspaceA.getId())
+                .createdBy(teacherA.getId())
+                .title("Giáo án Hàm số")
+                .contentType("LESSON_PLAN")
+                .reviewStatus("DRAFT")
+                .contentData(Map.of("topic", "Test"))
+                .build());
+
+        UpdateLessonContentRequestDto updateDto = UpdateLessonContentRequestDto.builder()
+                .reviewStatus("INVALID_STATUS")
+                .build();
+
+        mockMvc.perform(put("/workspaces/" + workspaceA.getId() + "/generations/" + existing.getId())
+                        .header("Authorization", "Bearer " + tokenA)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success", is(false)))
+                .andExpect(jsonPath("$.error", containsString("Invalid review status")));
+    }
+
+    @Test
+    @DisplayName("PUT /workspaces/{workspaceId}/generation/{id} rejects empty contentData with 400 Bad Request [BE-021]")
+    void shouldRejectEmptyContentData() throws Exception {
+        GeneratedContent existing = generatedContentRepository.save(GeneratedContent.builder()
+                .workspaceId(workspaceA.getId())
+                .createdBy(teacherA.getId())
+                .title("Giáo án Hàm số")
+                .contentType("LESSON_PLAN")
+                .reviewStatus("DRAFT")
+                .contentData(Map.of("topic", "Test"))
+                .build());
+
+        UpdateLessonContentRequestDto updateDto = UpdateLessonContentRequestDto.builder()
+                .contentData(Map.of())
+                .build();
+
+        mockMvc.perform(put("/workspaces/" + workspaceA.getId() + "/generation/" + existing.getId())
+                        .header("Authorization", "Bearer " + tokenA)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success", is(false)))
+                .andExpect(jsonPath("$.error", containsString("contentData cannot be empty")));
+    }
+
+    @Test
+    @DisplayName("PUT /workspaces/{workspaceId}/generation/{id} rejects non-owner with 403 Forbidden [BE-021]")
+    void shouldRejectNonOwnerUpdateWithForbidden() throws Exception {
+        GeneratedContent existing = generatedContentRepository.save(GeneratedContent.builder()
+                .workspaceId(workspaceA.getId())
+                .createdBy(teacherA.getId())
+                .title("Giáo án của Teacher A")
+                .contentType("LESSON_PLAN")
+                .reviewStatus("DRAFT")
+                .contentData(Map.of("topic", "Test"))
+                .build());
+
+        UpdateLessonContentRequestDto updateDto = UpdateLessonContentRequestDto.builder()
+                .reviewStatus("REVIEWED")
+                .build();
+
+        // Teacher B attempts to update Teacher A's content
+        mockMvc.perform(put("/workspaces/" + workspaceA.getId() + "/generation/" + existing.getId())
+                        .header("Authorization", "Bearer " + tokenB)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateDto)))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.success", is(false)));
+    }
+
+    @Test
+    @DisplayName("GET /workspaces/{workspaceId}/generation/{id} retrieves generated content successfully [BE-021]")
+    void shouldGetGeneratedContentByIdSuccessfully() throws Exception {
+        GeneratedContent existing = generatedContentRepository.save(GeneratedContent.builder()
+                .workspaceId(workspaceA.getId())
+                .createdBy(teacherA.getId())
+                .title("Giáo án tra cứu")
+                .contentType("LESSON_PLAN")
+                .reviewStatus("DRAFT")
+                .contentData(Map.of("topic", "Test"))
+                .build());
+
+        mockMvc.perform(get("/workspaces/" + workspaceA.getId() + "/generation/" + existing.getId())
+                        .header("Authorization", "Bearer " + tokenA))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.data.title", is("Giáo án tra cứu")));
+    }
+
+    @Test
+    @DisplayName("GET /workspaces/{workspaceId}/generation/history retrieves generation history list [BE-021]")
+    void shouldGetGenerationHistorySuccessfully() throws Exception {
+        generatedContentRepository.save(GeneratedContent.builder()
+                .workspaceId(workspaceA.getId())
+                .createdBy(teacherA.getId())
+                .title("Bài 1")
+                .contentType("LESSON_PLAN")
+                .reviewStatus("DRAFT")
+                .contentData(Map.of("topic", "Test 1"))
+                .build());
+        mockMvc.perform(get("/workspaces/" + workspaceA.getId() + "/generation/history")
+                        .header("Authorization", "Bearer " + tokenA))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.data", hasSize(1)));
+    }
+
+    @Test
+    @DisplayName("PUT /workspaces/{workspaceId}/generation/{id} transitions review status DRAFT -> REVIEWED -> APPROVED [QA-021]")
+    void shouldTransitionReviewStatusDraftToReviewedToApproved() throws Exception {
+        GeneratedContent content = generatedContentRepository.save(GeneratedContent.builder()
+                .workspaceId(workspaceA.getId())
+                .createdBy(teacherA.getId())
+                .title("Giáo án Chu trình Sinh học")
+                .contentType("LESSON_PLAN")
+                .reviewStatus("DRAFT")
+                .contentData(Map.of("topic", "Quang hợp"))
+                .build());
+
+        // 1. Transition DRAFT -> REVIEWED
+        UpdateLessonContentRequestDto toReviewed = UpdateLessonContentRequestDto.builder()
+                .reviewStatus("REVIEWED")
+                .build();
+
+        mockMvc.perform(put("/workspaces/" + workspaceA.getId() + "/generation/" + content.getId())
+                        .header("Authorization", "Bearer " + tokenA)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(toReviewed)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.reviewStatus", is("REVIEWED")));
+
+        // 2. Transition REVIEWED -> APPROVED
+        UpdateLessonContentRequestDto toApproved = UpdateLessonContentRequestDto.builder()
+                .reviewStatus("APPROVED")
+                .build();
+
+        mockMvc.perform(put("/workspaces/" + workspaceA.getId() + "/generation/" + content.getId())
+                        .header("Authorization", "Bearer " + tokenA)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(toApproved)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.reviewStatus", is("APPROVED")));
+
+        GeneratedContent finalEntity = generatedContentRepository.findById(content.getId()).orElseThrow();
+        assertThat(finalEntity.getReviewStatus()).isEqualTo("APPROVED");
+    }
+
+    @Test
+    @DisplayName("PUT /workspaces/{workspaceId}/generation/{id} auto-saves complex contentData without data loss [QA-021]")
+    void shouldAutoSaveContentDataWithoutDataLoss() throws Exception {
+        GeneratedContent content = generatedContentRepository.save(GeneratedContent.builder()
+                .workspaceId(workspaceA.getId())
+                .createdBy(teacherA.getId())
+                .title("Giáo án Khảo sát Hàm số 12")
+                .contentType("LESSON_PLAN")
+                .reviewStatus("DRAFT")
+                .contentData(Map.of("topic", "Ban đầu"))
+                .build());
+
+        Map<String, Object> complexAutoSaveData = Map.of(
+                "title", "Giáo án Khảo sát Hàm số Bậc Ba Nâng Cao",
+                "duration_minutes", 45,
+                "objectives", List.of("Hiểu tính đơn điệu", "Vẽ đồ thị chính xác"),
+                "materials_needed", List.of("Thước kẻ", "Máy tính cầm tay"),
+                "sections", List.of(
+                        Map.of("title", "Khởi động", "duration_minutes", 10, "content", "Nhắc lại lý thuyết"),
+                        Map.of("title", "Khám phá", "duration_minutes", 20, "content", "Lập bảng biến thiên"),
+                        Map.of("title", "Luyện tập", "duration_minutes", 15, "content", "Bài tập củng cố")
+                )
+        );
+
+        UpdateLessonContentRequestDto autoSaveDto = UpdateLessonContentRequestDto.builder()
+                .contentData(complexAutoSaveData)
+                .build();
+
+        mockMvc.perform(put("/workspaces/" + workspaceA.getId() + "/generation/" + content.getId())
+                        .header("Authorization", "Bearer " + tokenA)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(autoSaveDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.data.contentData.title", is("Giáo án Khảo sát Hàm số Bậc Ba Nâng Cao")))
+                .andExpect(jsonPath("$.data.contentData.duration_minutes", is(45)))
+                .andExpect(jsonPath("$.data.contentData.objectives", hasSize(2)))
+                .andExpect(jsonPath("$.data.contentData.sections", hasSize(3)));
+
+        GeneratedContent saved = generatedContentRepository.findById(content.getId()).orElseThrow();
+        assertThat(saved.getContentData()).containsEntry("title", "Giáo án Khảo sát Hàm số Bậc Ba Nâng Cao");
+        assertThat(saved.getContentData()).containsEntry("duration_minutes", 45);
+        assertThat(saved.getReviewStatus()).isEqualTo("DRAFT"); // Status preserved
+    }
+
+    @Test
+    @DisplayName("PUT /workspaces/{workspaceId}/generation/{id} rejects cross-workspace update with 403 Forbidden [QA-021]")
+    void shouldRejectCrossWorkspaceContentUpdateWithForbidden() throws Exception {
+        GeneratedContent contentInA = generatedContentRepository.save(GeneratedContent.builder()
+                .workspaceId(workspaceA.getId())
+                .createdBy(teacherA.getId())
+                .title("Giáo án thuộc Không gian A")
+                .contentType("LESSON_PLAN")
+                .reviewStatus("DRAFT")
+                .contentData(Map.of("topic", "Nội dung Không gian A"))
+                .build());
+
+        UpdateLessonContentRequestDto updateDto = UpdateLessonContentRequestDto.builder()
+                .title("Cố ý sửa từ Không gian B")
+                .build();
+
+        Workspace workspaceB = workspaceRepository.save(Workspace.builder()
+                .name("Toán 11 KNTT")
+                .ownerId(teacherB.getId())
+                .subject("Toán")
+                .gradeLevel("11")
+                .build());
+
+        // Attempting to update contentInA via workspaceB URL with teacherB's token
+        mockMvc.perform(put("/workspaces/" + workspaceB.getId() + "/generation/" + contentInA.getId())
+                        .header("Authorization", "Bearer " + tokenB)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateDto)))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.success", is(false)))
+                .andExpect(jsonPath("$.error", containsString("Cross-workspace content modification is forbidden")));
+    }
+
+    // ===== [BE-025] Quiz Generation & Persistence Integration Tests =====
+
+    @Test
+    @DisplayName("POST /workspaces/{workspaceId}/generation/quiz generates and persists quiz with citations [BE-025]")
+    void shouldGenerateAndPersistQuizSuccessfully() throws Exception {
+        // Arrange
+        WebClient.RequestBodyUriSpec requestBodyUriSpec = mock(WebClient.RequestBodyUriSpec.class);
+        WebClient.RequestBodySpec requestBodySpec = mock(WebClient.RequestBodySpec.class);
+        WebClient.RequestHeadersSpec<?> requestHeadersSpec = mock(WebClient.RequestHeadersSpec.class);
+        WebClient.ResponseSpec responseSpec = mock(WebClient.ResponseSpec.class);
+
+        doReturn(requestBodyUriSpec).when(aiServiceWebClient).post();
+        doReturn(requestBodySpec).when(requestBodyUriSpec).uri(anyString());
+        doReturn(requestHeadersSpec).when(requestBodySpec).bodyValue(any());
+        doReturn(responseSpec).when(requestHeadersSpec).retrieve();
+
+        Map<String, Object> question1 = Map.of(
+                "question_number", 1,
+                "question_type", "MCQ",
+                "question_text", "Véc tơ là gì?",
+                "options", List.of("Đoạn thẳng", "Đoạn thẳng có hướng", "Đường thẳng", "Tia"),
+                "correct_answer", "B",
+                "explanation", "Theo định nghĩa SGK Toán 10",
+                "bloom_level", "REMEMBER",
+                "points", 1.0,
+                "source_chunk_ids", List.of(chunk1.getId().toString())
+        );
+
+        Map<String, Object> question2 = Map.of(
+                "question_number", 2,
+                "question_type", "SHORT_ANSWER",
+                "question_text", "Nêu hai đặc trưng cơ bản của véc tơ?",
+                "correct_answer", "Phương hướng và độ dài",
+                "explanation", "Véc tơ có phương, hướng và độ dài",
+                "bloom_level", "UNDERSTAND",
+                "points", 2.0,
+                "source_chunk_ids", List.of()
+        );
+
+        Map<String, Object> quizData = Map.of(
+                "title", "Đề kiểm tra 15 phút: Véc tơ và các phép toán",
+                "subject", "Toán",
+                "grade_level", "10",
+                "total_points", 10.0,
+                "duration_minutes", 15,
+                "bloom_distribution", Map.of("REMEMBER", 1, "UNDERSTAND", 1),
+                "questions", List.of(question1, question2),
+                "source_chunk_ids", List.of(chunk1.getId().toString()),
+                "insufficient_evidence", false
+        );
+
+        Map<String, Object> aiResponse = Map.of(
+                "status", "success",
+                "content_type", "quiz",
+                "data", quizData
+        );
+
+        doReturn(Mono.just(aiResponse)).when(responseSpec).bodyToMono(any(ParameterizedTypeReference.class));
+
+        GenerationRequestDto requestDto = GenerationRequestDto.builder()
+                .subject("Toán")
+                .gradeLevel("10")
+                .topic("Véc tơ")
+                .numQuestions(2)
+                .questionTypes(List.of("MCQ", "SHORT_ANSWER"))
+                .difficulty("MEDIUM")
+                .instructions("Soạn đề kiểm tra 15 phút")
+                .build();
+
+        // Act & Assert
+        mockMvc.perform(post("/workspaces/" + workspaceA.getId() + "/generation/quiz")
+                        .header("Authorization", "Bearer " + tokenA)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.data.contentType", is("QUIZ")))
+                .andExpect(jsonPath("$.data.reviewStatus", is("DRAFT")))
+                .andExpect(jsonPath("$.data.version", is(1)))
+                .andExpect(jsonPath("$.data.title", is("Đề kiểm tra 15 phút: Véc tơ và các phép toán")))
+                .andExpect(jsonPath("$.data.id", notNullValue()));
+
+        // Assert database persistence
+        List<GeneratedContent> allContents = generatedContentRepository.findByWorkspaceIdOrderByCreatedAtDesc(workspaceA.getId());
+        assertThat(allContents).hasSize(1);
+
+        GeneratedContent saved = allContents.get(0);
+        assertThat(saved.getContentType()).isEqualTo("QUIZ");
+        assertThat(saved.getReviewStatus()).isEqualTo("DRAFT");
+        assertThat(saved.getVersion()).isEqualTo(1);
+        assertThat(saved.getCreatedBy()).isEqualTo(teacherA.getId());
+        assertThat(saved.getWorkspaceId()).isEqualTo(workspaceA.getId());
+        assertThat(saved.getSubject()).isEqualTo("Toán");
+        assertThat(saved.getGradeLevel()).isEqualTo("10");
+        assertThat(saved.getTopic()).isEqualTo("Véc tơ");
+        assertThat(saved.getModelUsed()).isEqualTo("gemini-1.5-flash");
+        assertThat(saved.getGenerationTimeMs()).isNotNull();
+
+        // Verify contentData structure contains questions
+        Map<String, Object> savedContentData = saved.getContentData();
+        assertThat(savedContentData).containsKey("questions");
+        assertThat((List<?>) savedContentData.get("questions")).hasSize(2);
+
+        // Assert citation persistence
+        var citations = contentCitationRepository.findByContentId(saved.getId());
+        assertThat(citations).hasSize(1);
+        assertThat(citations.get(0).getChunkId()).isEqualTo(chunk1.getId());
+        assertThat(citations.get(0).getDocumentId()).isEqualTo(chunk1.getDocumentId());
+    }
+
+    @Test
+    @DisplayName("POST /workspaces/{workspaceId}/generation/quiz rejects cross-workspace request with 403 Forbidden [BE-025]")
+    void shouldReturnForbiddenForCrossWorkspaceQuizGeneration() throws Exception {
+        GenerationRequestDto requestDto = GenerationRequestDto.builder()
+                .subject("Toán")
+                .gradeLevel("10")
+                .topic("Véc tơ")
+                .build();
+
+        mockMvc.perform(post("/workspaces/" + workspaceA.getId() + "/generation/quiz")
+                        .header("Authorization", "Bearer " + tokenB)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.success", is(false)));
+    }
+
+    // ===== [BE-027] Content Regeneration API with Version Lineage Integration Tests =====
+
+    @Test
+    @DisplayName("POST /workspaces/{workspaceId}/generation/{id}/regenerate creates v2 with parentId and preserves parent [BE-027]")
+    void shouldRegenerateContentAndPreserveParentLineage() throws Exception {
+        GeneratedContent v1 = generatedContentRepository.save(GeneratedContent.builder()
+                .workspaceId(workspaceA.getId())
+                .createdBy(teacherA.getId())
+                .title("Đề kiểm tra Đại số 10")
+                .subject("Toán")
+                .gradeLevel("10")
+                .topic("Hàm số bậc hai")
+                .contentType("QUIZ")
+                .contentData(Map.of("topic", "Hàm số bậc hai", "total_questions", 5))
+                .promptInput("Soạn đề 5 câu hỏi")
+                .reviewStatus("REVIEWED")
+                .version(1)
+                .build());
+
+        RegenerateRequestDto regenerateDto = new RegenerateRequestDto("Bổ sung thêm 3 câu vận dụng thực tế");
+
+        mockMvc.perform(post("/workspaces/" + workspaceA.getId() + "/generation/" + v1.getId() + "/regenerate")
+                        .header("Authorization", "Bearer " + tokenA)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(regenerateDto)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.data.id", notNullValue()))
+                .andExpect(jsonPath("$.data.version", is(2)))
+                .andExpect(jsonPath("$.data.parentId", is(v1.getId().toString())))
+                .andExpect(jsonPath("$.data.reviewStatus", is("DRAFT")))
+                .andExpect(jsonPath("$.data.contentType", is("QUIZ")));
+
+        // Verify parent in database remains unchanged
+        GeneratedContent original = generatedContentRepository.findById(v1.getId()).orElseThrow();
+        assertThat(original.getVersion()).isEqualTo(1);
+        assertThat(original.getParentId()).isNull();
+        assertThat(original.getReviewStatus()).isEqualTo("REVIEWED");
+        assertThat(original.getContentData()).containsEntry("topic", "Hàm số bậc hai");
+
+        // Verify child in database
+        List<GeneratedContent> children = generatedContentRepository.findByParentIdOrderByVersionAsc(v1.getId());
+        assertThat(children).hasSize(1);
+        GeneratedContent v2 = children.get(0);
+        assertThat(v2.getVersion()).isEqualTo(2);
+        assertThat(v2.getParentId()).isEqualTo(v1.getId());
+        assertThat(v2.getReviewStatus()).isEqualTo("DRAFT");
+        assertThat(v2.getPromptInput()).contains("[Refinement]: Bổ sung thêm 3 câu vận dụng thực tế");
+    }
+
+    @Test
+    @DisplayName("GET /workspaces/{workspaceId}/generation/{id}/versions returns sorted version lineage [BE-027]")
+    void shouldRetrieveContentVersionsLineageInAscendingOrder() throws Exception {
+        GeneratedContent v1 = generatedContentRepository.save(GeneratedContent.builder()
+                .workspaceId(workspaceA.getId())
+                .createdBy(teacherA.getId())
+                .title("Giáo án Vật lí 10")
+                .contentType("LESSON_PLAN")
+                .contentData(Map.of("topic", "Định luật Newton"))
+                .reviewStatus("REVIEWED")
+                .version(1)
+                .build());
+
+        GeneratedContent v2 = generatedContentRepository.save(GeneratedContent.builder()
+                .workspaceId(workspaceA.getId())
+                .createdBy(teacherA.getId())
+                .title("Giáo án Vật lí 10")
+                .contentType("LESSON_PLAN")
+                .contentData(Map.of("topic", "Định luật Newton v2"))
+                .reviewStatus("DRAFT")
+                .version(2)
+                .parentId(v1.getId())
+                .build());
+
+        mockMvc.perform(get("/workspaces/" + workspaceA.getId() + "/generation/" + v2.getId() + "/versions")
+                        .header("Authorization", "Bearer " + tokenA))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.data", hasSize(2)))
+                .andExpect(jsonPath("$.data[0].id", is(v1.getId().toString())))
+                .andExpect(jsonPath("$.data[0].version", is(1)))
+                .andExpect(jsonPath("$.data[1].id", is(v2.getId().toString())))
+                .andExpect(jsonPath("$.data[1].version", is(2)))
+                .andExpect(jsonPath("$.data[1].parentId", is(v1.getId().toString())));
+    }
+
+    @Test
+    @DisplayName("POST /workspaces/{workspaceId}/generation/{id}/regenerate rejects cross-workspace request with 403 Forbidden [BE-027]")
+    void shouldRejectCrossWorkspaceRegenerationWithForbidden() throws Exception {
+        GeneratedContent v1InA = generatedContentRepository.save(GeneratedContent.builder()
+                .workspaceId(workspaceA.getId())
+                .createdBy(teacherA.getId())
+                .title("Nội dung Workspace A")
+                .contentType("QUIZ")
+                .contentData(Map.of("topic", "Bảo mật"))
+                .version(1)
+                .build());
+
+        Workspace workspaceB = workspaceRepository.save(Workspace.builder()
+                .name("Không gian B")
+                .ownerId(teacherB.getId())
+                .subject("Hóa học")
+                .gradeLevel("10")
+                .build());
+
+        RegenerateRequestDto requestDto = new RegenerateRequestDto("Cố ý regenerate từ workspace B");
+
+        mockMvc.perform(post("/workspaces/" + workspaceB.getId() + "/generation/" + v1InA.getId() + "/regenerate")
+                        .header("Authorization", "Bearer " + tokenB)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.success", is(false)))
+                .andExpect(jsonPath("$.error", containsString("Cross-workspace content regeneration is forbidden")));
+    }
+
+    @Test
+    @DisplayName("GET /workspaces/{workspaceId}/history supports optional contentType filtering [BE-028]")
+    void shouldGetWorkspaceHistoryFilteredByContentType() throws Exception {
+        generatedContentRepository.save(GeneratedContent.builder()
+                .workspaceId(workspaceA.getId())
+                .createdBy(teacherA.getId())
+                .title("Giáo án Lịch sử 10")
+                .contentType("LESSON_PLAN")
+                .reviewStatus("DRAFT")
+                .contentData(Map.of("topic", "Lịch sử"))
+                .build());
+
+        generatedContentRepository.save(GeneratedContent.builder()
+                .workspaceId(workspaceA.getId())
+                .createdBy(teacherA.getId())
+                .title("Đề trắc nghiệm 15p")
+                .contentType("QUIZ")
+                .reviewStatus("DRAFT")
+                .contentData(Map.of("topic", "Quiz 1"))
+                .build());
+
+        generatedContentRepository.save(GeneratedContent.builder()
+                .workspaceId(workspaceA.getId())
+                .createdBy(teacherA.getId())
+                .title("Đề 1 tiết Đại số")
+                .contentType("QUIZ")
+                .reviewStatus("DRAFT")
+                .contentData(Map.of("topic", "Quiz 2"))
+                .build());
+
+        // 1. Filter by QUIZ via /history
+        mockMvc.perform(get("/workspaces/" + workspaceA.getId() + "/history")
+                        .param("contentType", "QUIZ")
+                        .header("Authorization", "Bearer " + tokenA))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.data", hasSize(2)))
+                .andExpect(jsonPath("$.data[0].contentType", is("QUIZ")))
+                .andExpect(jsonPath("$.data[1].contentType", is("QUIZ")));
+
+        // 2. Filter by LESSON_PLAN via /generation/history
+        mockMvc.perform(get("/workspaces/" + workspaceA.getId() + "/generation/history")
+                        .param("contentType", "LESSON_PLAN")
+                        .header("Authorization", "Bearer " + tokenA))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.data", hasSize(1)))
+                .andExpect(jsonPath("$.data[0].contentType", is("LESSON_PLAN")));
+
+        // 3. Unfiltered history retrieves all 3 items
+        mockMvc.perform(get("/workspaces/" + workspaceA.getId() + "/history")
+                        .header("Authorization", "Bearer " + tokenA))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.data", hasSize(3)));
+    }
+
+    @Test
+    @DisplayName("GET /workspaces/{workspaceId}/history/{id}/tree returns complete version tree and lineage [BE-028]")
+    void shouldGetVersionTreeSuccessfullyWithCompleteHierarchy() throws Exception {
+        GeneratedContent v1 = generatedContentRepository.save(GeneratedContent.builder()
+                .workspaceId(workspaceA.getId())
+                .createdBy(teacherA.getId())
+                .title("Giáo án Hóa học 10 v1")
+                .contentType("LESSON_PLAN")
+                .contentData(Map.of("topic", "Nguyên tử v1"))
+                .version(1)
+                .build());
+
+        GeneratedContent v2 = generatedContentRepository.save(GeneratedContent.builder()
+                .workspaceId(workspaceA.getId())
+                .createdBy(teacherA.getId())
+                .title("Giáo án Hóa học 10 v2")
+                .contentType("LESSON_PLAN")
+                .contentData(Map.of("topic", "Nguyên tử v2"))
+                .version(2)
+                .parentId(v1.getId())
+                .build());
+
+        generatedContentRepository.save(GeneratedContent.builder()
+                .workspaceId(workspaceA.getId())
+                .createdBy(teacherA.getId())
+                .title("Giáo án Hóa học 10 v3")
+                .contentType("LESSON_PLAN")
+                .contentData(Map.of("topic", "Nguyên tử v3"))
+                .version(3)
+                .parentId(v1.getId())
+                .build());
+
+        // Verify version tree via HistoryController (/history/{id}/tree)
+        mockMvc.perform(get("/workspaces/" + workspaceA.getId() + "/history/" + v2.getId() + "/tree")
+                        .header("Authorization", "Bearer " + tokenA))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.data.rootId", is(v1.getId().toString())))
+                .andExpect(jsonPath("$.data.currentId", is(v2.getId().toString())))
+                .andExpect(jsonPath("$.data.currentVersion", is(2)))
+                .andExpect(jsonPath("$.data.latestVersion", is(3)))
+                .andExpect(jsonPath("$.data.totalVersions", is(3)))
+                .andExpect(jsonPath("$.data.versions", hasSize(3)))
+                .andExpect(jsonPath("$.data.versions[0].version", is(1)))
+                .andExpect(jsonPath("$.data.versions[1].version", is(2)))
+                .andExpect(jsonPath("$.data.versions[2].version", is(3)));
+
+        // Verify version tree via GenerationController (/generation/{id}/tree)
+        mockMvc.perform(get("/workspaces/" + workspaceA.getId() + "/generation/" + v2.getId() + "/tree")
+                        .header("Authorization", "Bearer " + tokenA))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.data.rootId", is(v1.getId().toString())))
+                .andExpect(jsonPath("$.data.currentVersion", is(2)))
+                .andExpect(jsonPath("$.data.latestVersion", is(3)));
+    }
+
+    @Test
+    @DisplayName("GET /workspaces/{workspaceId}/history rejects unauthorized cross-workspace access with 403 [BE-028]")
+    void shouldRejectCrossWorkspaceHistoryAndTreeAccessWithForbidden() throws Exception {
+        GeneratedContent v1InA = generatedContentRepository.save(GeneratedContent.builder()
+                .workspaceId(workspaceA.getId())
+                .createdBy(teacherA.getId())
+                .title("Giáo án Workspace A")
+                .contentType("LESSON_PLAN")
+                .contentData(Map.of("topic", "Bảo mật"))
+                .version(1)
+                .build());
+
+        Workspace workspaceB = workspaceRepository.save(Workspace.builder()
+                .name("Không gian B")
+                .ownerId(teacherB.getId())
+                .subject("Tin học")
+                .gradeLevel("11")
+                .build());
+
+        // Teacher B tries to access workspace A's history -> 403
+        mockMvc.perform(get("/workspaces/" + workspaceA.getId() + "/history")
+                        .header("Authorization", "Bearer " + tokenB))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.success", is(false)));
+
+        // Teacher B tries to access content from workspace A via workspace B path -> 403
+        mockMvc.perform(get("/workspaces/" + workspaceB.getId() + "/history/" + v1InA.getId() + "/tree")
+                        .header("Authorization", "Bearer " + tokenB))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.success", is(false)))
+                .andExpect(jsonPath("$.error", containsString("Cross-workspace content access is forbidden")));
+    }
+
+    @Test
+    @DisplayName("GET /history/{id} and DELETE /history/{id} work with workspace authorization [BE-028]")
+    void shouldGetAndDeleteHistoryItemDirectlyWithAuthorization() throws Exception {
+        GeneratedContent content = generatedContentRepository.save(GeneratedContent.builder()
+                .workspaceId(workspaceA.getId())
+                .createdBy(teacherA.getId())
+                .title("Bài kiểm tra tra cứu trực tiếp")
+                .contentType("QUIZ")
+                .contentData(Map.of("topic", "Trực tiếp"))
+                .version(1)
+                .build());
+
+        // 1. Direct GET by authorized teacher -> 200 OK
+        mockMvc.perform(get("/history/" + content.getId())
+                        .header("Authorization", "Bearer " + tokenA))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.data.title", is("Bài kiểm tra tra cứu trực tiếp")));
+
+        // 2. Direct GET by unauthorized teacher B -> 403 Forbidden
+        mockMvc.perform(get("/history/" + content.getId())
+                        .header("Authorization", "Bearer " + tokenB))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.success", is(false)));
+
+        // 3. Direct DELETE by authorized teacher -> 200 OK
+        mockMvc.perform(delete("/history/" + content.getId())
+                        .header("Authorization", "Bearer " + tokenA))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(true)));
+
+        // 4. Verify content is deleted
+        assertThat(generatedContentRepository.findById(content.getId())).isEmpty();
+    }
+
+    @Test
+    @DisplayName("POST /generation/rubric generates structured rubric draft and persists with content_type='RUBRIC' [BE-029]")
+    void shouldGenerateRubricAndPersistWithContentTypeRubric() throws Exception {
+        // Mock WebClient response
+        WebClient.RequestBodyUriSpec requestBodyUriSpec = mock(WebClient.RequestBodyUriSpec.class);
+        WebClient.RequestBodySpec requestBodySpec = mock(WebClient.RequestBodySpec.class);
+        WebClient.RequestHeadersSpec<?> requestHeadersSpec = mock(WebClient.RequestHeadersSpec.class);
+        WebClient.ResponseSpec responseSpec = mock(WebClient.ResponseSpec.class);
+
+        doReturn(requestBodyUriSpec).when(aiServiceWebClient).post();
+        doReturn(requestBodySpec).when(requestBodyUriSpec).uri(anyString());
+        doReturn(requestHeadersSpec).when(requestBodySpec).bodyValue(any());
+        doReturn(responseSpec).when(requestHeadersSpec).retrieve();
+
+        Map<String, Object> aiRubricData = Map.of(
+                "title", "Ma trận Rubric Đánh giá Bảng tuần hoàn",
+                "subject", "Hóa học",
+                "grade_level", "10",
+                "topic", "Bảng tuần hoàn",
+                "scale_type", "PERCENTAGE",
+                "levels", List.of(
+                        Map.of("id", "L4", "name", "Xuất sắc", "points", 4.0),
+                        Map.of("id", "L3", "name", "Tốt", "points", 3.0),
+                        Map.of("id", "L2", "name", "Đạt", "points", 2.0),
+                        Map.of("id", "L1", "name", "Cần cố gắng", "points", 1.0)
+                ),
+                "criteria", List.of(
+                        Map.of("id", "crit-1", "name", "Nắm vững lý thuyết", "weight", 50, "descriptors", Map.of("L4", "Rất tốt")),
+                        Map.of("id", "crit-2", "name", "Vận dụng bài tập", "weight", 50, "descriptors", Map.of("L4", "Rất tốt"))
+                ),
+                "curriculum_alignment", "Chương trình GDPT 2018 môn Hóa học",
+                "source_chunk_ids", List.of(chunk1.getId().toString())
+        );
+
+        Map<String, Object> aiResponse = Map.of(
+                "status", "success",
+                "content_type", "rubric",
+                "data", aiRubricData
+        );
+
+        doReturn(Mono.just(aiResponse)).when(responseSpec).bodyToMono(any(ParameterizedTypeReference.class));
+
+        GenerationRequestDto requestDto = GenerationRequestDto.builder()
+                .subject("Hóa học")
+                .gradeLevel("10")
+                .topic("Bảng tuần hoàn")
+                .numCriteria(2)
+                .scaleType("PERCENTAGE")
+                .instructions("Đánh giá năng lực hóa học")
+                .build();
+
+        // 1. Generate Rubric
+        mockMvc.perform(post("/workspaces/" + workspaceA.getId() + "/generation/rubric")
+                        .header("Authorization", "Bearer " + tokenA)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.data.contentType", is("RUBRIC")))
+                .andExpect(jsonPath("$.data.reviewStatus", is("DRAFT")))
+                .andExpect(jsonPath("$.data.version", is(1)))
+                .andExpect(jsonPath("$.data.title", is("Ma trận Rubric Đánh giá Bảng tuần hoàn")))
+                .andExpect(jsonPath("$.data.contentData.criteria", hasSize(2)))
+                .andExpect(jsonPath("$.data.contentData.levels", hasSize(4)));
+
+        // 2. Verify Citations were persisted
+        List<GeneratedContent> contents = generatedContentRepository.findByWorkspaceIdOrderByCreatedAtDesc(workspaceA.getId());
+        assertThat(contents).isNotEmpty();
+        GeneratedContent rubricContent = contents.stream()
+                .filter(c -> "RUBRIC".equals(c.getContentType()))
+                .findFirst()
+                .orElse(null);
+        assertThat(rubricContent).isNotNull();
+
+        List<ContentCitation> citations = contentCitationRepository.findByContentId(rubricContent.getId());
+        assertThat(citations).isNotEmpty();
+        assertThat(citations.get(0).getChunkId()).isEqualTo(chunk1.getId());
+
+        // 3. Query History with ?contentType=RUBRIC
+        mockMvc.perform(get("/workspaces/" + workspaceA.getId() + "/generation/history")
+                        .param("contentType", "RUBRIC")
+                        .header("Authorization", "Bearer " + tokenA))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.data", hasSize(1)))
+                .andExpect(jsonPath("$.data[0].contentType", is("RUBRIC")));
+
+        // 4. Unauthorized teacher B cannot generate rubric in workspace A -> 403
+        mockMvc.perform(post("/workspaces/" + workspaceA.getId() + "/generation/rubric")
+                        .header("Authorization", "Bearer " + tokenB)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.success", is(false)));
+    }
+}
+
+
+

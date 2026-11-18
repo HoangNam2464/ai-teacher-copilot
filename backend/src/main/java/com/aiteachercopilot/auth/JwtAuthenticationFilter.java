@@ -21,10 +21,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * JWT authentication filter — extracts and validates the Bearer token
- * from the Authorization header, then sets the SecurityContext.
- */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -42,17 +38,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = extractToken(request);
 
         if (token != null && tokenProvider.validateToken(token)) {
-            UUID userId = tokenProvider.getUserIdFromToken(token);
-            User user = userRepository.findById(userId).orElse(null);
-
-            if (user != null && user.getIsActive()) {
-                var authorities = List.of(
-                        new SimpleGrantedAuthority("ROLE_" + user.getRole()));
-                var auth = new UsernamePasswordAuthenticationToken(
-                        user, null, authorities);
-                auth.setDetails(new WebAuthenticationDetailsSource()
-                        .buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(auth);
+            try {
+                UUID userId = tokenProvider.getUserIdFromToken(token);
+                if (userId != null) {
+                    User user = userRepository.findById(userId).orElse(null);
+                    if (user != null && Boolean.TRUE.equals(user.getIsActive())) {
+                        var authorities = List.of(
+                                new SimpleGrantedAuthority("ROLE_" + user.getRole()));
+                        var auth = new UsernamePasswordAuthenticationToken(
+                                user, null, authorities);
+                        auth.setDetails(new WebAuthenticationDetailsSource()
+                                .buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(auth);
+                    }
+                }
+            } catch (Exception ex) {
+                log.warn("Failed to set user authentication from token: {}", ex.getMessage());
             }
         }
 

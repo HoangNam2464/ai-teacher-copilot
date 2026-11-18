@@ -4,10 +4,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-/**
- * DTOs for authentication requests and responses.
- */
 public final class AuthDto {
 
     private AuthDto() {}
@@ -37,17 +35,102 @@ public final class AuthDto {
     }
 
     @Data
+    @NoArgsConstructor
     public static class AuthResponse {
         private String token;
         private String email;
         private String fullName;
         private String role;
+        private String avatarUrl;
+        private Boolean requiresEmailVerification;
+        private String message;
 
         public AuthResponse(String token, String email, String fullName, String role) {
             this.token = token;
             this.email = email;
             this.fullName = fullName;
             this.role = role;
+        }
+
+        public AuthResponse(String token, String email, String fullName, String role, String avatarUrl) {
+            this.token = token;
+            this.email = email;
+            this.fullName = fullName;
+            this.role = role;
+            this.avatarUrl = avatarUrl;
+        }
+
+        public AuthResponse(String token, String email, String fullName, String role, Boolean requiresEmailVerification, String message) {
+            this.token = token;
+            this.email = email;
+            this.fullName = fullName;
+            this.role = role;
+            this.requiresEmailVerification = requiresEmailVerification;
+            this.message = message;
+        }
+    }
+
+    @Data
+    public static class GoogleLoginRequest {
+        @NotBlank(message = "Google credential is required")
+        private String credential;
+    }
+
+    @Data
+    public static class FacebookLoginRequest {
+        @NotBlank(message = "Facebook access token is required")
+        private String accessToken;
+    }
+
+    @Data
+    public static class AppleLoginRequest {
+        @NotBlank(message = "Apple idToken is required")
+        private String idToken;
+        private String fullName;
+    }
+
+    @Data
+    public static class ForgotPasswordRequest {
+        @NotBlank(message = "Email is required")
+        @Email(message = "Invalid email format")
+        private String email;
+    }
+
+    @Data
+    public static class ResetPasswordRequest {
+        @NotBlank(message = "Token is required")
+        private String token;
+
+        @NotBlank(message = "New password is required")
+        @Size(min = 8, message = "Password must be at least 8 characters")
+        private String newPassword;
+    }
+
+    @Data
+    public static class VerifyEmailRequest {
+        @NotBlank(message = "Token is required")
+        private String token;
+    }
+
+    @Data
+    public static class ResendVerificationRequest {
+        @NotBlank(message = "Email is required")
+        @Email(message = "Invalid email format")
+        private String email;
+    }
+
+    @Data
+    public static class MessageResponse {
+        private String message;
+        private String token;
+
+        public MessageResponse(String message) {
+            this.message = message;
+        }
+
+        public MessageResponse(String message, String token) {
+            this.message = message;
+            this.token = token;
         }
     }
 }

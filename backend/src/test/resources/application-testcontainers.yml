@@ -1,0 +1,37 @@
+# ==============================================================================
+# AI Teacher Copilot — Testcontainers Profile Configuration [BE-032]
+# ==============================================================================
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: false
+  flyway:
+    enabled: false
+
+app:
+  jwt:
+    secret: test-secret-key-that-is-at-least-32-characters-long-for-hmac
+    expiration-ms: 3600000
+  ai-service:
+    url: http://localhost:8000
+    api-key: test-api-key
+  minio:
+    endpoint: http://localhost:9000
+    access-key: minioadmin
+    secret-key: minioadmin
+    bucket-documents: test-documents
+    bucket-exports: test-exports
+  frontend-url: http://localhost:3000
+  mail:
+    enabled: false
+    from: test@school.edu.vn
+    sender-name: AI Teacher Copilot

@@ -1,0 +1,270 @@
+/* ==========================================================================
+   Auth Layout & Form Styles (Minimalist Centered Card Architecture)
+   Adheres to SOURCE_OF_TRUTH.md Group A (Action Screen) Specification
+   ========================================================================== */
+
+/* Fullpage Centered Canvas */
+.auth-centered-wrapper {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: hsl(var(--background));
+  padding: var(--space-6) var(--space-4);
+  position: relative;
+}
+
+.auth-centered-main {
+  width: 100%;
+  max-width: 460px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: auto;
+}
+
+/* Elevated Clean Auth Card */
+.auth-card {
+  width: 100%;
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius-2xl); /* 16px */
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 4px 12px -2px rgba(0, 0, 0, 0.03);
+  padding: 2.25rem 2rem;
+  transition: box-shadow var(--transition-base);
+}
+
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 1.75rem 1.25rem;
+    border-radius: var(--radius-xl);
+  }
+}
+
+/* Centered Header with Brand Icon */
+.auth-header-centered {
+  text-align: center;
+  margin-bottom: var(--space-6);
+}
+
+.auth-logo-badge {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto var(--space-3) auto;
+  border-radius: var(--radius-lg);
+  border: 1.5px solid hsl(var(--primary) / 0.35);
+  background: linear-gradient(135deg, hsl(var(--primary) / 0.08) 0%, hsl(var(--primary) / 0.02) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: hsl(var(--primary));
+  box-shadow: 0 2px 8px rgba(13, 148, 136, 0.1);
+}
+
+.auth-title {
+  font-size: 1.45rem;
+  font-weight: var(--font-weight-bold);
+  color: hsl(var(--foreground));
+  margin: 0 0 0.25rem 0;
+  letter-spacing: -0.02em;
+}
+
+.auth-title--primary {
+  color: hsl(var(--primary));
+}
+
+.auth-subtitle {
+  font-size: var(--font-size-xs);
+  color: hsl(var(--muted-foreground));
+  margin: 0;
+  line-height: 1.45;
+}
+
+/* Social SSO Buttons Row */
+.social-auth-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.social-auth-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius);
+  border: 1px solid hsl(var(--border));
+  background-color: hsl(var(--card));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.social-auth-btn:hover {
+  background-color: hsl(var(--secondary));
+  border-color: hsl(var(--border-hover, 214 32% 80%));
+  transform: translateY(-1px);
+}
+
+.social-auth-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px hsl(var(--ring) / 0.25);
+}
+
+.social-auth-btn.github-btn {
+  background-color: #0f172a;
+  color: #ffffff;
+  border-color: #0f172a;
+}
+
+.social-auth-btn.github-btn:hover {
+  background-color: #1e293b;
+  border-color: #1e293b;
+}
+
+/* SSO Divider */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: var(--space-4) 0;
+  font-size: 0.6875rem;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: hsl(var(--muted-foreground));
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background-color: hsl(var(--border));
+}
+
+/* Form Controls & Inputs */
+.auth-form-group {
+  margin-bottom: var(--space-3);
+}
+
+.auth-form-group .form-label {
+  font-size: 0.8125rem;
+  font-weight: var(--font-weight-medium);
+  margin-bottom: 0.25rem;
+}
+
+.form-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.form-input-action-right {
+  position: absolute;
+  right: 0.5rem;
+  background: transparent;
+  border: none;
+  color: hsl(var(--muted-foreground));
+  padding: 0.25rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--transition-fast);
+}
+
+.form-input-action-right:hover {
+  color: hsl(var(--foreground));
+}
+
+.form-input-action-right:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px hsl(var(--ring));
+}
+
+/* Password Helper Text */
+.password-helper-text {
+  font-size: 0.725rem;
+  color: hsl(var(--muted-foreground));
+  margin-top: 0.35rem;
+  line-height: 1.35;
+}
+
+/* Checkbox Terms */
+.auth-terms-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin: var(--space-4) 0 var(--space-5) 0;
+  font-size: var(--font-size-xs);
+  color: hsl(var(--muted-foreground));
+  line-height: 1.4;
+  cursor: pointer;
+  user-select: none;
+}
+
+.auth-terms-checkbox {
+  margin-top: 0.125rem;
+  accent-color: hsl(var(--primary));
+  width: 0.95rem;
+  height: 0.95rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.auth-terms-link {
+  color: hsl(var(--primary));
+  text-decoration: none;
+  font-weight: var(--font-weight-medium);
+}
+
+.auth-terms-link:hover {
+  text-decoration: underline;
+}
+
+/* Submit Action */
+.auth-submit-btn {
+  width: 100%;
+  height: 44px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, hsl(160 84% 36%) 0%, hsl(172 84% 28%) 100%);
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 2px 4px rgba(13, 148, 136, 0.15);
+  transition: all var(--transition-fast);
+}
+
+.auth-submit-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, hsl(160 84% 32%) 0%, hsl(172 84% 24%) 100%);
+  box-shadow: 0 4px 10px rgba(13, 148, 136, 0.25);
+  transform: translateY(-1px);
+}
+
+/* Footer Link */
+.auth-footer-switch {
+  text-align: center;
+  margin-top: var(--space-5);
+  font-size: var(--font-size-xs);
+  color: hsl(var(--muted-foreground));
+}
+
+.auth-footer-link {
+  font-weight: var(--font-weight-semibold);
+  color: hsl(var(--primary));
+  text-decoration: none;
+  margin-left: 0.25rem;
+  transition: color var(--transition-fast);
+}
+
+.auth-footer-link:hover {
+  text-decoration: underline;
+  color: hsl(172 84% 22%);
+}
+

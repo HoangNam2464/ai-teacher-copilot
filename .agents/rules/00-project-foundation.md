@@ -53,16 +53,24 @@ ai-teacher-copilot/
 
 ---
 
-## 4. Git Workflow
+## 4. Git Workflow & Conventions
 
 ```text
-feature/<name>  →  develop  →  main
+feature/<feature-name>  →  develop  →  main
 ```
 
-- **`feature/*`**: Feature development branch. Created from `develop`, merged back to `develop` via PR after passing CI.
-- **`develop`**: Integration branch. Aggregates completed features, runs automated tests, and serves as the integration testing environment.
-- **`main`**: Stable / release branch. Only receives code from `develop` after full system integration verification. Must remain clean, stable, and release-ready at all times.
-- **Commit Format**: `type(scope): description` (types: `feat`, `fix`, `chore`, `docs`, `refactor`, `test`, `ci`).
+- **Quy tắc đặt tên nhánh (`feature/<feature-name>`)**:
+  - Tên nhánh BẮT BUỘC là **tên chung của tính năng** (domain/feature name), ví dụ: `feature/lesson-planner`, `feature/quiz-generator`, `feature/workspace`, `feature/document-upload`.
+  - **TUYỆT ĐỐI KHÔNG** dùng mã/tên task (như `fe-010`, `BE-002`, `TASK-123`) làm tên nhánh.
+  - **Tính bền vững của nhánh tính năng**: Nhánh `feature/<feature-name>` được giữ cố định làm nhánh phát triển chung cho tính năng đó. Mọi cập nhật, sửa lỗi hay nâng cấp tính năng tiếp theo đều tiếp tục thực hiện trên chính nhánh này.
+  - Nhánh được tạo từ `develop`, sau khi hoàn thiện sẽ tạo PR merge về `develop` để kiểm thử và tích hợp.
+- **`develop`**: Integration branch. Nơi tổng hợp các tính năng đã hoàn thành, chạy automated CI tests, và dùng cho kiểm thử tích hợp.
+- **`main`**: Release branch ổn định. Chỉ nhận code từ `develop` sau khi đã kiểm thử toàn diện.
+- **Quy tắc Commit & Gắn Mã Task**:
+  - Format: `type(scope): description [TASK-ID]` hoặc `type(scope): [TASK-ID] description`
+  - Các loại: `feat`, `fix`, `chore`, `docs`, `refactor`, `test`, `ci`.
+  - **Mã task CHỈ ĐƯỢC PHÉP xuất hiện trong commit message**, không xuất hiện trong tên nhánh git.
+  - Ví dụ: `feat(frontend): implement lesson planner generation form and viewer [FE-010]`
 
 ---
 
@@ -93,6 +101,9 @@ feature/<name>  →  develop  →  main
 - Centralized Axios client with request/response interceptors for JWT
 - State management via Zustand
 - Never store secrets or sensitive API keys in frontend environment variables
+- **Khuôn mẫu thiết kế chuẩn (`frontend1/`)**: Khi xây dựng bất kỳ giao diện chức năng nào, BẮT BUỘC phải đối chiếu và tuân thủ khuôn mẫu tương ứng trong thư mục `frontend1/`.
+- **Tối giản & Tránh "quá AI" (No AI Clutter)**: Tuyệt đối KHÔNG tự ý bịa thêm chi tiết thừa thãi, các đoạn văn bản hướng dẫn dài dòng, hay các khối trang trí rườm rà làm giao diện bị rối mắt, mất tự nhiên và mang cảm giác "quá AI".
+- **Bố cục tinh gọn, súc tích**: Giữ UI đơn giản, sạch sẽ, khoảng trắng hợp lý, đúng trọng tâm chức năng như mẫu tham chiếu.
 
 ---
 
@@ -147,3 +158,4 @@ feature/<name>  →  develop  →  main
 3. **Baseline Before Optimization**: Establish a working baseline, measure with metrics, and optimize only where bottlenecks exist.
 4. **Draft-First AI Output**: AI output is an editable draft proposal. The teacher is the final decision-maker.
 5. **Explicit Insufficient Evidence**: If retrieval does not provide sufficient context, the pipeline returns an explicit `insufficient_evidence` response rather than generating ungrounded or hallucinated content.
+6. **Template-Driven & Anti-Clutter UI**: Giao diện luôn bám sát khuôn mẫu thực tế (`frontend1/`), giữ sự đơn giản, thanh lịch, kiên quyết loại bỏ chi tiết và chữ thừa thãi.

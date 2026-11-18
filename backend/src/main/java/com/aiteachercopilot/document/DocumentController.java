@@ -20,14 +20,24 @@ public class DocumentController {
 
     private final DocumentService documentService;
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    /**
+     * POST /api/workspaces/{workspaceId}/documents — Upload a document.
+     */
+    @PostMapping(value = {"", "/upload"}, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<DocumentDto.UploadResponse>> upload(
             @AuthenticationPrincipal User user,
             @PathVariable UUID workspaceId,
-            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "file", required = false) MultipartFile file,
+            org.springframework.web.multipart.MultipartHttpServletRequest multipartRequest,
             @RequestParam(required = false) String subject,
             @RequestParam(required = false) String gradeLevel,
             @RequestParam(required = false) String topic) {
+        if (file == null && multipartRequest != null && !multipartRequest.getFileMap().isEmpty()) {
+            file = multipartRequest.getFileMap().values().iterator().next();
+        }
+        if (file == null) {
+            throw new IllegalArgumentException("File is required");
+        }
         DocumentDto.UploadResponse response = documentService.upload(
                 workspaceId, user.getId(), file, subject, gradeLevel, topic);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -41,5 +51,17 @@ public class DocumentController {
         List<DocumentDto.ListResponse> documents =
                 documentService.listByWorkspace(workspaceId, user.getId());
         return ResponseEntity.ok(ApiResponse.success(documents));
+    }
+
+    /**
+     * DELETE /api/workspaces/{workspaceId}/documents/{documentId} — Delete a document.
+     */
+    @DeleteMapping("/{documentId}")
+    public ResponseEntity<Void> delete(
+            @AuthenticationPrincipal User user,
+            @PathVariable UUID workspaceId,
+            @PathVariable UUID documentId) {
+        documentService.deleteDocument(documentId, workspaceId, user.getId());
+        return ResponseEntity.noContent().build();
     }
 }
